@@ -1,0 +1,85 @@
+body {
+    background-color: #f4f6f8;
+}
+
+.sidebar {
+    min-height: 100vh;
+    background-color: #1e2a35;
+    color: #cfd8dc;
+}
+
+.sidebar .nav-link {
+    color: #cfd8dc;
+    border-radius: 6px;
+    margin-bottom: 2px;
+}
+
+.sidebar .nav-link:hover {
+    background-color: #2b3b47;
+    color: #fff;
+}
+
+.sidebar .nav-link.active {
+    background-color: #2e7d32;
+    color: #fff;
+}
+
+.sidebar .brand {
+    color: #fff;
+    font-weight: 600;
+}
+
+.stat-card {
+    border: none;
+    border-radius: 10px;
+}
+
+.mobile-nav-toggle {
+    display: none;
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 1050;
+}
+
+.sidebar-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1030;
+}
+
+.sidebar-backdrop.show {
+    display: block;
+}
+
+@media (max-width: 767.98px) {
+    .mobile-nav-toggle {
+        display: inline-block;
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        z-index: 1040;
+        transform: translateX(-100%);
+        transition: transform 0.2s ease-in-out;
+        overflow-y: auto;
+    }
+
+    .sidebar.sidebar-open {
+        transform: translateX(0);
+    }
+
+    main {
+        padding-top: 4rem !important;
+        width: 100%;
+    }
+
+    .table-responsive {
+        max-width: 100vw;
+    }
+}
