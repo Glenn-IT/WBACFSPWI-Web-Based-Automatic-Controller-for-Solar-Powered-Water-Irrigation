@@ -1,5 +1,4 @@
 <?php
-require_once __DIR__ . '/../../components/under-construction.php';
 require_once __DIR__ . '/partials/guard.php';
 
 $pageTitle = 'Dashboard';

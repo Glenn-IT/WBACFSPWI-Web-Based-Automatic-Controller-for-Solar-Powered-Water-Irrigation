@@ -1,12 +1,6 @@
 <?php
 // AJAX endpoint polled by the admin dashboard for live widgets.
 
-// Under-construction data gate: returns an empty payload until the Dashboard
-// version is unlocked. Remove this block when v1.01 is reached.
-header('Content-Type: application/json');
-echo json_encode(['reading' => null, 'today_schedules' => [], 'alerts' => []]);
-exit;
-
 require_once __DIR__ . '/../../../config/bootstrap.php';
 header('Content-Type: application/json');
 
