@@ -1,5 +1,4 @@
 <?php
-require_once __DIR__ . '/../../components/under-construction.php';
 require_once __DIR__ . '/../../config/bootstrap.php';
 Auth::requireRole(['super_admin', 'admin']);
 
