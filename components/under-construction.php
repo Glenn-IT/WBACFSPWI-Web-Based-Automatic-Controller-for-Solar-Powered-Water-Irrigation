@@ -22,7 +22,7 @@ define('CURRENT_VERSION', 'v1.00');
                 This page is not yet available in the current version of the system.
                 It will be unlocked in an upcoming release.
             </p>
-            <button type="button" class="btn btn-primary" onclick="history.back()">Go Back</button>
+            <a href="../logout.php" class="btn btn-danger">Logout</a>
         </div>
     </div>
 </div>
