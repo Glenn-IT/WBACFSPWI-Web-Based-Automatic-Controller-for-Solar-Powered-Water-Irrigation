@@ -76,15 +76,15 @@ git checkout main
 
 | Version | Tag | Commit Hash |
 |---------|-----|-------------|
-| v1.00 | `v1.00` | _(filled after push)_ |
-| v1.01 | `v1.01` | _(filled after push)_ |
-| v1.02 | `v1.02` | _(filled after push)_ |
-| v1.03 | `v1.03` | _(filled after push)_ |
-| v1.04 | `v1.04` | _(filled after push)_ |
-| v1.05 | `v1.05` | _(filled after push)_ |
-| v1.06 | `v1.06` | _(filled after push)_ |
-| v1.07 | `v1.07` | _(filled after push)_ |
-| v1.08 | `v1.08` | _(filled after push)_ |
+| v1.00 | `v1.00` | `430bad3f6c6618f4ee5f7467e95d9fecb693bfb7` |
+| v1.01 | `v1.01` | `53ce1746cd81fbb7127f47c8034861d0d38fa784` |
+| v1.02 | `v1.02` | `37b6546413a3ca41e3ecd1079ef95f8bd9220ddc` |
+| v1.03 | `v1.03` | `e42e09d0859c095a6f8e834d06eecae4afbc99e9` |
+| v1.04 | `v1.04` | `4637c4e309b52c9723532fe4ae48968ce8769af3` |
+| v1.05 | `v1.05` | `a31c26b349a1673ab3582a45024a4ba3e96cce8f` |
+| v1.06 | `v1.06` | `612fd13ffcd5d22f769532a15e07298655e39874` |
+| v1.07 | `v1.07` | `52e83c1415054c5e4c3af6469b31008786b2e62f` |
+| v1.08 | `v1.08` | `9f64df6f749d92f886fcdf1be496fe02a8e2d3da` |
 
 Regenerate this list any time with:
 
