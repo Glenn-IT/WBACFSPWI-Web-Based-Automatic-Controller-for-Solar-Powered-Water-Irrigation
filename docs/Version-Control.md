@@ -76,7 +76,7 @@ git checkout main
 
 | Version | Tag | Commit Hash |
 |---------|-----|-------------|
-| v1.00 | `v1.00` | `430bad3f6c6618f4ee5f7467e95d9fecb693bfb7` |
+| v1.00 | `v1.00` | `11bb5daa474f1bc6d78df38ef88bce4cd773ac9f` |
 | v1.01 | `v1.01` | `53ce1746cd81fbb7127f47c8034861d0d38fa784` |
 | v1.02 | `v1.02` | `37b6546413a3ca41e3ecd1079ef95f8bd9220ddc` |
 | v1.03 | `v1.03` | `e42e09d0859c095a6f8e834d06eecae4afbc99e9` |
