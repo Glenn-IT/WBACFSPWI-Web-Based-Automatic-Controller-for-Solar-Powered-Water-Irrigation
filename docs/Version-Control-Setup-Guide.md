@@ -11,6 +11,7 @@ I want to set up a week-by-week versioned presentation system for this project u
 
 Before doing anything, scan the entire project and identify:
 - All pages or screens available in the system
+
 - What each page does (brief description)
 - Group them by feature or role (e.g. admin pages, user pages, public pages)
 
