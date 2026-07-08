@@ -97,7 +97,7 @@ include __DIR__ . '/partials/sidebar.php';
         <div class="card shadow-sm">
             <div class="card-header">Account Info</div>
             <div class="card-body">
-                <form method="post" action="/admin/profile.php">
+                <form method="post" action="<?= BASE_URL ?>/admin/profile.php">
                     <?= Csrf::field() ?>
                     <input type="hidden" name="action" value="update_info">
                     <div class="mb-3">
@@ -127,7 +127,7 @@ include __DIR__ . '/partials/sidebar.php';
         <div class="card shadow-sm">
             <div class="card-header">Change Password</div>
             <div class="card-body">
-                <form method="post" action="/admin/profile.php">
+                <form method="post" action="<?= BASE_URL ?>/admin/profile.php">
                     <?= Csrf::field() ?>
                     <input type="hidden" name="action" value="update_password">
                     <div class="mb-3">
@@ -156,7 +156,7 @@ include __DIR__ . '/partials/sidebar.php';
                     Currently set:
                     <strong><?= htmlspecialchars($securityQuestions[$fresh['security_question']] ?? 'Not set') ?></strong>
                 </div>
-                <form method="post" action="/admin/profile.php">
+                <form method="post" action="<?= BASE_URL ?>/admin/profile.php">
                     <?= Csrf::field() ?>
                     <input type="hidden" name="action" value="update_security">
                     <div class="mb-3">

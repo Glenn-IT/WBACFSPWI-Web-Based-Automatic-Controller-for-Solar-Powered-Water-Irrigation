@@ -68,7 +68,7 @@ include __DIR__ . '/partials/sidebar.php';
 
 <div class="card shadow-sm mb-3">
     <div class="card-body">
-        <form method="get" action="/admin/reports.php" class="row g-2 align-items-end">
+        <form method="get" action="<?= BASE_URL ?>/admin/reports.php" class="row g-2 align-items-end">
             <div class="col-auto">
                 <label class="form-label small mb-1">From</label>
                 <input type="date" name="from" class="form-control form-control-sm" value="<?= htmlspecialchars($from) ?>">
@@ -79,7 +79,7 @@ include __DIR__ . '/partials/sidebar.php';
             </div>
             <div class="col-auto">
                 <button type="submit" class="btn btn-sm btn-primary">Apply</button>
-                <a href="/admin/reports.php?from=<?= htmlspecialchars($from) ?>&to=<?= htmlspecialchars($to) ?>&export=csv"
+                <a href="<?= BASE_URL ?>/admin/reports.php?from=<?= htmlspecialchars($from) ?>&to=<?= htmlspecialchars($to) ?>&export=csv"
                    class="btn btn-sm btn-outline-secondary">Export CSV</a>
             </div>
         </form>

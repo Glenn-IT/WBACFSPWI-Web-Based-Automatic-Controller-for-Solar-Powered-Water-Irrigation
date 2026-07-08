@@ -3,7 +3,7 @@
 require_once __DIR__ . '/../config/bootstrap.php';
 
 if (Auth::check()) {
-    header('Location: /admin/dashboard.php');
+    header('Location: ' . BASE_URL . '/admin/dashboard.php');
     exit;
 }
 
@@ -103,7 +103,7 @@ if (($step === 'answer' || $step === 'reset') && !empty($_SESSION['pwreset_user_
     <meta charset="UTF-8">
     <title>Forgot Password - WBACFSPWI Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/assets/css/app.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/app.css">
 </head>
 <body class="bg-light">
 <div class="d-flex align-items-center justify-content-center vh-100">
@@ -120,7 +120,7 @@ if (($step === 'answer' || $step === 'reset') && !empty($_SESSION['pwreset_user_
 
             <?php if ($step === 'email'): ?>
                 <p class="text-muted small">Enter your account email to begin recovery.</p>
-                <form method="post" action="/forgot-password.php">
+                <form method="post" action="<?= BASE_URL ?>/forgot-password.php">
                     <?= Csrf::field() ?>
                     <input type="hidden" name="action" value="lookup">
                     <div class="mb-3">
@@ -131,7 +131,7 @@ if (($step === 'answer' || $step === 'reset') && !empty($_SESSION['pwreset_user_
                 </form>
             <?php elseif ($step === 'answer'): ?>
                 <p class="text-muted small">Select your security question and provide the answer to continue.</p>
-                <form method="post" action="/forgot-password.php">
+                <form method="post" action="<?= BASE_URL ?>/forgot-password.php">
                     <?= Csrf::field() ?>
                     <input type="hidden" name="action" value="answer">
                     <div class="mb-3">
@@ -151,7 +151,7 @@ if (($step === 'answer' || $step === 'reset') && !empty($_SESSION['pwreset_user_
                 </form>
             <?php elseif ($step === 'reset'): ?>
                 <p class="text-muted small">Answer verified. Set a new password.</p>
-                <form method="post" action="/forgot-password.php">
+                <form method="post" action="<?= BASE_URL ?>/forgot-password.php">
                     <?= Csrf::field() ?>
                     <input type="hidden" name="action" value="reset">
                     <div class="mb-3">
@@ -166,18 +166,18 @@ if (($step === 'answer' || $step === 'reset') && !empty($_SESSION['pwreset_user_
                 </form>
             <?php else: ?>
                 <div class="text-center">
-                    <a href="/login.php" class="btn btn-primary w-100">Back to Log In</a>
+                    <a href="<?= BASE_URL ?>/login.php" class="btn btn-primary w-100">Back to Log In</a>
                 </div>
             <?php endif; ?>
 
             <?php if ($step !== 'done'): ?>
                 <div class="text-center mt-3">
-                    <a href="/login.php" class="small">Back to Log In</a>
+                    <a href="<?= BASE_URL ?>/login.php" class="small">Back to Log In</a>
                 </div>
             <?php endif; ?>
         </div>
     </div>
 </div>
-<script src="/assets/js/app.js"></script>
+<script src="<?= BASE_URL ?>/assets/js/app.js"></script>
 </body>
 </html>

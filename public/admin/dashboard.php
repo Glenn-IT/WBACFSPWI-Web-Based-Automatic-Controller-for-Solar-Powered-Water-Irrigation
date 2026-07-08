@@ -69,7 +69,7 @@ include __DIR__ . '/partials/sidebar.php';
 
 <script>
 function refreshDashboard() {
-    fetch('/api/admin/dashboard-data.php')
+    fetch('<?= BASE_URL ?>/api/admin/dashboard-data.php')
         .then(res => res.json())
         .then(data => {
             const r = data.reading;

@@ -6,7 +6,7 @@ $user = Auth::user();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!Csrf::verify($_POST['csrf_token'] ?? null)) {
-        header('Location: /admin/alerts.php');
+        header('Location: ' . BASE_URL . '/admin/alerts.php');
         exit;
     }
 
@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         AuditLog::record((int) $user['id'], 'alert_delete', "Deleted alert #$id");
     }
 
-    header('Location: /admin/alerts.php?' . http_build_query($_GET));
+    header('Location: ' . BASE_URL . '/admin/alerts.php?' . http_build_query($_GET));
     exit;
 }
 
@@ -52,7 +52,7 @@ include __DIR__ . '/partials/sidebar.php';
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="mb-0">Alerts & Notifications</h4>
-    <form method="post" action="/admin/alerts.php">
+    <form method="post" action="<?= BASE_URL ?>/admin/alerts.php">
         <?= Csrf::field() ?>
         <input type="hidden" name="action" value="mark_all_read">
         <button type="submit" class="btn btn-sm btn-outline-secondary">Mark All Read</button>
@@ -61,7 +61,7 @@ include __DIR__ . '/partials/sidebar.php';
 
 <div class="card shadow-sm mb-3">
     <div class="card-body">
-        <form method="get" action="/admin/alerts.php" class="row g-2 align-items-end">
+        <form method="get" action="<?= BASE_URL ?>/admin/alerts.php" class="row g-2 align-items-end">
             <div class="col-auto">
                 <label class="form-label small mb-1">Type</label>
                 <select name="type" class="form-select form-select-sm">
@@ -81,7 +81,7 @@ include __DIR__ . '/partials/sidebar.php';
             </div>
             <div class="col-auto">
                 <button type="submit" class="btn btn-sm btn-primary">Filter</button>
-                <a href="/admin/alerts.php" class="btn btn-sm btn-outline-secondary">Reset</a>
+                <a href="<?= BASE_URL ?>/admin/alerts.php" class="btn btn-sm btn-outline-secondary">Reset</a>
             </div>
         </form>
     </div>
@@ -111,14 +111,14 @@ include __DIR__ . '/partials/sidebar.php';
                         <td><?= htmlspecialchars($a['created_at']) ?></td>
                         <td class="text-end">
                             <?php if ((int) $a['is_read'] === 0): ?>
-                                <form method="post" action="/admin/alerts.php" class="d-inline">
+                                <form method="post" action="<?= BASE_URL ?>/admin/alerts.php" class="d-inline">
                                     <?= Csrf::field() ?>
                                     <input type="hidden" name="action" value="mark_read">
                                     <input type="hidden" name="id" value="<?= (int) $a['id'] ?>">
                                     <button type="submit" class="btn btn-sm btn-outline-secondary">Mark Read</button>
                                 </form>
                             <?php endif; ?>
-                            <form method="post" action="/admin/alerts.php" class="d-inline" onsubmit="return confirm('Delete this alert?');">
+                            <form method="post" action="<?= BASE_URL ?>/admin/alerts.php" class="d-inline" onsubmit="return confirm('Delete this alert?');">
                                 <?= Csrf::field() ?>
                                 <input type="hidden" name="action" value="delete">
                                 <input type="hidden" name="id" value="<?= (int) $a['id'] ?>">

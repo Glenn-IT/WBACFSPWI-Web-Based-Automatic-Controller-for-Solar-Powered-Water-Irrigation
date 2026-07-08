@@ -23,7 +23,7 @@ include __DIR__ . '/partials/sidebar.php';
 
 <div class="card shadow-sm mb-3">
     <div class="card-body">
-        <form method="get" action="/admin/logs.php" class="row g-2 align-items-end">
+        <form method="get" action="<?= BASE_URL ?>/admin/logs.php" class="row g-2 align-items-end">
             <div class="col-md-3">
                 <label class="form-label small">Action contains</label>
                 <input type="text" name="action" class="form-control form-control-sm"
@@ -41,7 +41,7 @@ include __DIR__ . '/partials/sidebar.php';
             </div>
             <div class="col-md-3">
                 <button type="submit" class="btn btn-sm btn-primary">Filter</button>
-                <a href="/admin/logs.php" class="btn btn-sm btn-outline-secondary">Reset</a>
+                <a href="<?= BASE_URL ?>/admin/logs.php" class="btn btn-sm btn-outline-secondary">Reset</a>
             </div>
         </form>
     </div>

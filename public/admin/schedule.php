@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $existing = Schedule::find($id);
             Schedule::delete($id);
             AuditLog::record((int) $user['id'], 'schedule_delete', "Deleted schedule #$id (" . ($existing['label'] ?? '') . ')');
-            header('Location: /admin/schedule.php');
+            header('Location: ' . BASE_URL . '/admin/schedule.php');
             exit;
         }
 
@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $newState = (int) $_POST['is_active'] === 1 ? false : true;
             Schedule::setActive($id, $newState);
             AuditLog::record((int) $user['id'], 'schedule_toggle', "Schedule #$id set to " . ($newState ? 'active' : 'inactive'));
-            header('Location: /admin/schedule.php');
+            header('Location: ' . BASE_URL . '/admin/schedule.php');
             exit;
         }
 
@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     AuditLog::record((int) $user['id'], 'schedule_create', "Created schedule #$newId ($label)");
                 }
 
-                header('Location: /admin/schedule.php');
+                header('Location: ' . BASE_URL . '/admin/schedule.php');
                 exit;
             }
         }
@@ -89,7 +89,7 @@ include __DIR__ . '/partials/sidebar.php';
         <div class="card shadow-sm">
             <div class="card-header"><?= $editing ? 'Edit Schedule' : 'Add Schedule' ?></div>
             <div class="card-body">
-                <form method="post" action="/admin/schedule.php">
+                <form method="post" action="<?= BASE_URL ?>/admin/schedule.php">
                     <?= Csrf::field() ?>
                     <input type="hidden" name="action" value="save">
                     <?php if ($editing): ?>
@@ -127,7 +127,7 @@ include __DIR__ . '/partials/sidebar.php';
 
                     <button type="submit" class="btn btn-primary"><?= $editing ? 'Update' : 'Add Schedule' ?></button>
                     <?php if ($editing): ?>
-                        <a href="/admin/schedule.php" class="btn btn-outline-secondary">Cancel</a>
+                        <a href="<?= BASE_URL ?>/admin/schedule.php" class="btn btn-outline-secondary">Cancel</a>
                     <?php endif; ?>
                 </form>
             </div>
@@ -165,8 +165,8 @@ include __DIR__ . '/partials/sidebar.php';
                                     </span>
                                 </td>
                                 <td class="text-end">
-                                    <a href="/admin/schedule.php?edit=<?= (int) $s['id'] ?>" class="btn btn-sm btn-outline-primary">Edit</a>
-                                    <form method="post" action="/admin/schedule.php" class="d-inline">
+                                    <a href="<?= BASE_URL ?>/admin/schedule.php?edit=<?= (int) $s['id'] ?>" class="btn btn-sm btn-outline-primary">Edit</a>
+                                    <form method="post" action="<?= BASE_URL ?>/admin/schedule.php" class="d-inline">
                                         <?= Csrf::field() ?>
                                         <input type="hidden" name="action" value="toggle">
                                         <input type="hidden" name="id" value="<?= (int) $s['id'] ?>">
@@ -175,7 +175,7 @@ include __DIR__ . '/partials/sidebar.php';
                                             <?= $s['is_active'] ? 'Disable' : 'Enable' ?>
                                         </button>
                                     </form>
-                                    <form method="post" action="/admin/schedule.php" class="d-inline"
+                                    <form method="post" action="<?= BASE_URL ?>/admin/schedule.php" class="d-inline"
                                           onsubmit="return confirm('Delete this schedule?');">
                                         <?= Csrf::field() ?>
                                         <input type="hidden" name="action" value="delete">

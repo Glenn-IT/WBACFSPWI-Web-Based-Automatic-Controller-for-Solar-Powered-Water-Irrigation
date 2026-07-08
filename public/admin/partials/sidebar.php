@@ -20,7 +20,7 @@ $navItems = [
         <?php foreach ($navItems as $key => $item): ?>
             <?php if (!in_array($user['role'], $item['roles'], true)) continue; ?>
             <li class="nav-item">
-                <a href="<?= $item['href'] ?>" class="nav-link <?= $activePage === $key ? 'active' : '' ?>">
+                <a href="<?= BASE_URL . $item['href'] ?>" class="nav-link <?= $activePage === $key ? 'active' : '' ?>">
                     <?= htmlspecialchars($item['label']) ?>
                 </a>
             </li>
@@ -32,6 +32,6 @@ $navItems = [
         <strong class="text-light"><?= htmlspecialchars($user['name']) ?></strong>
         <span class="badge bg-secondary text-uppercase"><?= htmlspecialchars($user['role']) ?></span>
     </div>
-    <a href="/logout.php" class="btn btn-sm btn-outline-light w-100">Log Out</a>
+    <a href="<?= BASE_URL ?>/logout.php" class="btn btn-sm btn-outline-light w-100">Log Out</a>
 </nav>
 <main class="flex-grow-1 p-4">

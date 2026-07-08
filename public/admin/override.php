@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             Override::create((int) $user['id'], $action, $reason ?: null, $autoRevert);
             AuditLog::record((int) $user['id'], 'manual_override', "Pump forced $action for {$autoRevert}min" . ($reason ? " ($reason)" : ''));
-            header('Location: /admin/override.php');
+            header('Location: ' . BASE_URL . '/admin/override.php');
             exit;
         }
     }
@@ -58,7 +58,7 @@ include __DIR__ . '/partials/sidebar.php';
                     <div class="text-muted small mb-3">No active override — device is following its normal schedule.</div>
                 <?php endif; ?>
 
-                <form method="post" action="/admin/override.php">
+                <form method="post" action="<?= BASE_URL ?>/admin/override.php">
                     <?= Csrf::field() ?>
                     <div class="mb-3">
                         <label class="form-label">Action</label>

@@ -48,21 +48,21 @@ class Auth
     }
 
     // Redirects to login if not authenticated. Call at the top of any protected page.
-    public static function requireLogin(string $loginUrl = '/login.php'): void
+    public static function requireLogin(?string $loginUrl = null): void
     {
         if (!self::check()) {
-            header('Location: ' . $loginUrl);
+            header('Location: ' . ($loginUrl ?? BASE_URL . '/login.php'));
             exit;
         }
     }
 
     // Redirects away if the current user's role isn't in $roles.
-    public static function requireRole(array $roles, string $redirectUrl = '/admin/dashboard.php'): void
+    public static function requireRole(array $roles, ?string $redirectUrl = null): void
     {
         self::requireLogin();
         $user = self::user();
         if (!in_array($user['role'], $roles, true)) {
-            header('Location: ' . $redirectUrl);
+            header('Location: ' . ($redirectUrl ?? BASE_URL . '/admin/dashboard.php'));
             exit;
         }
     }

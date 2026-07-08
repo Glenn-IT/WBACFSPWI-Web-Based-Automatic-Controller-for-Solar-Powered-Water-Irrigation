@@ -97,7 +97,7 @@ include __DIR__ . '/partials/sidebar.php';
         <div class="card shadow-sm">
             <div class="card-header">Add User</div>
             <div class="card-body">
-                <form method="post" action="/admin/users.php">
+                <form method="post" action="<?= BASE_URL ?>/admin/users.php">
                     <?= Csrf::field() ?>
                     <input type="hidden" name="action" value="create">
                     <div class="mb-3">
@@ -150,7 +150,7 @@ include __DIR__ . '/partials/sidebar.php';
                                     <?php if ((int) $u['id'] === (int) $user['id']): ?>
                                         <span class="badge bg-secondary text-uppercase"><?= htmlspecialchars($u['role']) ?></span>
                                     <?php else: ?>
-                                        <form method="post" action="/admin/users.php" class="d-inline-flex gap-1">
+                                        <form method="post" action="<?= BASE_URL ?>/admin/users.php" class="d-inline-flex gap-1">
                                             <?= Csrf::field() ?>
                                             <input type="hidden" name="action" value="update_role">
                                             <input type="hidden" name="id" value="<?= (int) $u['id'] ?>">
@@ -170,7 +170,7 @@ include __DIR__ . '/partials/sidebar.php';
                                 <td class="small text-muted"><?= htmlspecialchars($u['last_login_at'] ?? 'Never') ?></td>
                                 <td class="text-end">
                                     <?php if ((int) $u['id'] !== (int) $user['id']): ?>
-                                        <form method="post" action="/admin/users.php" class="d-inline">
+                                        <form method="post" action="<?= BASE_URL ?>/admin/users.php" class="d-inline">
                                             <?= Csrf::field() ?>
                                             <input type="hidden" name="action" value="toggle_active">
                                             <input type="hidden" name="id" value="<?= (int) $u['id'] ?>">
@@ -179,7 +179,7 @@ include __DIR__ . '/partials/sidebar.php';
                                                 <?= $u['is_active'] ? 'Deactivate' : 'Activate' ?>
                                             </button>
                                         </form>
-                                        <form method="post" action="/admin/users.php" class="d-inline"
+                                        <form method="post" action="<?= BASE_URL ?>/admin/users.php" class="d-inline"
                                               onsubmit="return confirm('Delete this user?');">
                                             <?= Csrf::field() ?>
                                             <input type="hidden" name="action" value="delete">
