@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login - WBACFSPWI Admin</title>
+    <title>Login - Web Based Automatic Controller for Solar Powered Water Irrigation</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/app.css">
 </head>
@@ -67,8 +67,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="d-flex align-items-center justify-content-center vh-100">
     <div class="card shadow-sm" style="width: 360px;">
         <div class="card-body p-4">
-            <h5 class="card-title mb-3 text-center">WBACFSPWI Admin</h5>
-            <p class="text-muted text-center small mb-4">Solar-Powered Water Irrigation Controller</p>
+            <h5 class="card-title mb-3 text-center">Web Based Automatic Controller for Solar Powered Water Irrigation</h5>
+            <p class="text-muted text-center small mb-4">Admin Login</p>
 
             <?php if ($error): ?>
                 <div class="alert alert-danger py-2"><?= htmlspecialchars($error) ?></div>
@@ -78,11 +78,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?= Csrf::field() ?>
                 <div class="mb-3">
                     <label class="form-label">Email</label>
-                    <input type="email" name="email" class="form-control" required autofocus>
+                    <input type="email" name="email" id="login-email" class="form-control" required autofocus
+                           <?= $lockRemaining > 0 ? 'disabled' : '' ?>>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Password</label>
-                    <input type="password" name="password" class="form-control" required>
+                    <input type="password" name="password" id="login-password" class="form-control" required
+                           <?= $lockRemaining > 0 ? 'disabled' : '' ?>>
                 </div>
                 <button type="submit" class="btn btn-primary w-100" id="login-btn"
                         <?= $lockRemaining > 0 ? 'disabled' : '' ?>>Log In</button>
@@ -98,11 +100,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <script>
 (function () {
     const btn = document.getElementById('login-btn');
+    const emailInput = document.getElementById('login-email');
+    const passwordInput = document.getElementById('login-password');
     let remaining = <?= (int) $lockRemaining ?>;
 
     function tick() {
         if (remaining <= 0) {
             btn.disabled = false;
+            emailInput.disabled = false;
+            passwordInput.disabled = false;
             btn.textContent = 'Log In';
             return;
         }
