@@ -91,7 +91,7 @@ git checkout main
 | v1.06 | `v1.06` | `612fd13ffcd5d22f769532a15e07298655e39874` |
 | v1.07 | `v1.07` | `52e83c1415054c5e4c3af6469b31008786b2e62f` |
 | v1.08 | `v1.08` | `9f64df6f749d92f886fcdf1be496fe02a8e2d3da` |
-| v2.00 | `v2.00` | *(fill in after commit)* |
+| v2.00 | `v2.00` | `b3b444e33914be047c77523c8edc2d20bfb0a6e4` |
 
 Regenerate this list any time with:
 
