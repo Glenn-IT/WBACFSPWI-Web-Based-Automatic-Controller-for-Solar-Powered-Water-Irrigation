@@ -19,6 +19,12 @@ not yet part of the current version show an **Under Construction** placeholder i
 | v1.06 | Admin: Manual Override | + override | users, profile |
 | v1.07 | Admin: User Management | + users | profile |
 | v1.08 | Admin: Profile (Full System) | + profile | — none — |
+| v2.00 | New rollout cycle: v1.00 auth pages + Dashboard + Profile | login, forgot-password, logout, index, dashboard, profile | schedule, reports, logs, alerts, override, users |
+
+> **Note:** v2.00 starts a new presentation cycle and does not follow the strict
+> "one more page than before" rule. Schedule, Reports, Logs, Alerts, Override, and
+> Users were re-gated back to Under Construction; Dashboard and Profile stayed
+> unlocked alongside the v1.00 auth pages.
 
 The two device API endpoints (`api/device/report.php`, `api/device/pull-schedule.php`)
 are never gated — they serve the irrigation hardware, not the presentation.
@@ -85,6 +91,7 @@ git checkout main
 | v1.06 | `v1.06` | `612fd13ffcd5d22f769532a15e07298655e39874` |
 | v1.07 | `v1.07` | `52e83c1415054c5e4c3af6469b31008786b2e62f` |
 | v1.08 | `v1.08` | `9f64df6f749d92f886fcdf1be496fe02a8e2d3da` |
+| v2.00 | `v2.00` | *(fill in after commit)* |
 
 Regenerate this list any time with:
 
