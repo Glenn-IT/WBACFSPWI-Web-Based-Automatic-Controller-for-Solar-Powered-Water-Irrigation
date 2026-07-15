@@ -120,7 +120,7 @@ git push origin v1.00              # push new tag
 ## Tips and Things to Watch Out For
 
 **Only touch what needs fixing.**
-The whole point is surgical precision. If you edit three files when only one needed changing, the tag no longer represents a clean snapshot of that version.
+The whole point is surgical precision. If you edit three files when only oasdwne needed changing, the tag no longer represents a clean snapshot of that version.
 
 **The temp branch is just a vehicle.**
 It exists only to let you build the right commit. Once the tag is re-pointed, the branch is worthless — delete it immediately so it doesn't clutter your branch list.
