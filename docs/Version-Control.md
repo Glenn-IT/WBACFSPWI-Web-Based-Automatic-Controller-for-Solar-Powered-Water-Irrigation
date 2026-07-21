@@ -21,13 +21,15 @@ not yet part of the current version show an **Under Construction** placeholder i
 | v1.08 | Admin: Profile (Full System) | + profile | — none — |
 | v2.00 | New rollout cycle: v1.00 auth pages + Dashboard + Profile | login, forgot-password, logout, index, dashboard, profile | schedule, reports, logs, alerts, override, users |
 | v3.00 | + Schedule + User Management | login, forgot-password, logout, index, dashboard, profile, schedule, users | reports, logs, alerts, override |
+| v3.10 | + Reports + Logs + Alerts + Override (all pages open) | login, forgot-password, logout, index, dashboard, profile, schedule, users, reports, logs, alerts, override | — none — |
 
 > **Note:** v2.00 starts a new presentation cycle and does not follow the strict
 > "one more page than before" rule. Schedule, Reports, Logs, Alerts, Override, and
 > Users were re-gated back to Under Construction; Dashboard and Profile stayed
 > unlocked alongside the v1.00 auth pages. v3.00 continues this cycle by unlocking
 > Schedule and User Management as well, leaving Reports, Logs, Alerts, and Override
-> gated.
+> gated. v3.10 completes this cycle by unlocking the remaining pages, so the full
+> system is open.
 
 The two device API endpoints (`api/device/report.php`, `api/device/pull-schedule.php`)
 are never gated — they serve the irrigation hardware, not the presentation.
@@ -96,6 +98,7 @@ git checkout main
 | v1.08 | `v1.08` | `9f64df6f749d92f886fcdf1be496fe02a8e2d3da` |
 | v2.00 | `v2.00` | `b3b444e33914be047c77523c8edc2d20bfb0a6e4` |
 | v3.00 | `v3.00` | `581c5ad3d124bf6752c181f66d66325072726e4a` |
+| v3.10 | `v3.10` | *(fill in after commit)* |
 
 Regenerate this list any time with:
 
