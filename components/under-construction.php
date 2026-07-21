@@ -1,6 +1,6 @@
 <?php
 
-define('CURRENT_VERSION', 'v2.00');
+define('CURRENT_VERSION', 'v3.00');
 ?>
 <!DOCTYPE html>
 <html lang="en">
