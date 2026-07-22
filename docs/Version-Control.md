@@ -97,7 +97,7 @@ git checkout main
 | v1.07 | `v1.07` | `52e83c1415054c5e4c3af6469b31008786b2e62f` |
 | v1.08 | `v1.08` | `9f64df6f749d92f886fcdf1be496fe02a8e2d3da` |
 | v2.00 | `v2.00` | `b3b444e33914be047c77523c8edc2d20bfb0a6e4` |
-| v3.00 | `v3.00` | `581c5ad3d124bf6752c181f66d66325072726e4a` |
+| v3.00 | `v3.00` | `f23ca4138f5b59b0505935e82a58bf0ad7d26024` |
 | v3.10 | `v3.10` | `0cde6bb72e120d01bae1dbd37e526f638a29176a` |
 
 Regenerate this list any time with:
