@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS schedules (
 CREATE TABLE IF NOT EXISTS sensor_readings (
     id INT AUTO_INCREMENT PRIMARY KEY,
     soil_moisture DECIMAL(5,2) NULL,
+    water_level DECIMAL(5,2) NULL,
     battery_voltage DECIMAL(5,2) NULL,
     solar_output DECIMAL(6,2) NULL,
     pump_state ENUM('on','off') NOT NULL DEFAULT 'off',

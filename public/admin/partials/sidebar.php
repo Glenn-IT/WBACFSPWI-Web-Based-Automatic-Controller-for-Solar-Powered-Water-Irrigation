@@ -15,7 +15,10 @@ $navItems = [
 ];
 ?>
 <nav class="sidebar p-3" id="sidebar" style="width: 240px;">
-    <div class="brand mb-4 px-2">WBACFSPWI</div>
+    <div class="brand mb-4 px-2 d-flex align-items-center gap-2">
+        <img src="<?= BASE_URL ?>/assets/img/logo.png" alt="Logo" class="brand-logo flex-shrink-0">
+        <span>Web Based Automatic Controller for Solar Powered Water Irrigation</span>
+    </div>
     <ul class="nav nav-pills flex-column mb-auto">
         <?php foreach ($navItems as $key => $item): ?>
             <?php if (!in_array($user['role'], $item['roles'], true)) continue; ?>

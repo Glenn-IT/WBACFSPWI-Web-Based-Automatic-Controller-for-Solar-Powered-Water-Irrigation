@@ -27,6 +27,20 @@ body {
 .sidebar .brand {
     color: #fff;
     font-weight: 600;
+    font-size: 0.8rem;
+    line-height: 1.2;
+}
+
+.brand-logo {
+    height: 32px;
+    width: 32px;
+    object-fit: contain;
+}
+
+.login-logo {
+    height: 64px;
+    width: 64px;
+    object-fit: contain;
 }
 
 .stat-card {

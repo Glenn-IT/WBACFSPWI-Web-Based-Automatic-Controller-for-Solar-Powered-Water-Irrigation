@@ -60,6 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <title>Login - Web Based Automatic Controller for Solar Powered Water Irrigation</title>
+    <link rel="icon" href="<?= BASE_URL ?>/assets/img/logo.png" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/app.css">
 </head>
@@ -67,7 +68,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="d-flex align-items-center justify-content-center vh-100">
     <div class="card shadow-sm" style="width: 360px;">
         <div class="card-body p-4">
-            <h5 class="card-title mb-3 text-center">Web Based Automatic Controller for Solar Powered Water Irrigation</h5>
+            <div class="text-center mb-3">
+                <img src="<?= BASE_URL ?>/assets/img/logo.png" alt="Logo" class="login-logo mb-2">
+                <p class="text-muted small mb-0">Web Based Automatic Controller for Solar Powered Water Irrigation</p>
+            </div>
             <p class="text-muted text-center small mb-4">Admin Login</p>
 
             <?php if ($error): ?>

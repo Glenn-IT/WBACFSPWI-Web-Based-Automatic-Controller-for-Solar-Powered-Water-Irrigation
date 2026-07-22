@@ -1,6 +1,6 @@
 <?php
 // Device (ESP8266/ESP32) posts sensor readings + pump state here periodically.
-// Expects JSON body: { "soil_moisture": 45.2, "battery_voltage": 12.1, "solar_output": 30.5,
+// Expects JSON body: { "soil_moisture": 45.2, "water_level": 60.0, "battery_voltage": 12.1, "solar_output": 30.5,
 //                       "pump_state": "on"|"off", "schedule_id": 3 (optional, only when trigger is scheduled) }
 
 require_once __DIR__ . '/../../../config/bootstrap.php';
@@ -24,12 +24,14 @@ if (!is_array($payload) || !isset($payload['pump_state'])) {
 
 $pumpState = $payload['pump_state'] === 'on' ? 'on' : 'off';
 $soilMoisture = isset($payload['soil_moisture']) ? (float) $payload['soil_moisture'] : null;
+$waterLevel = isset($payload['water_level']) ? (float) $payload['water_level'] : null;
 $batteryVoltage = isset($payload['battery_voltage']) ? (float) $payload['battery_voltage'] : null;
 $solarOutput = isset($payload['solar_output']) ? (float) $payload['solar_output'] : null;
 $scheduleId = isset($payload['schedule_id']) ? (int) $payload['schedule_id'] : null;
 
 SensorReading::create([
     'soil_moisture' => $soilMoisture,
+    'water_level' => $waterLevel,
     'battery_voltage' => $batteryVoltage,
     'solar_output' => $solarOutput,
     'pump_state' => $pumpState,
