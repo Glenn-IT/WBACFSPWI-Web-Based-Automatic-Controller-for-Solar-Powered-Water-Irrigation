@@ -22,6 +22,7 @@ not yet part of the current version show an **Under Construction** placeholder i
 | v2.00 | New rollout cycle: v1.00 auth pages + Dashboard + Profile | login, forgot-password, logout, index, dashboard, profile | schedule, reports, logs, alerts, override, users |
 | v3.00 | + Schedule + User Management | login, forgot-password, logout, index, dashboard, profile, schedule, users | reports, logs, alerts, override |
 | v3.10 | + Reports + Logs + Alerts + Override (all pages open) | login, forgot-password, logout, index, dashboard, profile, schedule, users, reports, logs, alerts, override | — none — |
+| v4.00 | New rollout cycle: v3.00 pages + Reports | login, forgot-password, logout, index, dashboard, profile, schedule, users, reports | logs (Logs & Alerts) |
 
 > **Note:** v2.00 starts a new presentation cycle and does not follow the strict
 > "one more page than before" rule. Schedule, Reports, Logs, Alerts, Override, and
@@ -30,6 +31,14 @@ not yet part of the current version show an **Under Construction** placeholder i
 > Schedule and User Management as well, leaving Reports, Logs, Alerts, and Override
 > gated. v3.10 completes this cycle by unlocking the remaining pages, so the full
 > system is open.
+>
+> **v4.00 starts a third cycle**, built on top of system changes made after v3.10:
+> Manual Override was removed entirely (no longer a feature, so it no longer
+> appears in any "gated" column from this point on), and Alerts was merged into
+> the Logs page as a single "Logs & Alerts" view with tabs (`public/admin/logs.php`;
+> `alerts.php` now just redirects there). v4.00 re-gates back to the v3.00 page
+> set (dashboard, profile, schedule, users) and unlocks Reports on top; Logs &
+> Alerts stays gated until a future version.
 
 The two device API endpoints (`api/device/report.php`, `api/device/pull-schedule.php`)
 are never gated — they serve the irrigation hardware, not the presentation.
@@ -99,6 +108,7 @@ git checkout main
 | v2.00 | `v2.00` | `b3b444e33914be047c77523c8edc2d20bfb0a6e4` |
 | v3.00 | `v3.00` | `f23ca4138f5b59b0505935e82a58bf0ad7d26024` |
 | v3.10 | `v3.10` | `0cde6bb72e120d01bae1dbd37e526f638a29176a` |
+| v4.00 | `v4.00` | *(fill in after tagging)* |
 
 Regenerate this list any time with:
 
