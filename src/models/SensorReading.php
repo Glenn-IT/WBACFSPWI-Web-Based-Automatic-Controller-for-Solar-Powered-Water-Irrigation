@@ -106,6 +106,32 @@ class SensorReading
         return $history;
     }
 
+    // Placeholder trend data for the Reports page, shown when a date range has no real readings yet.
+    // $from/$to are 'Y-m-d' date strings (inclusive). Returned oldest-first for charting.
+    public static function sampleRange(string $from, string $to): array
+    {
+        $start = strtotime($from . ' 00:00:00');
+        $end = strtotime($to . ' 23:59:59');
+        $totalHours = max(1, ($end - $start) / 3600);
+        $stepHours = max(4, (int) ceil($totalHours / 180));
+
+        $readings = [];
+        $i = 0;
+        for ($t = $start; $t <= $end; $t += $stepHours * 3600) {
+            $hourOfDay = (int) date('G', $t);
+            $readings[] = [
+                'recorded_at' => date('Y-m-d H:i:s', $t),
+                'soil_moisture' => round(40 + 10 * sin($i / 3), 1),
+                'water_level' => round(65 + 8 * cos($i / 4), 1),
+                'battery_voltage' => round(12.0 + 0.5 * sin($i / 5) + ($hourOfDay >= 8 && $hourOfDay <= 17 ? 0.4 : 0), 2),
+                'solar_output' => round(max(0, 22 * sin(($hourOfDay - 6) / 12 * M_PI)), 1),
+                'pump_state' => ($i % 9 === 0) ? 'on' : 'off',
+            ];
+            $i++;
+        }
+        return $readings;
+    }
+
     // $from/$to are 'Y-m-d' date strings (inclusive). Returned oldest-first for charting.
     public static function rangeBetween(string $from, string $to, int $limit = 500): array
     {

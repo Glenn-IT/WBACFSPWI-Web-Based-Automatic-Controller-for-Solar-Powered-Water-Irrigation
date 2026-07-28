@@ -20,7 +20,17 @@ if ($from > $to) {
 }
 
 $readings = SensorReading::rangeBetween($from, $to);
+$isSampleReadings = empty($readings);
+if ($isSampleReadings) {
+    $readings = SensorReading::sampleRange($from, $to);
+}
+
 $events = IrrigationEvent::between($from, $to);
+$isSampleEvents = empty($events);
+if ($isSampleEvents) {
+    $events = IrrigationEvent::sampleBetween($from, $to);
+}
+$isSample = $isSampleReadings || $isSampleEvents;
 
 if (($_GET['export'] ?? '') === 'csv') {
     header('Content-Type: text/csv');
@@ -85,6 +95,13 @@ include __DIR__ . '/partials/sidebar.php';
         </form>
     </div>
 </div>
+
+<?php if ($isSample): ?>
+<div class="mb-3">
+    <span class="badge bg-warning text-dark">Sample data</span>
+    <span class="text-muted small">No real records for this range yet — showing example data so you can see how reports work.</span>
+</div>
+<?php endif; ?>
 
 <div class="row g-3 mb-3">
     <div class="col-md-4">

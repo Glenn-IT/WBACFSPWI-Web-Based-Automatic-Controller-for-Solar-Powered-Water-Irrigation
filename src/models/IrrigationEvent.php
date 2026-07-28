@@ -51,4 +51,30 @@ class IrrigationEvent
         $stmt->execute([$from . ' 00:00:00', $to . ' 23:59:59']);
         return $stmt->fetchAll();
     }
+
+    // Placeholder events for the Reports page, shown when a date range has no real events yet.
+    // $from/$to are 'Y-m-d' date strings (inclusive). Returned newest-first, matching between().
+    public static function sampleBetween(string $from, string $to): array
+    {
+        $labels = ['Morning Beds', 'Greenhouse', 'Evening Beds', null];
+        $start = strtotime($from);
+        $days = max(1, (int) round((strtotime($to) - $start) / 86400) + 1);
+
+        $events = [];
+        $id = 1000;
+        for ($d = 0; $d < $days; $d += 2) {
+            $label = $labels[($d / 2) % count($labels)];
+            $startedAt = date('Y-m-d', strtotime("+{$d} days", $start)) . ' 06:00:00';
+            $durationMinutes = 10 + ($d % 4) * 5;
+            $events[] = [
+                'id' => $id++,
+                'schedule_label' => $label,
+                'trigger_type' => $label ? 'scheduled' : 'manual',
+                'started_at' => $startedAt,
+                'ended_at' => date('Y-m-d H:i:s', strtotime($startedAt) + $durationMinutes * 60),
+                'status' => 'completed',
+            ];
+        }
+        return array_reverse($events);
+    }
 }
