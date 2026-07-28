@@ -108,7 +108,7 @@ git checkout main
 | v2.00 | `v2.00` | `b3b444e33914be047c77523c8edc2d20bfb0a6e4` |
 | v3.00 | `v3.00` | `f23ca4138f5b59b0505935e82a58bf0ad7d26024` |
 | v3.10 | `v3.10` | `0cde6bb72e120d01bae1dbd37e526f638a29176a` |
-| v4.00 | `v4.00` | *(fill in after tagging)* |
+| v4.00 | `v4.00` | `66f0406eb9bfee802f1f68164b7f38be711f84fa` |
 
 Regenerate this list any time with:
 
