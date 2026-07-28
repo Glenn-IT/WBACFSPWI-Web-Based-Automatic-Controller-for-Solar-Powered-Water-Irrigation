@@ -47,16 +47,6 @@ CREATE TABLE IF NOT EXISTS irrigation_events (
     FOREIGN KEY (schedule_id) REFERENCES schedules(id) ON DELETE SET NULL
 );
 
-CREATE TABLE IF NOT EXISTS overrides (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    action ENUM('on', 'off') NOT NULL,
-    reason VARCHAR(255) NULL,
-    auto_revert_minutes INT NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-
 CREATE TABLE IF NOT EXISTS alerts (
     id INT AUTO_INCREMENT PRIMARY KEY,
     type ENUM('low_moisture', 'low_battery', 'pump_fail', 'schedule_conflict') NOT NULL,

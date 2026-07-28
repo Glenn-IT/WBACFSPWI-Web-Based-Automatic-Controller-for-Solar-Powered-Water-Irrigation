@@ -7,9 +7,7 @@ $navItems = [
     'dashboard' => ['label' => 'Dashboard', 'href' => '/admin/dashboard.php', 'roles' => ['super_admin', 'admin', 'viewer']],
     'schedule'  => ['label' => 'Schedule', 'href' => '/admin/schedule.php', 'roles' => ['super_admin', 'admin']],
     'reports'   => ['label' => 'Reports', 'href' => '/admin/reports.php', 'roles' => ['super_admin', 'admin', 'viewer']],
-    'logs'      => ['label' => 'Logs', 'href' => '/admin/logs.php', 'roles' => ['super_admin', 'admin']],
-    'alerts'    => ['label' => 'Alerts', 'href' => '/admin/alerts.php', 'roles' => ['super_admin', 'admin']],
-    'override'  => ['label' => 'Manual Override', 'href' => '/admin/override.php', 'roles' => ['super_admin', 'admin']],
+    'logs'      => ['label' => 'Logs & Alerts', 'href' => '/admin/logs.php', 'roles' => ['super_admin', 'admin']],
     'users'     => ['label' => 'User Management', 'href' => '/admin/users.php', 'roles' => ['super_admin']],
     'profile'   => ['label' => 'Profile', 'href' => '/admin/profile.php', 'roles' => ['super_admin', 'admin', 'viewer']],
 ];

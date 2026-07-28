@@ -128,28 +128,6 @@ INSERT INTO `irrigation_events` (`id`, `schedule_id`, `trigger_type`, `started_a
 -- --------------------------------------------------------
 
 --
--- Table structure for table `overrides`
---
-
-CREATE TABLE `overrides` (
-  `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `action` enum('on','off') NOT NULL,
-  `reason` varchar(255) DEFAULT NULL,
-  `auto_revert_minutes` int(11) DEFAULT NULL,
-  `created_at` datetime NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `overrides`
---
-
-INSERT INTO `overrides` (`id`, `user_id`, `action`, `reason`, `auto_revert_minutes`, `created_at`) VALUES
-(1, 1, 'on', 'Testing dry spell', 30, '2026-07-06 19:10:54');
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `schedules`
 --
 
@@ -247,13 +225,6 @@ ALTER TABLE `irrigation_events`
   ADD KEY `schedule_id` (`schedule_id`);
 
 --
--- Indexes for table `overrides`
---
-ALTER TABLE `overrides`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `user_id` (`user_id`);
-
---
 -- Indexes for table `schedules`
 --
 ALTER TABLE `schedules`
@@ -296,12 +267,6 @@ ALTER TABLE `irrigation_events`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- AUTO_INCREMENT for table `overrides`
---
-ALTER TABLE `overrides`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
 -- AUTO_INCREMENT for table `schedules`
 --
 ALTER TABLE `schedules`
@@ -334,12 +299,6 @@ ALTER TABLE `audit_logs`
 --
 ALTER TABLE `irrigation_events`
   ADD CONSTRAINT `irrigation_events_ibfk_1` FOREIGN KEY (`schedule_id`) REFERENCES `schedules` (`id`) ON DELETE SET NULL;
-
---
--- Constraints for table `overrides`
---
-ALTER TABLE `overrides`
-  ADD CONSTRAINT `overrides_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `schedules`

@@ -2,7 +2,7 @@
 
 A PHP + MySQL admin panel for monitoring and controlling an ESP8266/ESP32-based
 solar-powered irrigation system: live sensor dashboard, schedule management,
-manual override, alerts, reports, user/role management, and audit logging.
+alerts, reports, user/role management, and audit logging.
 
 See [`docs/project-structure-and-plan.md`](docs/project-structure-and-plan.md) for
 full architecture/schema and [`docs/checklist.md`](docs/checklist.md) for build
@@ -17,11 +17,10 @@ progress and how to resume work.
   history, with CSV export.
 - **Alerts/Notifications** — threshold-based alerts (low moisture/battery),
   filterable, mark read/unread.
-- **Manual Override** — force the pump on/off with an auto-revert timer.
 - **User Management** — role-based accounts (`super_admin`, `admin`, `viewer`),
   restricted to `super_admin`.
 - **Logs** — filterable, paginated audit log of logins, schedule/profile/user
-  changes, and overrides.
+  changes.
 - **Profile** — edit own name/email, change password, set/update a security
   question for account recovery.
 - **Forgot Password** — recover access by correctly answering your security
@@ -87,8 +86,7 @@ progress and how to resume work.
 The ESP8266/ESP32 firmware talks to two endpoints under `public/api/device/`,
 authenticated with an `X-Api-Key` header matching `DEVICE_API_KEY`:
 
-- `GET /api/device/pull-schedule.php` — fetch active schedules and any pending
-  manual override.
+- `GET /api/device/pull-schedule.php` — fetch active schedules.
 - `POST /api/device/report.php` — report sensor readings and pump state as
   JSON: `{ "soil_moisture": 45.2, "battery_voltage": 12.1, "solar_output": 30.5, "pump_state": "on"|"off", "schedule_id": 3 }`.
 
