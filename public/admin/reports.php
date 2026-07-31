@@ -32,6 +32,11 @@ if ($isSampleEvents) {
 }
 $isSample = $isSampleReadings || $isSampleEvents;
 
+$sort = ($_GET['sort'] ?? 'desc') === 'asc' ? 'asc' : 'desc';
+usort($events, fn($a, $b) => $sort === 'asc'
+    ? strtotime($a['started_at']) <=> strtotime($b['started_at'])
+    : strtotime($b['started_at']) <=> strtotime($a['started_at']));
+
 if (($_GET['export'] ?? '') === 'csv') {
     header('Content-Type: text/csv');
     header('Content-Disposition: attachment; filename="irrigation-events_' . $from . '_to_' . $to . '.csv"');
@@ -144,7 +149,18 @@ include __DIR__ . '/partials/sidebar.php';
 </div>
 
 <div class="card shadow-sm">
-    <div class="card-header">Irrigation Events</div>
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Irrigation Logs</span>
+        <form method="get" action="<?= BASE_URL ?>/admin/reports.php" class="d-flex align-items-center gap-2">
+            <input type="hidden" name="from" value="<?= htmlspecialchars($from) ?>">
+            <input type="hidden" name="to" value="<?= htmlspecialchars($to) ?>">
+            <label class="small text-muted mb-0">Sort</label>
+            <select name="sort" class="form-select form-select-sm" onchange="this.form.submit()">
+                <option value="desc" <?= $sort === 'desc' ? 'selected' : '' ?>>Newest</option>
+                <option value="asc" <?= $sort === 'asc' ? 'selected' : '' ?>>Oldest</option>
+            </select>
+        </form>
+    </div>
     <div class="table-responsive">
         <table class="table table-hover mb-0 align-middle">
             <thead>
