@@ -23,6 +23,7 @@ not yet part of the current version show an **Under Construction** placeholder i
 | v3.00 | + Schedule + User Management | login, forgot-password, logout, index, dashboard, profile, schedule, users | reports, logs, alerts, override |
 | v3.10 | + Reports + Logs + Alerts + Override (all pages open) | login, forgot-password, logout, index, dashboard, profile, schedule, users, reports, logs, alerts, override | — none — |
 | v4.00 | New rollout cycle: v3.00 pages + Reports | login, forgot-password, logout, index, dashboard, profile, schedule, users, reports | logs (Logs & Alerts) |
+| v4.01 | Reports: "Irrigation Logs" rename + Newest/Oldest sort filter | same as v4.00 | logs (Logs & Alerts) |
 
 > **Note:** v2.00 starts a new presentation cycle and does not follow the strict
 > "one more page than before" rule. Schedule, Reports, Logs, Alerts, Override, and
@@ -39,6 +40,14 @@ not yet part of the current version show an **Under Construction** placeholder i
 > `alerts.php` now just redirects there). v4.00 re-gates back to the v3.00 page
 > set (dashboard, profile, schedule, users) and unlocks Reports on top; Logs &
 > Alerts stays gated until a future version.
+>
+> **v4.01** is a cherry-picked fix on top of the `v4.00` snapshot (not a straight
+> `main` commit) — `main` had picked up unrelated work (SQL dumps, firmware files,
+> a code-structure chore) after `v4.00` was tagged, so a temp branch was created
+> off the `v4.00` tag and only the Reports commit (renaming "Irrigation Events" to
+> "Irrigation Logs" and adding a Newest/Oldest sort filter) was cherry-picked onto
+> it, per the [Cherry-Pick Guide](Cherry-Pick-Guide.md). The page set unlocked is
+> unchanged from `v4.00`.
 
 The two device API endpoints (`api/device/report.php`, `api/device/pull-schedule.php`)
 are never gated — they serve the irrigation hardware, not the presentation.
@@ -109,6 +118,7 @@ git checkout main
 | v3.00 | `v3.00` | `f23ca4138f5b59b0505935e82a58bf0ad7d26024` |
 | v3.10 | `v3.10` | `0cde6bb72e120d01bae1dbd37e526f638a29176a` |
 | v4.00 | `v4.00` | `66f0406eb9bfee802f1f68164b7f38be711f84fa` |
+| v4.01 | `v4.01` | `7dc49ab30201d319fe934e6bedbb5dccce723f72` |
 
 Regenerate this list any time with:
 
