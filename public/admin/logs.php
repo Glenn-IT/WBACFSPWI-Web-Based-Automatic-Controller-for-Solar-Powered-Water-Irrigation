@@ -47,8 +47,8 @@ $alertPage = max(1, (int) ($_GET['apage'] ?? 1));
 $alertResult = Alert::list($alertFilters, $alertPage, 20);
 $alertTotalPages = max(1, (int) ceil($alertResult['total'] / $alertResult['perPage']));
 
-$typeOptions = ['low_moisture' => 'Low Moisture', 'low_battery' => 'Low Battery', 'pump_fail' => 'Pump Fail', 'schedule_conflict' => 'Schedule Conflict'];
-$typeLabels = ['low_moisture' => 'bg-warning text-dark', 'low_battery' => 'bg-danger', 'pump_fail' => 'bg-dark', 'schedule_conflict' => 'bg-secondary'];
+$typeOptions = ['low_moisture' => 'Low Moisture', 'low_battery' => 'Low Battery', 'overcharge' => 'Overcharge', 'pump_fail' => 'Pump Fail', 'schedule_conflict' => 'Schedule Conflict'];
+$typeLabels = ['low_moisture' => 'bg-warning text-dark', 'low_battery' => 'bg-danger', 'overcharge' => 'bg-danger', 'pump_fail' => 'bg-dark', 'schedule_conflict' => 'bg-secondary'];
 
 // Audit Logs tab
 $logFilters = [

@@ -58,4 +58,12 @@ if ($batteryVoltage !== null && $batteryVoltage < ALERT_LOW_BATTERY_VOLTS && !Al
     $newAlerts[] = 'low_battery';
 }
 
+// The solar panel trickle-charges the battery through a blocking diode with no
+// charge controller in the path, so nothing in hardware stops an overcharge.
+// This is the only warning that the panel has been left connected too long.
+if ($batteryVoltage !== null && $batteryVoltage > ALERT_HIGH_BATTERY_VOLTS && !Alert::existsRecent('overcharge')) {
+    Alert::create('overcharge', "Battery overcharging: {$batteryVoltage}V — disconnect the solar panel");
+    $newAlerts[] = 'overcharge';
+}
+
 echo json_encode(['status' => 'ok', 'alerts_created' => $newAlerts]);

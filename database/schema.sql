@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS irrigation_events (
 
 CREATE TABLE IF NOT EXISTS alerts (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    type ENUM('low_moisture', 'low_battery', 'pump_fail', 'schedule_conflict') NOT NULL,
+    type ENUM('low_moisture', 'low_battery', 'overcharge', 'pump_fail', 'schedule_conflict') NOT NULL,
     message VARCHAR(255) NOT NULL,
     is_read TINYINT(1) NOT NULL DEFAULT 0,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
