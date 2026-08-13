@@ -26,22 +26,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $error = 'Password must be at least 8 characters.';
             } elseif (!array_key_exists($role, $roleOptions)) {
                 $error = 'Invalid role.';
-            } elseif (User::findByEmail($email)) {
-                $error = 'That email is already in use.';
+            } elseif (User::isNameTaken($name)) {
+                $error = 'An account with that name already exists.';
+            } elseif (User::isEmailTaken($email)) {
+                $error = 'An account with that email address already exists.';
+            } elseif ($role === 'super_admin' && User::countSuperAdmins() >= 1) {
+                $error = 'Only 1 Super Admin account is allowed in the system.';
             } else {
                 $newId = User::create($name, $email, password_hash($password, PASSWORD_DEFAULT), $role);
                 AuditLog::record((int) $user['id'], 'user_create', "Created user #$newId ($email, $role)");
-                $success = 'User created.';
+                $success = 'User created successfully.';
             }
         }
 
         if ($action === 'update_role') {
             $id = (int) $_POST['id'];
             $role = $_POST['role'] ?? 'viewer';
-            if (!array_key_exists($role, $roleOptions)) {
+            $targetUser = User::findById($id);
+
+            if (!$targetUser) {
+                $error = 'User not found.';
+            } elseif (!array_key_exists($role, $roleOptions)) {
                 $error = 'Invalid role.';
             } elseif ($id === (int) $user['id']) {
                 $error = 'You cannot change your own role.';
+            } elseif ($role === 'super_admin' && User::countSuperAdmins($id) >= 1) {
+                $error = 'Only 1 Super Admin account is allowed in the system.';
+            } elseif ($targetUser['role'] === 'super_admin' && $role !== 'super_admin' && User::countSuperAdmins() <= 1) {
+                $error = 'Cannot demote the only Super Admin account in the system.';
             } else {
                 User::updateRole($id, $role);
                 AuditLog::record((int) $user['id'], 'user_role_change', "Set user #$id role to $role");
@@ -52,8 +64,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($action === 'toggle_active') {
             $id = (int) $_POST['id'];
             $newState = (int) $_POST['is_active'] === 1 ? false : true;
+            $targetUser = User::findById($id);
+
             if ($id === (int) $user['id']) {
                 $error = 'You cannot deactivate your own account.';
+            } elseif (!$newState && $targetUser && $targetUser['role'] === 'super_admin' && User::countSuperAdmins() <= 1) {
+                $error = 'Cannot deactivate the only Super Admin account in the system.';
             } else {
                 User::setActive($id, $newState);
                 AuditLog::record((int) $user['id'], 'user_toggle_active', "User #$id set to " . ($newState ? 'active' : 'inactive'));
@@ -63,10 +79,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($action === 'delete') {
             $id = (int) $_POST['id'];
+            $existing = User::findById($id);
+
             if ($id === (int) $user['id']) {
                 $error = 'You cannot delete your own account.';
+            } elseif ($existing && $existing['role'] === 'super_admin' && User::countSuperAdmins() <= 1) {
+                $error = 'Cannot delete the only Super Admin account in the system.';
             } else {
-                $existing = User::findById($id);
                 User::delete($id);
                 AuditLog::record((int) $user['id'], 'user_delete', "Deleted user #$id (" . ($existing['email'] ?? '') . ')');
                 $success = 'User deleted.';
@@ -76,6 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $users = User::all();
+$superAdminCount = User::countSuperAdmins();
 
 $pageTitle = 'User Management';
 $activePage = 'users';
@@ -116,7 +136,10 @@ include __DIR__ . '/partials/sidebar.php';
                         <label class="form-label">Role</label>
                         <select name="role" class="form-select">
                             <?php foreach ($roleOptions as $key => $label): ?>
-                                <option value="<?= $key ?>"><?= $label ?></option>
+                                <?php $disabled = ($key === 'super_admin' && $superAdminCount >= 1); ?>
+                                <option value="<?= $key ?>" <?= $disabled ? 'disabled' : '' ?>>
+                                    <?= $label ?><?= $disabled ? ' (Limit reached — 1 max)' : '' ?>
+                                </option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -156,7 +179,10 @@ include __DIR__ . '/partials/sidebar.php';
                                             <input type="hidden" name="id" value="<?= (int) $u['id'] ?>">
                                             <select name="role" class="form-select form-select-sm" onchange="this.form.submit()">
                                                 <?php foreach ($roleOptions as $key => $label): ?>
-                                                    <option value="<?= $key ?>" <?= $u['role'] === $key ? 'selected' : '' ?>><?= $label ?></option>
+                                                    <?php $disabled = ($key === 'super_admin' && $u['role'] !== 'super_admin' && $superAdminCount >= 1); ?>
+                                                    <option value="<?= $key ?>" <?= $u['role'] === $key ? 'selected' : '' ?> <?= $disabled ? 'disabled' : '' ?>>
+                                                        <?= $label ?><?= $disabled ? ' (Limit reached)' : '' ?>
+                                                    </option>
                                                 <?php endforeach; ?>
                                             </select>
                                         </form>
@@ -200,3 +226,4 @@ include __DIR__ . '/partials/sidebar.php';
 </div>
 
 <?php include __DIR__ . '/partials/footer.php'; ?>
+

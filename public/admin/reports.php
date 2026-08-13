@@ -61,6 +61,26 @@ if (($_GET['export'] ?? '') === 'csv') {
     exit;
 }
 
+if (($_GET['export'] ?? '') === 'sensor_csv') {
+    header('Content-Type: text/csv');
+    header('Content-Disposition: attachment; filename="sensor-readings_' . $from . '_to_' . $to . '.csv"');
+    $out = fopen('php://output', 'w');
+    fputcsv($out, ['id', 'recorded_at', 'soil_moisture_%', 'water_level_%', 'battery_voltage_V', 'solar_output_W', 'pump_state']);
+    foreach ($readings as $r) {
+        fputcsv($out, [
+            $r['id'] ?? '',
+            $r['recorded_at'],
+            $r['soil_moisture'],
+            $r['water_level'] ?? '',
+            $r['battery_voltage'],
+            $r['solar_output'] ?? '',
+            $r['pump_state'] ?? '',
+        ]);
+    }
+    fclose($out);
+    exit;
+}
+
 $completedMinutes = 0;
 foreach ($events as $e) {
     if ($e['ended_at']) {
@@ -68,8 +88,17 @@ foreach ($events as $e) {
     }
 }
 
+$validMoisture = array_filter(array_map(fn($r) => $r['soil_moisture'] ?? null, $readings), fn($v) => $v !== null);
+$avgMoisture = !empty($validMoisture) ? round(array_sum($validMoisture) / count($validMoisture), 1) : null;
+$latestMoisture = !empty($readings) ? end($readings)['soil_moisture'] : null;
+
+$validWaterLevel = array_filter(array_map(fn($r) => $r['water_level'] ?? null, $readings), fn($v) => $v !== null);
+$avgWaterLevel = !empty($validWaterLevel) ? round(array_sum($validWaterLevel) / count($validWaterLevel), 1) : null;
+$latestWaterLevel = !empty($readings) ? (end($readings)['water_level'] ?? null) : null;
+
 $chartLabels = array_map(fn($r) => $r['recorded_at'], $readings);
 $chartMoisture = array_map(fn($r) => $r['soil_moisture'], $readings);
+$chartWaterLevel = array_map(fn($r) => $r['water_level'] ?? null, $readings);
 $chartBattery = array_map(fn($r) => $r['battery_voltage'], $readings);
 $chartSolar = array_map(fn($r) => $r['solar_output'], $readings);
 
@@ -95,7 +124,9 @@ include __DIR__ . '/partials/sidebar.php';
             <div class="col-auto">
                 <button type="submit" class="btn btn-sm btn-primary">Apply</button>
                 <a href="<?= BASE_URL ?>/admin/reports.php?from=<?= htmlspecialchars($from) ?>&to=<?= htmlspecialchars($to) ?>&export=csv"
-                   class="btn btn-sm btn-outline-secondary">Export CSV</a>
+                   class="btn btn-sm btn-outline-secondary">Export Events CSV</a>
+                <a href="<?= BASE_URL ?>/admin/reports.php?from=<?= htmlspecialchars($from) ?>&to=<?= htmlspecialchars($to) ?>&export=sensor_csv"
+                   class="btn btn-sm btn-outline-secondary">Export Sensors CSV</a>
             </div>
         </form>
     </div>
@@ -109,27 +140,48 @@ include __DIR__ . '/partials/sidebar.php';
 <?php endif; ?>
 
 <div class="row g-3 mb-3">
-    <div class="col-md-4">
-        <div class="card stat-card shadow-sm">
+    <div class="col-6 col-md-4 col-lg">
+        <div class="card stat-card shadow-sm h-100">
             <div class="card-body">
                 <div class="text-muted small">Irrigation Events</div>
                 <div class="fs-3 fw-bold"><?= count($events) ?></div>
+                <div class="small text-muted">Total triggered</div>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card stat-card shadow-sm">
+    <div class="col-6 col-md-4 col-lg">
+        <div class="card stat-card shadow-sm h-100">
             <div class="card-body">
                 <div class="text-muted small">Total Pump Runtime</div>
                 <div class="fs-3 fw-bold"><?= round($completedMinutes) ?> min</div>
+                <div class="small text-muted">Completed duration</div>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card stat-card shadow-sm">
+    <div class="col-6 col-md-4 col-lg">
+        <div class="card stat-card shadow-sm h-100">
             <div class="card-body">
                 <div class="text-muted small">Sensor Readings</div>
                 <div class="fs-3 fw-bold"><?= count($readings) ?></div>
+                <div class="small text-muted">Data points</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-6 col-lg">
+        <div class="card stat-card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Soil Moisture</div>
+                <div class="fs-3 fw-bold text-success"><?= $avgMoisture !== null ? $avgMoisture . '%' : '--%' ?></div>
+                <div class="small text-muted"><?= $latestMoisture !== null ? 'Avg (Latest: ' . $latestMoisture . '%)' : 'No data' ?></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-6 col-lg">
+        <div class="card stat-card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Water Level</div>
+                <div class="fs-3 fw-bold text-primary"><?= $avgWaterLevel !== null ? $avgWaterLevel . '%' : '--%' ?></div>
+                <div class="small text-muted"><?= $latestWaterLevel !== null ? 'Avg (Latest: ' . $latestWaterLevel . '%)' : 'No data' ?></div>
             </div>
         </div>
     </div>
@@ -214,6 +266,14 @@ new Chart(ctx, {
                 spanGaps: true,
             },
             {
+                label: 'Water Level (%)',
+                data: <?= json_encode($chartWaterLevel) ?>,
+                borderColor: '#0288d1',
+                backgroundColor: 'rgba(2,136,209,0.1)',
+                tension: 0.3,
+                spanGaps: true,
+            },
+            {
                 label: 'Battery (V)',
                 data: <?= json_encode($chartBattery) ?>,
                 borderColor: '#1565c0',
@@ -241,3 +301,4 @@ new Chart(ctx, {
 <?php endif; ?>
 
 <?php include __DIR__ . '/partials/footer.php'; ?>
+

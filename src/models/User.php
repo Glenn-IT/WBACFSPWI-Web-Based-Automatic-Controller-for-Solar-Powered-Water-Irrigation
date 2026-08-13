@@ -4,10 +4,53 @@ class User
 {
     public static function findByEmail(string $email): ?array
     {
-        $stmt = getDb()->prepare('SELECT * FROM users WHERE email = ? LIMIT 1');
-        $stmt->execute([$email]);
+        $stmt = getDb()->prepare('SELECT * FROM users WHERE LOWER(email) = LOWER(?) LIMIT 1');
+        $stmt->execute([trim($email)]);
         $user = $stmt->fetch();
         return $user ?: null;
+    }
+
+    public static function findByName(string $name): ?array
+    {
+        $stmt = getDb()->prepare('SELECT * FROM users WHERE LOWER(name) = LOWER(?) LIMIT 1');
+        $stmt->execute([trim($name)]);
+        $user = $stmt->fetch();
+        return $user ?: null;
+    }
+
+    public static function isEmailTaken(string $email, ?int $excludeId = null): bool
+    {
+        if ($excludeId !== null) {
+            $stmt = getDb()->prepare('SELECT COUNT(*) FROM users WHERE LOWER(email) = LOWER(?) AND id != ?');
+            $stmt->execute([trim($email), $excludeId]);
+        } else {
+            $stmt = getDb()->prepare('SELECT COUNT(*) FROM users WHERE LOWER(email) = LOWER(?)');
+            $stmt->execute([trim($email)]);
+        }
+        return (int) $stmt->fetchColumn() > 0;
+    }
+
+    public static function isNameTaken(string $name, ?int $excludeId = null): bool
+    {
+        if ($excludeId !== null) {
+            $stmt = getDb()->prepare('SELECT COUNT(*) FROM users WHERE LOWER(name) = LOWER(?) AND id != ?');
+            $stmt->execute([trim($name), $excludeId]);
+        } else {
+            $stmt = getDb()->prepare('SELECT COUNT(*) FROM users WHERE LOWER(name) = LOWER(?)');
+            $stmt->execute([trim($name)]);
+        }
+        return (int) $stmt->fetchColumn() > 0;
+    }
+
+    public static function countSuperAdmins(?int $excludeId = null): int
+    {
+        if ($excludeId !== null) {
+            $stmt = getDb()->prepare("SELECT COUNT(*) FROM users WHERE role = 'super_admin' AND id != ?");
+            $stmt->execute([$excludeId]);
+        } else {
+            $stmt = getDb()->query("SELECT COUNT(*) FROM users WHERE role = 'super_admin'");
+        }
+        return (int) $stmt->fetchColumn();
     }
 
     public static function findById(int $id): ?array
