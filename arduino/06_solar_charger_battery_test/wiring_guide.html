@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test 06: Solar Charger & Battery Monitor Breadboard Wiring Guide — WBACFSPWI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #090d16;
+            --bg-card: #111827;
+            --bg-card-hover: #1f2937;
+            --border-color: #374151;
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --accent-cyan: #06b6d4;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-purple: #a855f7;
+            --accent-yellow: #eab308;
+            --bb-body: #1e293b;
+            --bb-hole: #0f172a;
+            --bb-border: #475569;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+        .container { max-width: 1480px; margin: 0 auto; }
+        
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.35rem 1.25rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            background: rgba(234, 179, 8, 0.15);
+            color: var(--accent-yellow);
+            border: 1px solid rgba(234, 179, 8, 0.4);
+            margin-bottom: 0.75rem;
+        }
+        h1 {
+            font-size: 2.3rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        p.subtitle { color: var(--text-secondary); font-size: 1.05rem; }
+
+        .nav-bar {
+            display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; margin-bottom: 2rem;
+        }
+        .nav-link {
+            font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); background: var(--bg-card);
+            padding: 0.5rem 1rem; border-radius: 0.5rem; text-decoration: none; border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #ffffff; background: var(--accent-yellow); border-color: var(--accent-yellow); color: #0f172a;
+        }
+
+        /* Filter Control Panel Styling */
+        .filter-panel {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.4);
+        }
+        .filter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .filter-header .title-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .filter-title-text {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+        .filter-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        .filter-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .preset-btn {
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 0.45rem 0.85rem;
+            border-radius: 0.4rem;
+            border: 1px solid var(--border-color);
+            background: #090d16;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .preset-btn:hover {
+            color: var(--text-primary);
+            border-color: var(--accent-cyan);
+            background: rgba(6, 182, 212, 0.1);
+        }
+        .btn-primary-preset {
+            border-color: rgba(234, 179, 8, 0.6);
+            background: rgba(234, 179, 8, 0.18);
+            color: var(--accent-yellow);
+        }
+        .btn-primary-preset:hover {
+            background: var(--accent-yellow);
+            color: #090d16;
+        }
+        .btn-reset {
+            border-color: rgba(59, 130, 246, 0.4);
+            color: #60a5fa;
+        }
+        .btn-reset:hover {
+            background: rgba(59, 130, 246, 0.2);
+            color: #ffffff;
+        }
+        .filter-options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+        .filter-chip {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.55rem 0.85rem;
+            background: #090d16;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+        }
+        .filter-chip:hover {
+            border-color: #64748b;
+        }
+        .filter-chip.checked {
+            border-color: rgba(234, 179, 8, 0.5);
+            background: rgba(234, 179, 8, 0.1);
+        }
+        .filter-chip input[type="checkbox"] {
+            accent-color: var(--accent-yellow);
+            width: 17px;
+            height: 17px;
+            cursor: pointer;
+        }
+        .chip-color {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+        .chip-text {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .filter-status-bar {
+            font-size: 0.8rem;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-secondary);
+            text-align: right;
+        }
+        .module-hidden {
+            display: none !important;
+        }
+
+        .grid-layout { display: grid; grid-template-columns: 1fr; gap: 2rem; }
+        
+        .card {
+            background-color: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: 1rem; padding: 1.75rem; box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+        }
+        .card-title {
+            font-size: 1.25rem; font-weight: 700; margin-bottom: 1.25rem; display: flex;
+            align-items: center; justify-content: space-between; color: var(--text-primary);
+        }
+        .card-title .title-left { display: flex; align-items: center; gap: 0.75rem; }
+        .card-title .icon {
+            width: 34px; height: 34px; border-radius: 0.5rem; background: rgba(234, 179, 8, 0.2);
+            color: var(--accent-yellow); display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+        }
+
+        /* SVG Canvas styling */
+        .svg-container {
+            width: 100%; overflow-x: auto; background: #050811; border-radius: 0.75rem;
+            padding: 1.5rem 1rem; border: 1px solid #1f2937; position: relative;
+        }
+        svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+        
+        .wire {
+            stroke-dasharray: 8;
+            animation: dash 35s linear infinite;
+            transition: stroke-width 0.2s ease, stroke 0.2s ease, filter 0.2s ease;
+            cursor: pointer;
+        }
+        .wire:hover { stroke-width: 5px !important; filter: drop-shadow(0 0 8px currentColor); }
+        @keyframes dash { to { stroke-dashoffset: -1000; } }
+
+        .term-dot { transition: r 0.2s ease, fill 0.2s ease; cursor: pointer; }
+        .term-dot:hover { r: 8px; filter: drop-shadow(0 0 6px currentColor); }
+
+        .table-responsive { overflow-x: auto; margin-top: 1rem; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.92rem; }
+        th {
+            background-color: #0b0f19; color: var(--text-secondary); font-weight: 700;
+            padding: 0.85rem 1rem; border-bottom: 2px solid var(--border-color);
+            text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em;
+        }
+        td { padding: 0.9rem 1rem; border-bottom: 1px solid var(--border-color); color: var(--text-primary); }
+        tr:hover td { background-color: rgba(255, 255, 255, 0.03); }
+        
+        .pin-tag {
+            font-family: 'JetBrains Mono', monospace; padding: 0.2rem 0.55rem; border-radius: 0.35rem;
+            font-size: 0.82rem; font-weight: 700; display: inline-block;
+        }
+        .tag-uno { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
+        .tag-bb { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+        .tag-pwr { background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.4); }
+        .tag-batt { background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.4); }
+        .tag-solar { background: rgba(234, 179, 8, 0.2); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.4); }
+        .tag-chg { background: rgba(234, 179, 8, 0.25); color: #fde047; border: 1px solid rgba(168, 85, 247, 0.5); }
+
+        .note-box {
+            background: rgba(234, 179, 8, 0.08); border-left: 4px solid var(--accent-yellow);
+            padding: 1.25rem; border-radius: 0 0.5rem 0.5rem 0; margin-top: 1.5rem;
+        }
+        .note-box h4 {
+            color: var(--accent-yellow); font-size: 1rem; margin-bottom: 0.5rem;
+            display: flex; align-items: center; gap: 0.5rem; font-weight: 700;
+        }
+        .note-box p, .note-box li { color: var(--text-secondary); font-size: 0.92rem; margin-bottom: 0.4rem; }
+        .note-box ul { padding-left: 1.25rem; }
+
+        .wire-legend {
+            display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1rem; padding: 0.75rem;
+            background: #090d16; border-radius: 0.5rem; border: 1px solid #1f2937;
+        }
+        .legend-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); }
+        .legend-color { width: 14px; height: 14px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <span class="badge">Test 06: Solar Charger & Battery Monitor</span>
+        <h1>WBACFSPWI Solar Charger & Battery Charging Test Guide</h1>
+        <p class="subtitle">Standalone Breadboard Test Circuit: 30W Solar Panel + 3S Solar Charger/BMS Module + 3S Battery Pack + Buck (5V) Main Logic Power</p>
+    </header>
+
+    <div class="nav-bar">
+        <a href="../index.html" class="nav-link">🏠 Master Hub</a>
+        <a href="../01_soil_root_capacitive_test/wiring_guide.html" class="nav-link">Test 01: Root Soil</a>
+        <a href="../02_surface_water_level_test/wiring_guide.html" class="nav-link">Test 02: HW-080 Surface</a>
+        <a href="../03_relay_pump_test/wiring_guide.html" class="nav-link">Test 03: Relay & Pump</a>
+        <a href="../04_battery_voltage_test/wiring_guide.html" class="nav-link">Test 04: Battery Monitor</a>
+        <a href="../05_solar_voltage_test/wiring_guide.html" class="nav-link">Test 05: Solar Monitor</a>
+        <a href="wiring_guide.html" class="nav-link active">⚡ Test 06: Solar Charger</a>
+        <a href="../wbacfspwi_arduino_controller/wiring_guide.html" class="nav-link">🚀 Full Controller</a>
+    </div>
+
+    <!-- Interactive Circuit Filter Control Panel -->
+    <div class="filter-panel">
+        <div class="filter-header">
+            <div class="title-left">
+                <div class="icon" style="width:34px; height:34px; border-radius:0.5rem; background:rgba(234,179,8,0.2); color:var(--accent-yellow); display:flex; align-items:center; justify-content:center; font-size:1.1rem;">🎛️</div>
+                <div>
+                    <span class="filter-title-text">Interactive Test 06 Circuit Filter</span>
+                    <p class="filter-subtitle">Toggle specific components to isolate the solar charger, battery pack, dividers, and buck converter.</p>
+                </div>
+            </div>
+            <div class="filter-actions">
+                <button type="button" class="preset-btn btn-primary-preset" id="btn-charger-battery">☀️ Solar Charger + Battery</button>
+                <button type="button" class="preset-btn" id="btn-dividers">📊 Voltage Dividers (A2/A3)</button>
+                <button type="button" class="preset-btn btn-reset" id="btn-show-all">✨ Show All (Reset)</button>
+            </div>
+        </div>
+        <div class="filter-options-grid">
+            <label class="filter-chip checked">
+                <input type="checkbox" id="chk-solar" checked>
+                <span class="chip-color" style="background: #eab308;"></span>
+                <span class="chip-text">☀️ 30W Solar Panel & 22V Divider</span>
+            </label>
+            <label class="filter-chip checked">
+                <input type="checkbox" id="chk-solar-charger" checked>
+                <span class="chip-color" style="background: #f59e0b;"></span>
+                <span class="chip-text">🔌 3S Solar Charge Controller / BMS</span>
+            </label>
+            <label class="filter-chip checked">
+                <input type="checkbox" id="chk-battery" checked>
+                <span class="chip-color" style="background: #a855f7;"></span>
+                <span class="chip-text">🔋 3S Battery Pack & 12V Divider</span>
+            </label>
+            <label class="filter-chip checked">
+                <input type="checkbox" id="chk-power" checked>
+                <span class="chip-color" style="background: #f43f5e;"></span>
+                <span class="chip-text">⚡ LM2596 Buck & 5V Power Rails</span>
+            </label>
+        </div>
+        <div class="filter-status-bar">
+            <span id="filter-counter-text">Showing 4 of 4 Test Modules</span>
+        </div>
+    </div>
+
+    <div class="grid-layout">
+        <!-- Visual Schematic Card -->
+        <div class="card">
+            <div class="card-title">
+                <div class="title-left">
+                    <div class="icon">⚡</div>
+                    <span>Test 06 Schematic (30W Solar Panel + 3S Charger + 3S Battery + Dividers A2/A3)</span>
+                </div>
+            </div>
+            
+            <div class="svg-container">
+                <svg viewBox="0 0 1440 620" width="1440" height="620" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Background Grid -->
+                    <defs>
+                        <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.75" opacity="0.6"/>
+                        </pattern>
+                    </defs>
+                    <rect width="1440" height="620" fill="#050811"/>
+                    <rect width="1440" height="620" fill="url(#grid)"/>
+
+                    <!-- LEFT COLUMN: POWER STAGE & ARDUINO -->
+                    <!-- LM2596 BUCK CONVERTER -->
+                    <g id="buck-converter" data-module="power">
+                        <rect x="50" y="40" width="280" height="150" rx="10" fill="#111827" stroke="#f59e0b" stroke-width="2"/>
+                        <rect x="70" y="55" width="240" height="30" rx="4" fill="#1f2937"/>
+                        <text x="190" y="75" fill="#fde047" font-size="13" font-weight="800" text-anchor="middle">LM2596 BUCK CONVERTER</text>
+                        <text x="190" y="100" fill="#9ca3af" font-size="10" text-anchor="middle">MAIN LOGIC POWER (12V IN &rarr; 5.00V OUT)</text>
+
+                        <circle id="buck-in-pos" cx="50" cy="130" r="6" fill="#f43f5e" class="term-dot"/>
+                        <text x="65" y="134" fill="#fb7185" font-size="10" font-family="JetBrains Mono" font-weight="700">IN+ (12V)</text>
+
+                        <circle id="buck-in-neg" cx="50" cy="160" r="6" fill="#64748b" class="term-dot"/>
+                        <text x="65" y="164" fill="#cbd5e1" font-size="10" font-family="JetBrains Mono" font-weight="700">IN- (GND)</text>
+
+                        <circle id="buck-out-pos" cx="330" cy="130" r="7" fill="#f43f5e" class="term-dot"/>
+                        <text x="315" y="134" fill="#fb7185" font-size="10" font-family="JetBrains Mono" font-weight="700" text-anchor="end">OUT+ (5.00V)</text>
+
+                        <circle id="buck-out-neg" cx="330" cy="160" r="7" fill="#3b82f6" class="term-dot"/>
+                        <text x="315" y="164" fill="#93c5fd" font-size="10" font-family="JetBrains Mono" font-weight="700" text-anchor="end">OUT- (Star GND)</text>
+                    </g>
+
+                    <!-- ARDUINO UNO R3 -->
+                    <g id="arduino-uno">
+                        <rect x="50" y="230" width="280" height="350" rx="14" fill="#0f172a" stroke="#3b82f6" stroke-width="2.5"/>
+                        <rect x="70" y="245" width="240" height="40" rx="6" fill="#1e293b"/>
+                        <text x="190" y="271" fill="#60a5fa" font-size="15" font-weight="800" text-anchor="middle">ARDUINO UNO R3</text>
+
+                        <circle id="uno-5v" cx="310" cy="320" r="7" fill="#f43f5e" class="term-dot"/>
+                        <text x="295" y="324" fill="#fb7185" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">5V Pin (Power In)</text>
+
+                        <circle id="uno-gnd" cx="310" cy="360" r="7" fill="#3b82f6" class="term-dot"/>
+                        <text x="295" y="364" fill="#93c5fd" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">GND Pin (Common Return)</text>
+
+                        <circle id="uno-a2" cx="310" cy="440" r="6" fill="#a855f7" class="term-dot"/>
+                        <text x="295" y="444" fill="#c084fc" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">Pin A2 (Battery Voltage)</text>
+
+                        <circle id="uno-a3" cx="310" cy="490" r="6" fill="#eab308" class="term-dot"/>
+                        <text x="295" y="494" fill="#fde047" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">Pin A3 (Solar Voltage)</text>
+                    </g>
+
+                    <!-- CENTER BREADBOARD -->
+                    <g id="master-breadboard">
+                        <rect x="410" y="40" width="560" height="540" rx="14" fill="#1e293b" stroke="#475569" stroke-width="2.5"/>
+                        <rect x="430" y="55" width="520" height="35" rx="5" fill="#0f172a"/>
+                        <text x="690" y="78" fill="#f8fafc" font-size="13" font-weight="800" text-anchor="middle">CENTRAL STAR BREADBOARD (VOLTAGE DIVIDER HUBS)</text>
+
+                        <!-- Rails -->
+                        <rect x="430" y="105" width="520" height="50" rx="4" fill="#0f172a" stroke="#334155"/>
+                        <line x1="450" y1="120" x2="930" y2="120" stroke="#ef4444" stroke-width="3"/>
+                        <line x1="450" y1="142" x2="930" y2="142" stroke="#3b82f6" stroke-width="3"/>
+                        <text x="690" y="117" fill="#f87171" font-size="9" font-family="JetBrains Mono" font-weight="800" text-anchor="middle">STAR 5V POWER RAIL</text>
+                        <text x="690" y="152" fill="#60a5fa" font-size="9" font-family="JetBrains Mono" font-weight="800" text-anchor="middle">STAR COMMON GROUND BUS</text>
+
+                        <!-- Battery Divider -->
+                        <g id="bb-batt-divider" data-module="battery">
+                            <rect x="445" y="195" width="220" height="155" rx="6" fill="#111827" stroke="#a855f7" stroke-width="1.5"/>
+                            <text x="455" y="215" fill="#c084fc" font-size="11" font-weight="800">1. BATTERY DIVIDER (100k / 33k)</text>
+                            <circle id="bb-r5-in" cx="470" cy="240" r="5" fill="#f43f5e" class="term-dot"/>
+                            <text x="485" y="244" fill="#fb7185" font-size="10" font-family="JetBrains Mono">Row 5: Batt (+12V In)</text>
+                            <rect x="520" y="250" width="20" height="35" rx="3" fill="#d97706" stroke="#fbbf24"/>
+                            <text x="550" y="272" fill="#fde047" font-size="9" font-family="JetBrains Mono" font-weight="700">R1 (100kΩ)</text>
+                            <circle id="bb-r10-tap" cx="470" cy="290" r="6" fill="#a855f7" class="term-dot"/>
+                            <text x="485" y="294" fill="#c084fc" font-size="10" font-family="JetBrains Mono" font-weight="700">Row 10: Tap &rarr; A2</text>
+                            <rect x="520" y="300" width="20" height="35" rx="3" fill="#d97706" stroke="#fbbf24"/>
+                            <text x="550" y="322" fill="#fde047" font-size="9" font-family="JetBrains Mono" font-weight="700">R2 (33kΩ)</text>
+                            <circle id="bb-r15-gnd" cx="470" cy="340" r="5" fill="#3b82f6" class="term-dot"/>
+                            <text x="485" y="344" fill="#93c5fd" font-size="10" font-family="JetBrains Mono">Row 15: &rarr; Star GND</text>
+                        </g>
+
+                        <!-- Solar Divider -->
+                        <g id="bb-solar-divider" data-module="solar">
+                            <rect x="445" y="365" width="220" height="155" rx="6" fill="#111827" stroke="#eab308" stroke-width="1.5"/>
+                            <text x="455" y="385" fill="#fde047" font-size="11" font-weight="800">2. SOLAR DIVIDER (100k / 20k)</text>
+                            <circle id="bb-r20-in" cx="470" cy="410" r="5" fill="#f43f5e" class="term-dot"/>
+                            <text x="485" y="414" fill="#fb7185" font-size="10" font-family="JetBrains Mono">Row 20: Solar (+22V In)</text>
+                            <rect x="520" y="420" width="20" height="35" rx="3" fill="#d97706" stroke="#fbbf24"/>
+                            <text x="550" y="442" fill="#fde047" font-size="9" font-family="JetBrains Mono" font-weight="700">R3 (100kΩ)</text>
+                            <circle id="bb-r25-tap" cx="470" cy="460" r="6" fill="#eab308" class="term-dot"/>
+                            <text x="485" y="464" fill="#fde047" font-size="10" font-family="JetBrains Mono" font-weight="700">Row 25: Tap &rarr; A3</text>
+                            <rect x="520" y="470" width="20" height="35" rx="3" fill="#d97706" stroke="#fbbf24"/>
+                            <text x="550" y="492" fill="#fde047" font-size="9" font-family="JetBrains Mono" font-weight="700">R4 (20kΩ)</text>
+                            <circle id="bb-r30-gnd" cx="470" cy="510" r="5" fill="#3b82f6" class="term-dot"/>
+                            <text x="485" y="514" fill="#93c5fd" font-size="10" font-family="JetBrains Mono">Row 30: &rarr; Star GND</text>
+                        </g>
+                    </g>
+
+                    <!-- RIGHT COLUMN: SOLAR PANEL, CHARGER & BATTERY PACK -->
+                    <!-- 30W SOLAR PANEL -->
+                    <g id="solar-panel" data-module="solar">
+                        <rect x="1030" y="40" width="360" height="110" rx="10" fill="#111827" stroke="#eab308" stroke-width="2"/>
+                        <rect x="1050" y="55" width="320" height="28" rx="4" fill="#1f2937"/>
+                        <text x="1210" y="74" fill="#fde047" font-size="13" font-weight="800" text-anchor="middle">30W SOLAR PANEL</text>
+                        <text x="1210" y="96" fill="#9ca3af" font-size="10" text-anchor="middle">18V OPERATING / 21.6V VOC OPEN CIRCUIT</text>
+
+                        <circle id="solar-pos" cx="1030" cy="110" r="7" fill="#f43f5e" class="term-dot"/>
+                        <text x="1045" y="114" fill="#fb7185" font-size="11" font-family="JetBrains Mono" font-weight="700">(+) Solar Pos (0-22V)</text>
+
+                        <circle id="solar-neg" cx="1390" cy="110" r="7" fill="#3b82f6" class="term-dot"/>
+                        <text x="1375" y="114" fill="#93c5fd" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">(-) Solar Ground</text>
+                    </g>
+
+                    <!-- 3S MPPT SOLAR CHARGE CONTROLLER / BMS -->
+                    <g id="solar-charger" data-module="solar solar-charger battery">
+                        <rect x="1030" y="180" width="360" height="120" rx="10" fill="#0f172a" stroke="#eab308" stroke-width="2"/>
+                        <rect x="1050" y="195" width="320" height="28" rx="4" fill="#1e293b"/>
+                        <text x="1210" y="214" fill="#fde047" font-size="12" font-weight="800" text-anchor="middle">3S SOLAR CHARGE CONTROLLER / BMS</text>
+                        <text x="1210" y="235" fill="#9ca3af" font-size="9.5" text-anchor="middle">Solar-to-Battery Charger (18V In &rarr; 12.6V CC/CV Charge)</text>
+
+                        <circle id="chg-sol-pos" cx="1030" cy="250" r="6" fill="#eab308" class="term-dot"/>
+                        <text x="1045" y="254" fill="#fde047" font-size="10" font-family="JetBrains Mono" font-weight="700">SOLAR IN+ (from Panel)</text>
+
+                        <circle id="chg-sol-neg" cx="1030" cy="280" r="6" fill="#3b82f6" class="term-dot"/>
+                        <text x="1045" y="284" fill="#93c5fd" font-size="10" font-family="JetBrains Mono">SOLAR IN- (Star GND)</text>
+
+                        <circle id="chg-bat-pos" cx="1390" cy="250" r="6" fill="#a855f7" class="term-dot"/>
+                        <text x="1375" y="254" fill="#c084fc" font-size="10" font-family="JetBrains Mono" font-weight="700" text-anchor="end">BAT+ Out &rarr; 3S Battery (+)</text>
+
+                        <circle id="chg-bat-neg" cx="1390" cy="280" r="6" fill="#3b82f6" class="term-dot"/>
+                        <text x="1375" y="284" fill="#93c5fd" font-size="10" font-family="JetBrains Mono" text-anchor="end">BAT- Out &rarr; Star GND</text>
+                    </g>
+
+                    <!-- 3S 18650 BATTERY PACK -->
+                    <g id="battery-pack" data-module="battery">
+                        <rect x="1030" y="330" width="360" height="120" rx="10" fill="#111827" stroke="#a855f7" stroke-width="2"/>
+                        <rect x="1050" y="345" width="320" height="28" rx="4" fill="#1f2937"/>
+                        <text x="1210" y="364" fill="#c084fc" font-size="13" font-weight="800" text-anchor="middle">3S 18650 LI-ION BATTERY PACK</text>
+                        <text x="1210" y="384" fill="#9ca3af" font-size="10" text-anchor="middle">11.1V NOMINAL / 12.60V FULL CHARGE (SOLAR CHARGED)</text>
+
+                        <circle id="batt-pos" cx="1030" cy="400" r="7" fill="#f43f5e" class="term-dot"/>
+                        <text x="1045" y="404" fill="#fb7185" font-size="11" font-family="JetBrains Mono" font-weight="700">(+) 12V Main / Charge IN+</text>
+
+                        <circle id="batt-neg" cx="1390" cy="400" r="7" fill="#3b82f6" class="term-dot"/>
+                        <text x="1375" y="404" fill="#93c5fd" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">(-) Common Ground</text>
+                    </g>
+
+                    <!-- WIRE ROUTING -->
+                    <!-- Power Wires -->
+                    <path class="wire" data-module="power" d="M 330 130 L 400 130 L 400 120 L 470 120" stroke="#f43f5e" stroke-width="3.5" fill="none"/>
+                    <path class="wire" data-module="power" d="M 500 120 L 380 120 L 380 320 L 310 320" stroke="#f43f5e" stroke-width="3.5" fill="none"/>
+                    <path class="wire" data-module="power" d="M 330 160 L 410 160 L 410 142 L 470 142" stroke="#3b82f6" stroke-width="3.5" fill="none"/>
+                    <path class="wire" data-module="power" d="M 520 142 L 360 142 L 360 360 L 310 360" stroke="#3b82f6" stroke-width="3.5" fill="none"/>
+                    <path class="wire" data-module="battery" d="M 780 142 L 780 80 L 1420 80 L 1420 400 L 1390 400" stroke="#3b82f6" stroke-width="3.5" fill="none"/>
+                    <path class="wire" data-module="solar solar-charger" d="M 820 142 L 820 160 L 1410 160 L 1410 110 L 1390 110" stroke="#3b82f6" stroke-width="3.5" fill="none"/>
+                    <path class="wire" data-module="battery" d="M 470 340 L 430 340 L 430 142 L 470 142" stroke="#3b82f6" stroke-width="3" fill="none"/>
+                    <path class="wire" data-module="solar" d="M 470 510 L 430 510 L 430 340" stroke="#3b82f6" stroke-width="3" fill="none"/>
+
+                    <!-- Solar Charger & Battery Wires -->
+                    <path class="wire" data-module="solar solar-charger" d="M 1030 110 L 990 110 L 990 250 L 1030 250" stroke="#eab308" stroke-width="3.5" fill="none"/>
+                    <path class="wire" data-module="solar solar-charger" d="M 1390 110 L 1410 110 L 1410 160 L 990 160 L 990 280 L 1030 280" stroke="#3b82f6" stroke-width="3" fill="none"/>
+                    <path class="wire" data-module="battery solar-charger" d="M 1390 250 L 1420 250 L 1420 340 L 1000 340 L 1000 400 L 1030 400" stroke="#a855f7" stroke-width="3.5" fill="none"/>
+                    <path class="wire" data-module="battery solar-charger" d="M 1390 280 L 1405 280 L 1405 400 L 1390 400" stroke="#3b82f6" stroke-width="3.5" fill="none"/>
+
+                    <path class="wire" data-module="battery power" d="M 1030 400 L 970 400 L 970 20 L 20 20 L 20 130 L 50 130" stroke="#f43f5e" stroke-width="3.5" fill="none"/>
+                    <path class="wire" data-module="battery power" d="M 1390 400 L 1430 400 L 1430 10 L 10 10 L 10 160 L 50 160" stroke="#3b82f6" stroke-width="3.5" fill="none"/>
+                    <path class="wire" data-module="battery" d="M 1030 400 L 960 400 L 960 240 L 470 240" stroke="#a855f7" stroke-width="3" fill="none"/>
+                    <path class="wire" data-module="solar" d="M 1030 110 L 970 110 L 970 410 L 470 410" stroke="#eab308" stroke-width="3" fill="none"/>
+
+                    <!-- Signal Wires -->
+                    <path class="wire" data-module="battery" d="M 470 290 L 350 290 L 350 440 L 310 440" stroke="#a855f7" stroke-width="3" fill="none"/>
+                    <path class="wire" data-module="solar" d="M 470 460 L 340 460 L 340 490 L 310 490" stroke="#eab308" stroke-width="3" fill="none"/>
+                </svg>
+            </div>
+
+            <!-- Wire Legend Bar -->
+            <div class="wire-legend">
+                <div class="legend-item" data-module="power"><div class="legend-color" style="background: #f43f5e;"></div> Star 5V Logic Power (Red)</div>
+                <div class="legend-item" data-module="power"><div class="legend-color" style="background: #3b82f6;"></div> Star Common Ground 0V (Blue)</div>
+                <div class="legend-item" data-module="solar-charger battery"><div class="legend-color" style="background: #a855f7; border: 1px solid #eab308;"></div> Solar Charger to Battery (12.6V CC/CV)</div>
+                <div class="legend-item" data-module="battery"><div class="legend-color" style="background: #a855f7;"></div> 12V Battery Power / A2 Divider (Purple)</div>
+                <div class="legend-item" data-module="solar"><div class="legend-color" style="background: #eab308;"></div> 22V Solar Power / A3 Divider (Gold)</div>
+            </div>
+        </div>
+
+        <!-- Master Breadboard Pin & Component Matrix -->
+        <div class="card">
+            <div class="card-title">
+                <div class="title-left">
+                    <div class="icon">📊</div>
+                    <span>Test 06 Pin & Component Connection Matrix</span>
+                </div>
+            </div>
+            
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Wire ID</th>
+                            <th>Origin Node (From)</th>
+                            <th>Breadboard Tie-Point</th>
+                            <th>Destination Node (To)</th>
+                            <th>Wire Color</th>
+                            <th>Signal Type / Voltage</th>
+                            <th>Operational Function & Safety Rule</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-module="solar solar-charger">
+                            <td><strong style="color: #eab308;">CHG-01</strong></td>
+                            <td><span class="pin-tag tag-solar">30W Solar (+) Lead [0-22V]</span></td>
+                            <td>Direct Wire</td>
+                            <td><span class="pin-tag tag-chg">Solar Charger SOLAR IN+</span></td>
+                            <td><strong style="color: #eab308;">Gold / Red</strong></td>
+                            <td>0V – 21.6V DC</td>
+                            <td>Raw solar output into 3S MPPT/PWM solar charge controller module.</td>
+                        </tr>
+                        <tr data-module="solar solar-charger">
+                            <td><strong style="color: #3b82f6;">CHG-02</strong></td>
+                            <td><span class="pin-tag tag-solar">30W Solar (-) Lead</span></td>
+                            <td><span class="pin-tag tag-bb">Top Blue Rail (-)</span></td>
+                            <td><span class="pin-tag tag-chg">Solar Charger SOLAR IN-</span></td>
+                            <td><strong style="color: #3b82f6;">Blue / Black</strong></td>
+                            <td>0.00V (Common)</td>
+                            <td>Solar ground return tied into common Star Ground bus.</td>
+                        </tr>
+                        <tr data-module="battery solar-charger">
+                            <td><strong style="color: #a855f7;">CHG-03</strong></td>
+                            <td><span class="pin-tag tag-chg">Solar Charger BAT+ Out</span></td>
+                            <td>Direct Heavy Wire</td>
+                            <td><span class="pin-tag tag-batt">3S Battery (+) [12.6V]</span></td>
+                            <td><strong style="color: #a855f7;">Purple / Red</strong></td>
+                            <td>12.60V CC/CV Charge</td>
+                            <td>Regulated charging current feeds 3S 18650 battery pack (overcharge protected).</td>
+                        </tr>
+                        <tr data-module="battery solar-charger">
+                            <td><strong style="color: #3b82f6;">CHG-04</strong></td>
+                            <td><span class="pin-tag tag-chg">Solar Charger BAT- Out</span></td>
+                            <td><span class="pin-tag tag-bb">Top Blue Rail (-)</span></td>
+                            <td><span class="pin-tag tag-batt">3S Battery (-) Terminal</span></td>
+                            <td><strong style="color: #3b82f6;">Blue / Black</strong></td>
+                            <td>0.00V (Common)</td>
+                            <td>Battery charge ground return to central Star Ground reference.</td>
+                        </tr>
+                        <tr data-module="battery power">
+                            <td><strong style="color: #f43f5e;">PWR-01</strong></td>
+                            <td><span class="pin-tag tag-batt">3S Battery (+) [12.6V]</span></td>
+                            <td>Direct Wire</td>
+                            <td><span class="pin-tag tag-pwr">LM2596 Buck IN+</span></td>
+                            <td><strong style="color: #f43f5e;">Red</strong></td>
+                            <td>11.1V – 12.6V DC</td>
+                            <td>Raw high-capacity battery supply to Buck step-down converter.</td>
+                        </tr>
+                        <tr data-module="power">
+                            <td><strong style="color: #f43f5e;">PWR-02</strong></td>
+                            <td><span class="pin-tag tag-pwr">LM2596 Buck OUT+</span></td>
+                            <td><span class="pin-tag tag-bb">Top Red Rail (+)</span></td>
+                            <td><span class="pin-tag tag-uno">Arduino 5V Pin</span></td>
+                            <td><strong style="color: #f43f5e;">Red</strong></td>
+                            <td>5.00V DC Regulated</td>
+                            <td><strong>Primary Logic Power:</strong> Powers Arduino ATmega328P MCU.</td>
+                        </tr>
+                        <tr data-module="power">
+                            <td><strong style="color: #3b82f6;">GND-01</strong></td>
+                            <td><span class="pin-tag tag-pwr">LM2596 Buck OUT-</span></td>
+                            <td><span class="pin-tag tag-bb">Top Blue Rail (-)</span></td>
+                            <td><span class="pin-tag tag-uno">Arduino GND Pin</span></td>
+                            <td><strong style="color: #3b82f6;">Blue / Slate</strong></td>
+                            <td>0.00V (Star GND)</td>
+                            <td><strong>Star Ground Reference:</strong> Central zero-volt reference point.</td>
+                        </tr>
+                        <tr data-module="battery">
+                            <td><strong style="color: #a855f7;">SIG-05</strong></td>
+                            <td><span class="pin-tag tag-bb">Row 10 (R1/R2 Junction)</span></td>
+                            <td>100kΩ / 33kΩ Divider</td>
+                            <td><span class="pin-tag tag-uno">Arduino Pin A2</span></td>
+                            <td><strong style="color: #a855f7;">Purple</strong></td>
+                            <td>0V – 3.13V Analog</td>
+                            <td>Battery voltage monitor (V<sub>batt</sub> / 4.0303). Lockout &lt; 10.0V.</td>
+                        </tr>
+                        <tr data-module="solar">
+                            <td><strong style="color: #eab308;">SIG-06</strong></td>
+                            <td><span class="pin-tag tag-bb">Row 25 (R3/R4 Junction)</span></td>
+                            <td>100kΩ / 20kΩ Divider</td>
+                            <td><span class="pin-tag tag-uno">Arduino Pin A3</span></td>
+                            <td><strong style="color: #eab308;">Gold / Yellow</strong></td>
+                            <td>0V – 3.67V Analog</td>
+                            <td>Solar panel monitor (V<sub>solar</sub> / 6.000). Harvesting &gt; 12.0V.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="note-box">
+                <h4>⚡ Golden Rules for Test 06 Assembly</h4>
+                <ul>
+                    <li><strong>1. Calibrate Buck Converter First:</strong> Adjust LM2596 brass screw to <code>5.00V &plusmn; 0.05V</code> before connecting to Arduino.</li>
+                    <li><strong>2. Verify Voltage Dividers:</strong> Ensure 100k/33k (A2) and 100k/20k (A3) dividers are properly installed to prevent over-voltage damage to Arduino analog inputs.</li>
+                    <li><strong>3. Serial Monitor Test:</strong> Upload <code>06_solar_charger_battery_test.ino</code> and open Serial Monitor at 115200 baud to view real-time solar harvesting and battery state telemetry.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const checkboxes = {
+        'solar': document.getElementById('chk-solar'),
+        'solar-charger': document.getElementById('chk-solar-charger'),
+        'battery': document.getElementById('chk-battery'),
+        'power': document.getElementById('chk-power')
+    };
+
+    const filterCounterText = document.getElementById('filter-counter-text');
+
+    function updateFilter() {
+        const activeModules = new Set();
+        let activeCount = 0;
+
+        for (const [key, chk] of Object.entries(checkboxes)) {
+            if (!chk) continue;
+            const chip = chk.closest('.filter-chip');
+            if (chk.checked) {
+                activeModules.add(key);
+                activeCount++;
+                if (chip) chip.classList.add('checked');
+            } else {
+                if (chip) chip.classList.remove('checked');
+            }
+        }
+
+        const targets = document.querySelectorAll('[data-module]');
+        targets.forEach(el => {
+            const modules = el.getAttribute('data-module').split(' ');
+            const isVisible = modules.some(m => activeModules.has(m));
+            if (isVisible) {
+                el.classList.remove('module-hidden');
+            } else {
+                el.classList.add('module-hidden');
+            }
+        });
+
+        if (filterCounterText) {
+            filterCounterText.textContent = `Showing ${activeCount} of 4 Test Modules`;
+        }
+    }
+
+    Object.values(checkboxes).forEach(chk => {
+        if (chk) chk.addEventListener('change', updateFilter);
+    });
+
+    document.getElementById('btn-charger-battery')?.addEventListener('click', function() {
+        Object.keys(checkboxes).forEach(key => {
+            if (checkboxes[key]) {
+                checkboxes[key].checked = (key === 'solar' || key === 'solar-charger' || key === 'battery');
+            }
+        });
+        updateFilter();
+    });
+
+    document.getElementById('btn-dividers')?.addEventListener('click', function() {
+        Object.keys(checkboxes).forEach(key => {
+            if (checkboxes[key]) {
+                checkboxes[key].checked = (key === 'solar' || key === 'battery');
+            }
+        });
+        updateFilter();
+    });
+
+    document.getElementById('btn-show-all')?.addEventListener('click', function() {
+        Object.keys(checkboxes).forEach(key => {
+            if (checkboxes[key]) {
+                checkboxes[key].checked = true;
+            }
+        });
+        updateFilter();
+    });
+
+    updateFilter();
+});
+</script>
+
+</body>
+</html>
