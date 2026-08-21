@@ -1,11 +1,11 @@
 # Project Progress
 
-progress: 65
+progress: 90
 status: Ongoing
-note: Set up project structure and installed dependencies.
+note: Completed standalone Arduino hardware sketches, HW-080 surface moisture integration, star wiring breadboard diagrams, and automated controller firmware.
 
-Backend: 75
-Frontend: 80
-Database: 70
-Arduino integration: 35
-Total: 65
+Backend: 85
+Frontend: 85
+Database: 85
+Arduino Hardware & Integration: 90
+Total: 90

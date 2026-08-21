@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WBACFSPWI — Arduino Star Wiring & Hardware Documentation Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-hover: #334155;
+            --border-color: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-cyan: #06b6d4;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-purple: #8b5cf6;
+            --accent-yellow: #eab308;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2.5rem 1rem;
+        }
+        .container { max-width: 1240px; margin: 0 auto; }
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.35rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-green);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            margin-bottom: 0.75rem;
+        }
+        h1 {
+            font-size: 2.4rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        p.subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 750px;
+            margin: 0 auto;
+        }
+        .hero-card {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(6, 182, 212, 0.1) 100%);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 1.25rem;
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
+        }
+        .hero-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 0.4rem;
+        }
+        .hero-desc {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            max-width: 680px;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.6rem;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .btn-green { background: var(--accent-green); color: #ffffff; }
+        .btn-green:hover { background: #059669; transform: translateY(-2px); }
+        .btn-cyan { background: var(--accent-cyan); color: #ffffff; }
+        .btn-cyan:hover { background: #0891b2; transform: translateY(-2px); }
+        .btn-amber { background: var(--accent-amber); color: #ffffff; }
+        .btn-amber:hover { background: #d97706; transform: translateY(-2px); }
+        .btn-purple { background: var(--accent-purple); color: #ffffff; }
+        .btn-purple:hover { background: #7e22ce; transform: translateY(-2px); }
+        .btn-yellow { background: var(--accent-yellow); color: #0f172a; }
+        .btn-yellow:hover { background: #ca8a04; transform: translateY(-2px); }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 1.75rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.2s ease;
+        }
+        .card:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-4px);
+            background-color: #24344d;
+        }
+        .card-tag {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+            width: fit-content;
+        }
+        .card h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        .card p {
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+        }
+        .summary-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 1.75rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+        .summary-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-primary);
+        }
+        .summary-title .icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 0.5rem;
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.95rem; }
+        th {
+            background-color: #0f172a; color: var(--text-secondary); font-weight: 600;
+            padding: 0.85rem 1rem; border-bottom: 2px solid var(--border-color);
+            text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em;
+        }
+        td { padding: 1rem; border-bottom: 1px solid var(--border-color); color: var(--text-primary); }
+        tr:hover td { background-color: rgba(255, 255, 255, 0.02); }
+        .pin-tag {
+            font-family: 'JetBrains Mono', monospace; padding: 0.2rem 0.5rem;
+            border-radius: 0.35rem; font-size: 0.85rem; font-weight: 600;
+        }
+        .tag-uno { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
+        .tag-bb { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+        .tag-pwr { background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.4); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <span class="badge">Star Wiring & Documentation Hub</span>
+        <h1>WBACFSPWI Arduino Hardware System</h1>
+        <p class="subtitle">Main Power: 3S Battery + LM2596 Buck Converter (5.00V) | Star Wiring Topology | USB Serial Data Bridge</p>
+    </header>
+
+    <!-- Master Controller Hero Card -->
+    <div class="hero-card">
+        <div>
+            <span class="card-tag" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981;">MASTER STAR PROTOTYPE</span>
+            <div class="hero-title">Full Automated Rice Irrigation Firmware</div>
+            <div class="hero-desc">Powered by 3S Battery + Buck (5.0V). Features Star Power/GND rails, dual root/surface sensing, battery lockout (<10.0V), solar telemetry, and USB serial data bridging.</div>
+        </div>
+        <a href="wbacfspwi_arduino_controller/wiring_guide.html" class="btn btn-green">Open Master Star Guide →</a>
+    </div>
+
+    <!-- Test Modules Grid -->
+    <div class="grid">
+        <!-- Test 01 -->
+        <div class="card">
+            <div>
+                <span class="card-tag" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3);">TEST 01</span>
+                <h3>Capacitive Soil Sensor (Root)</h3>
+                <p>Star breadboard wiring on pin A0. Features D8 power gating to eliminate DC sensor corrosion and Star GND connection.</p>
+            </div>
+            <a href="01_soil_root_capacitive_test/wiring_guide.html" class="btn btn-green">View Star Diagram →</a>
+        </div>
+
+        <!-- Test 02 -->
+        <div class="card">
+            <div>
+                <span class="card-tag" style="background: rgba(6, 182, 212, 0.15); color: #67e8f9; border: 1px solid rgba(6, 182, 212, 0.3);">TEST 02</span>
+                <h3>HW-080 Moisture Sensor (Surface)</h3>
+                <p>Star breadboard wiring for HW-080 probe + LM393 comparator module on pin A1 to measure rice field standing water (ponding depth).</p>
+            </div>
+            <a href="02_surface_water_level_test/wiring_guide.html" class="btn btn-cyan">View Star Diagram →</a>
+        </div>
+
+        <!-- Test 03 -->
+        <div class="card">
+            <div>
+                <span class="card-tag" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3);">TEST 03</span>
+                <h3>5V Relay & DC Water Pump</h3>
+                <p>Isolated motor current path with 1N4007 flyback diode on breadboard Row 20 & 25 returning directly to Star GND.</p>
+            </div>
+            <a href="03_relay_pump_test/wiring_guide.html" class="btn btn-amber">View Star Diagram →</a>
+        </div>
+
+        <!-- Test 04 -->
+        <div class="card">
+            <div>
+                <span class="card-tag" style="background: rgba(139, 92, 246, 0.15); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3);">TEST 04</span>
+                <h3>3S 18650 Battery Monitor</h3>
+                <p>100kΩ / 33kΩ resistor divider on breadboard scaling raw battery voltage to 0–3.13V for Arduino Pin A2.</p>
+            </div>
+            <a href="04_battery_voltage_test/wiring_guide.html" class="btn btn-purple">View Star Diagram →</a>
+        </div>
+
+        <!-- Test 05 -->
+        <div class="card">
+            <div>
+                <span class="card-tag" style="background: rgba(234, 179, 8, 0.15); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.3);">TEST 05</span>
+                <h3>30W Solar Panel Monitor</h3>
+                <p>100kΩ / 20kΩ resistor divider on breadboard scaling up to 22V open-circuit solar voltage to 0–3.67V for Arduino Pin A3.</p>
+            </div>
+            <a href="05_solar_voltage_test/wiring_guide.html" class="btn btn-yellow">View Star Diagram →</a>
+        </div>
+    </div>
+
+    <!-- Master Pin Matrix -->
+    <div class="summary-card">
+        <div class="summary-title">
+            <div class="icon">📊</div>
+            Star Wiring Architecture & Power Summary Reference
+        </div>
+        
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Power / Signal Node</th>
+                        <th>Breadboard Star Node</th>
+                        <th>Connection Description</th>
+                        <th>Operating Voltage / Threshold</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="pin-tag tag-pwr">Main Power (Buck OUT+)</span></td>
+                        <td><span class="pin-tag tag-bb">Star 5V Red Rail (+)</span></td>
+                        <td>LM2596 supplies 5.00V to Arduino 5V pin & sensors</td>
+                        <td>5.00V DC Regulated</td>
+                    </tr>
+                    <tr>
+                        <td><span class="pin-tag tag-uno">Star Ground (Buck OUT-)</span></td>
+                        <td><span class="pin-tag tag-bb">Star GND Blue Rail (-)</span></td>
+                        <td>Central return node for Arduino, battery, solar, and pump</td>
+                        <td>0.00V (Common Reference)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="pin-tag tag-uno">USB Connection</span></td>
+                        <td>Direct to Computer</td>
+                        <td>Serial Data Bridge for web dashboard & telemetry only</td>
+                        <td>115200 baud UART (Not main power)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="pin-tag tag-uno">Pin A0</span></td>
+                        <td>Sensor Signal Lead</td>
+                        <td>Root zone capacitive soil moisture</td>
+                        <td>0V – 3.0V (Irrigate &lt; 35%, Stop &ge; 65%)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="pin-tag tag-uno">Pin A1</span></td>
+                        <td>Sensor Signal Lead</td>
+                        <td>HW-080 Moisture Sensor (rice field ponding depth: dry ~950, wet ~300)</td>
+                        <td>Invert mapping: Inhibit pump if &ge; 75% ponding</td>
+                    </tr>
+                    <tr>
+                        <td><span class="pin-tag tag-uno">Pin A2</span></td>
+                        <td>Row 10 (Divider Tap)</td>
+                        <td>3S 18650 Battery voltage monitor ($V_{\text{batt}} / 4.0303$)</td>
+                        <td>Lockout cutoff &lt; 10.0V</td>
+                    </tr>
+                    <tr>
+                        <td><span class="pin-tag tag-uno">Pin A3</span></td>
+                        <td>Row 25 (Divider Tap)</td>
+                        <td>30W Solar panel voltage monitor ($V_{\text{solar}} / 6.000$)</td>
+                        <td>Daytime harvest &gt; 12.0V</td>
+                    </tr>
+                    <tr>
+                        <td><span class="pin-tag tag-uno">Pin D7</span></td>
+                        <td>Direct Jumper</td>
+                        <td>5V Relay module trigger (Active LOW)</td>
+                        <td>3-minute continuous runtime limit</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test 02: HW-080 Moisture Sensor Breadboard Wiring Guide — WBACFSPWI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-hover: #334155;
+            --border-color: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-cyan: #06b6d4;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-purple: #8b5cf6;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+        .container { max-width: 1240px; margin: 0 auto; }
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.35rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: rgba(6, 182, 212, 0.15);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            margin-bottom: 0.75rem;
+        }
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        p.subtitle { color: var(--text-secondary); font-size: 1.05rem; }
+        .nav-bar {
+            display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; margin-bottom: 2rem;
+        }
+        .nav-link {
+            font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); background: var(--bg-card);
+            padding: 0.5rem 1rem; border-radius: 0.5rem; text-decoration: none; border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #ffffff; background: var(--accent-cyan); border-color: var(--accent-cyan);
+        }
+        .grid-layout { display: grid; grid-template-columns: 1fr; gap: 2rem; }
+        .card {
+            background-color: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: 1rem; padding: 1.75rem; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+        .card-title {
+            font-size: 1.25rem; font-weight: 700; margin-bottom: 1.25rem; display: flex;
+            align-items: center; gap: 0.75rem; color: var(--text-primary);
+        }
+        .card-title .icon {
+            width: 32px; height: 32px; border-radius: 0.5rem; background: rgba(6, 182, 212, 0.2);
+            color: var(--accent-cyan); display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+        }
+        .svg-container {
+            width: 100%; overflow-x: auto; background: #090d16; border-radius: 0.75rem;
+            padding: 1.5rem 1rem; border: 1px solid #1e293b;
+        }
+        svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+        .wire {
+            stroke-dasharray: 8; animation: dash 30s linear infinite;
+            transition: stroke-width 0.2s ease, stroke 0.2s ease; cursor: pointer;
+        }
+        .wire:hover { stroke-width: 4.5px !important; filter: drop-shadow(0 0 6px currentColor); }
+        @keyframes dash { to { stroke-dashoffset: -1000; } }
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.95rem; }
+        th {
+            background-color: #0f172a; color: var(--text-secondary); font-weight: 600;
+            padding: 0.85rem 1rem; border-bottom: 2px solid var(--border-color);
+            text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em;
+        }
+        td { padding: 1rem; border-bottom: 1px solid var(--border-color); color: var(--text-primary); }
+        tr:hover td { background-color: rgba(255, 255, 255, 0.02); }
+        .pin-tag {
+            font-family: 'JetBrains Mono', monospace; padding: 0.2rem 0.5rem; border-radius: 0.35rem;
+            font-size: 0.85rem; font-weight: 600;
+        }
+        .tag-uno { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
+        .tag-bb { background: rgba(6, 182, 212, 0.2); color: #67e8f9; border: 1px solid rgba(6, 182, 212, 0.4); }
+        .tag-sensor { background: rgba(6, 182, 212, 0.2); color: #67e8f9; border: 1px solid rgba(6, 182, 212, 0.4); }
+        .tag-gnd { background: rgba(148, 163, 184, 0.2); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.4); }
+        .tag-pwr { background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.4); }
+        .tag-sig { background: rgba(6, 182, 212, 0.2); color: #22d3ee; border: 1px solid rgba(6, 182, 212, 0.4); }
+        .note-box {
+            background: rgba(6, 182, 212, 0.1); border-left: 4px solid var(--accent-cyan);
+            padding: 1.25rem; border-radius: 0 0.5rem 0.5rem 0; margin-top: 1.5rem;
+        }
+        .note-box h4 {
+            color: var(--accent-cyan); font-size: 1rem; margin-bottom: 0.5rem;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .note-box p, .note-box li { color: var(--text-secondary); font-size: 0.92rem; margin-bottom: 0.4rem; }
+        .note-box ul { padding-left: 1.25rem; }
+        code {
+            font-family: 'JetBrains Mono', monospace; background: #0f172a;
+            color: var(--accent-cyan); padding: 0.15rem 0.4rem; border-radius: 0.3rem; font-size: 0.88em;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <span class="badge">Star Wiring Test 02</span>
+        <h1>HW-080 Moisture Sensor (Surface & Ponding Depth)</h1>
+        <p class="subtitle">Main Power: 3S Battery + Buck (5.0V) | Star Wiring | HW-080 Probe + LM393 Comparator Module</p>
+    </header>
+
+    <div class="nav-bar">
+        <a href="../index.html" class="nav-link">🏠 Master Hub</a>
+        <a href="../01_soil_root_capacitive_test/wiring_guide.html" class="nav-link">Test 01: Root Soil</a>
+        <a href="wiring_guide.html" class="nav-link active">Test 02: HW-080 Surface Water</a>
+        <a href="../03_relay_pump_test/wiring_guide.html" class="nav-link">Test 03: Relay & Pump</a>
+        <a href="../04_battery_voltage_test/wiring_guide.html" class="nav-link">Test 04: Battery Monitor</a>
+        <a href="../05_solar_voltage_test/wiring_guide.html" class="nav-link">Test 05: Solar Monitor</a>
+        <a href="../wbacfspwi_arduino_controller/wiring_guide.html" class="nav-link">🚀 Full Controller</a>
+    </div>
+
+    <div class="grid-layout">
+        <!-- Visual Diagram -->
+        <div class="card">
+            <div class="card-title">
+                <div class="icon">🌊</div>
+                Interactive Star Breadboard Diagram (HW-080 Moisture Probe & LM393 Driver Board)
+            </div>
+            
+            <div class="svg-container">
+                <svg viewBox="0 0 1180 640" width="1180" height="640" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Background Grid Pattern -->
+                    <g opacity="0.05">
+                        <path d="M 0 0 L 1180 0 M 0 50 L 1180 50 M 0 100 L 1180 100 M 0 150 L 1180 150 M 0 200 L 1180 200 M 0 250 L 1180 250 M 0 300 L 1180 300 M 0 350 L 1180 350 M 0 400 L 1180 400 M 0 450 L 1180 450 M 0 500 L 1180 500 M 0 550 L 1180 550 M 0 600 L 1180 600" stroke="#ffffff" stroke-width="1"/>
+                    </g>
+
+                    <!-- Main Power: Buck Converter (Top L) -->
+                    <g id="main-power-buck">
+                        <rect x="50" y="30" width="240" height="95" rx="8" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
+                        <text x="170" y="55" fill="#fde047" font-size="13" font-weight="800" text-anchor="middle">LM2596 Buck Converter</text>
+                        <text x="170" y="75" fill="#94a3b8" font-size="10" text-anchor="middle">Main Power Source (12V -> 5.00V)</text>
+                        
+                        <circle cx="75" cy="105" r="5" fill="#f43f5e"/><text x="90" y="109" fill="#fb7185" font-size="10" font-weight="bold">OUT+ (5.0V Star)</text>
+                        <circle cx="240" cy="105" r="5" fill="#64748b"/><text x="225" y="109" fill="#cbd5e1" font-size="10" font-weight="bold" text-anchor="end">OUT- (Star GND)</text>
+                    </g>
+
+                    <!-- Arduino Uno R3 (Left) -->
+                    <g id="arduino-uno">
+                        <rect x="50" y="150" width="240" height="440" rx="14" fill="#1e293b" stroke="#3b82f6" stroke-width="2.5"/>
+                        <rect x="70" y="165" width="200" height="45" rx="6" fill="#0f172a"/>
+                        <text x="170" y="193" fill="#3b82f6" font-size="16" font-weight="800" text-anchor="middle">Arduino Uno</text>
+                        <text x="170" y="225" fill="#94a3b8" font-size="11" text-anchor="middle">Powered by Star 5V Rail</text>
+
+                        <!-- USB Data Bridge -->
+                        <rect x="110" y="128" width="120" height="22" rx="4" fill="#0284c7" stroke="#38bdf8"/>
+                        <text x="170" y="143" fill="#ffffff" font-size="9" font-weight="700" text-anchor="middle">USB Data Bridge Only</text>
+
+                        <!-- Power & Analog Headers -->
+                        <rect x="70" y="400" width="200" height="155" rx="6" fill="#0f172a"/>
+                        <circle cx="95" cy="430" r="7" fill="#f43f5e"/>
+                        <text x="110" y="434" fill="#fb7185" font-size="11" font-family="JetBrains Mono" font-weight="700">5V (Power In)</text>
+
+                        <circle cx="95" cy="465" r="7" fill="#64748b"/>
+                        <text x="110" y="469" fill="#cbd5e1" font-size="11" font-family="JetBrains Mono" font-weight="700">GND (Star)</text>
+
+                        <circle cx="250" cy="500" r="7" fill="#06b6d4"/>
+                        <text x="235" y="504" fill="#67e8f9" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">Pin A1 (AO)</text>
+
+                        <circle cx="250" cy="535" r="6" fill="#f59e0b"/>
+                        <text x="235" y="539" fill="#fbbf24" font-size="10" font-family="JetBrains Mono" font-weight="700" text-anchor="end">Pin D2 (DO Opt)</text>
+                    </g>
+
+                    <!-- Breadboard (Center) -->
+                    <g id="breadboard">
+                        <rect x="340" y="70" width="360" height="520" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+                        <rect x="360" y="85" width="320" height="30" rx="4" fill="#e2e8f0"/>
+                        <text x="520" y="105" fill="#334155" font-size="13" font-weight="800" text-anchor="middle">CENTRAL STAR BREADBOARD</text>
+
+                        <!-- Top Power Rail (+) Star 5V and (-) Star GND -->
+                        <line x1="370" y1="130" x2="670" y2="130" stroke="#ef4444" stroke-width="3"/>
+                        <text x="355" y="134" fill="#ef4444" font-size="12" font-weight="bold">+</text>
+                        <text x="520" y="126" fill="#ef4444" font-size="9" font-weight="bold" text-anchor="middle">STAR 5V POWER RAIL</text>
+
+                        <line x1="370" y1="155" x2="670" y2="155" stroke="#3b82f6" stroke-width="3"/>
+                        <text x="355" y="159" fill="#3b82f6" font-size="12" font-weight="bold">-</text>
+                        <text x="520" y="151" fill="#3b82f6" font-size="9" font-weight="bold" text-anchor="middle">STAR COMMON GROUND RAIL (0V)</text>
+
+                        <!-- Breadboard Terminals -->
+                        <!-- Row 5: 5V Star Power -->
+                        <circle cx="450" cy="230" r="6" fill="#f43f5e"/>
+                        <text x="380" y="234" fill="#f43f5e" font-size="10" font-weight="bold">Row 5 (5V Star)</text>
+
+                        <!-- Row 10: Star GND -->
+                        <circle cx="450" cy="300" r="6" fill="#64748b"/>
+                        <text x="380" y="304" fill="#64748b" font-size="10" font-weight="bold">Row 10 (Star GND)</text>
+
+                        <!-- Row 15: AO Signal -->
+                        <circle cx="450" cy="370" r="6" fill="#06b6d4"/>
+                        <text x="380" y="374" fill="#06b6d4" font-size="10" font-weight="bold">Row 15 (AO Signal)</text>
+                    </g>
+
+                    <!-- HW-080 LM393 Driver Board (Middle Right) -->
+                    <g id="hw080-driver">
+                        <rect x="740" y="70" width="200" height="230" rx="10" fill="#0f172a" stroke="#06b6d4" stroke-width="2"/>
+                        <text x="840" y="95" fill="#22d3ee" font-size="13" font-weight="800" text-anchor="middle">HW-080 Driver Board</text>
+                        <text x="840" y="115" fill="#94a3b8" font-size="10" text-anchor="middle">(LM393 Comparator)</text>
+
+                        <!-- Potentiometer -->
+                        <rect x="815" y="130" width="50" height="35" rx="4" fill="#0284c7" stroke="#38bdf8"/>
+                        <circle cx="840" cy="147" r="8" fill="#e2e8f0"/>
+                        <line x1="835" y1="147" x2="845" y2="147" stroke="#334155" stroke-width="2"/>
+
+                        <!-- 4-Pin Output Header -->
+                        <circle cx="740" cy="180" r="6" fill="#f43f5e"/><text x="755" y="184" fill="#f8fafc" font-size="10" font-family="JetBrains Mono">VCC (5V)</text>
+                        <circle cx="740" cy="210" r="6" fill="#64748b"/><text x="755" y="214" fill="#f8fafc" font-size="10" font-family="JetBrains Mono">GND (0V)</text>
+                        <circle cx="740" cy="240" r="6" fill="#f59e0b"/><text x="755" y="244" fill="#f8fafc" font-size="10" font-family="JetBrains Mono">DO (Digital)</text>
+                        <circle cx="740" cy="270" r="6" fill="#06b6d4"/><text x="755" y="274" fill="#f8fafc" font-size="10" font-family="JetBrains Mono">AO (Analog)</text>
+
+                        <!-- 2-Pin Probe Header (Right side of driver) -->
+                        <circle cx="940" cy="180" r="5" fill="#10b981"/><text x="925" y="184" fill="#34d399" font-size="9" font-family="JetBrains Mono" text-anchor="end">P1</text>
+                        <circle cx="940" cy="210" r="5" fill="#10b981"/><text x="925" y="214" fill="#34d399" font-size="9" font-family="JetBrains Mono" text-anchor="end">P2</text>
+                    </g>
+
+                    <!-- HW-080 Sensor Probe Board (Far Right) -->
+                    <g id="hw080-probe">
+                        <rect x="990" y="70" width="160" height="420" rx="10" fill="#1e293b" stroke="#06b6d4" stroke-width="2"/>
+                        <text x="1070" y="95" fill="#67e8f9" font-size="12" font-weight="800" text-anchor="middle">HW-080 Probe</text>
+                        <text x="1070" y="115" fill="#94a3b8" font-size="9" text-anchor="middle">Soil & Ponding Plate</text>
+
+                        <!-- 2 Input Terminals -->
+                        <circle cx="990" cy="180" r="5" fill="#10b981"/>
+                        <circle cx="990" cy="210" r="5" fill="#10b981"/>
+
+                        <!-- Interdigital Gold/Nickel Tracks -->
+                        <rect x="1010" y="140" width="120" height="320" rx="6" fill="#0f172a" stroke="#06b6d4"/>
+                        <line x1="1025" y1="160" x2="1025" y2="430" stroke="#f59e0b" stroke-width="4" stroke-linecap="round"/>
+                        <line x1="1045" y1="180" x2="1045" y2="430" stroke="#f59e0b" stroke-width="4" stroke-linecap="round"/>
+                        <line x1="1065" y1="160" x2="1065" y2="430" stroke="#f59e0b" stroke-width="4" stroke-linecap="round"/>
+                        <line x1="1085" y1="180" x2="1085" y2="430" stroke="#f59e0b" stroke-width="4" stroke-linecap="round"/>
+                        <line x1="1105" y1="160" x2="1105" y2="430" stroke="#f59e0b" stroke-width="4" stroke-linecap="round"/>
+                    </g>
+
+                    <!-- Jumper between Driver and Probe -->
+                    <path class="wire" d="M 940 180 L 990 180" stroke="#10b981" stroke-width="3" fill="none"/>
+                    <path class="wire" d="M 940 210 L 990 210" stroke="#10b981" stroke-width="3" fill="none"/>
+
+                    <!-- Animated Star Jumpers -->
+                    <!-- Buck OUT+ -> Star 5V Rail -->
+                    <path class="wire" d="M 75 105 L 75 80 L 370 80 L 370 130" stroke="#f43f5e" stroke-width="3.5" fill="none"/>
+
+                    <!-- Buck OUT- -> Star GND Rail -->
+                    <path class="wire" d="M 240 105 L 240 95 L 420 95 L 420 155" stroke="#94a3b8" stroke-width="3.5" fill="none"/>
+
+                    <!-- Star 5V Rail -> Arduino 5V Pin -->
+                    <path class="wire" d="M 370 130 L 320 130 L 320 430 L 95 430" stroke="#f43f5e" stroke-width="3" fill="none"/>
+
+                    <!-- Star GND Rail -> Arduino GND Pin -->
+                    <path class="wire" d="M 420 155 L 310 155 L 310 465 L 95 465" stroke="#94a3b8" stroke-width="3" fill="none"/>
+
+                    <!-- Star 5V Rail -> Row 5 -> HW-080 VCC -->
+                    <path class="wire" d="M 450 130 L 450 230" stroke="#f43f5e" stroke-width="3" fill="none"/>
+                    <path class="wire" d="M 450 230 L 640 230 L 640 180 L 740 180" stroke="#f43f5e" stroke-width="3.5" fill="none"/>
+
+                    <!-- HW-080 GND -> Row 10 -> Star GND Rail -->
+                    <path class="wire" d="M 740 210 L 660 210 L 660 300 L 450 300" stroke="#94a3b8" stroke-width="3.5" fill="none"/>
+                    <path class="wire" d="M 450 300 L 490 300 L 490 155" stroke="#94a3b8" stroke-width="3" fill="none"/>
+
+                    <!-- HW-080 AO -> Row 15 -> Arduino Pin A1 -->
+                    <path class="wire" d="M 740 270 L 680 270 L 680 370 L 450 370" stroke="#06b6d4" stroke-width="3.5" fill="none"/>
+                    <path class="wire" d="M 450 370 L 330 370 L 330 500 L 250 500" stroke="#06b6d4" stroke-width="3.5" fill="none"/>
+
+                    <!-- Optional HW-080 DO -> Arduino Pin D2 -->
+                    <path class="wire" d="M 740 240 L 700 240 L 700 480 L 340 480 L 340 535 L 250 535" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4" fill="none"/>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Connection Table -->
+        <div class="card">
+            <div class="card-title">
+                <div class="icon">📊</div>
+                HW-080 Moisture Sensor Star Wiring Reference Table
+            </div>
+            
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>From (Source)</th>
+                            <th>Breadboard Star Node</th>
+                            <th>Target HW-080 Pin</th>
+                            <th>Wire Color</th>
+                            <th>Signal Description & Threshold</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="pin-tag tag-pwr">Buck OUT+ (5.0V)</span></td>
+                            <td><span class="pin-tag tag-bb">Star 5V Red Rail (+)</span></td>
+                            <td><span class="pin-tag tag-sensor">HW-080 VCC Pin</span></td>
+                            <td><strong style="color: #f43f5e;">Red</strong></td>
+                            <td><strong>Main Power:</strong> Regulated 5.00V supply to LM393 driver board.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="pin-tag tag-gnd">Buck OUT- (GND)</span></td>
+                            <td><span class="pin-tag tag-bb">Star GND Blue Rail (-)</span></td>
+                            <td><span class="pin-tag tag-sensor">HW-080 GND Pin</span></td>
+                            <td><strong style="color: #94a3b8;">Black / Slate</strong></td>
+                            <td><strong>Star Ground:</strong> Return path connected directly to central Star GND.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="pin-tag tag-uno">Arduino Pin A1</span></td>
+                            <td><span class="pin-tag tag-bb">Row 15 (Terminal A)</span></td>
+                            <td><span class="pin-tag tag-sig">HW-080 AO Pin</span></td>
+                            <td><strong style="color: #06b6d4;">Cyan</strong></td>
+                            <td><strong>Analog Output:</strong> High ADC (~950) when dry; Low ADC (~300) when flooded.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="pin-tag tag-uno">Arduino Pin D2</span></td>
+                            <td>Direct Wire (Optional)</td>
+                            <td><span class="pin-tag tag-bb">HW-080 DO Pin</span></td>
+                            <td><strong style="color: #f59e0b;">Amber (Dashed)</strong></td>
+                            <td><strong>Digital Threshold:</strong> Triggers LOW when water crosses potentiometer setpoint.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="pin-tag tag-sensor">Driver Header (P1/P2)</span></td>
+                            <td>2-Wire Jumper</td>
+                            <td><span class="pin-tag tag-sensor">HW-080 Probe Board</span></td>
+                            <td><strong style="color: #10b981;">Green Pair</strong></td>
+                            <td>Conductive track loop sensing resistance across standing surface water.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="note-box">
+                <h4>💧 HW-080 Inverted Resistance Behavior</h4>
+                <p><strong>Analog Reading (AO):</strong><br>
+                - <strong>Dry Surface (Air):</strong> High resistance &rarr; ADC reads ~850–1023 (0% flood).<br>
+                - <strong>Standing Water (Ponding):</strong> Low resistance &rarr; ADC drops to ~250–450 (75%–100% flood).<br>
+                When ponding depth reaches &ge; 75%, the controller automatically halts the pump to prevent miniature rice field flooding.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

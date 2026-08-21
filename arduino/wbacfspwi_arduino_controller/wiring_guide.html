@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Full Controller Star Breadboard Wiring Guide — WBACFSPWI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #090d16;
+            --bg-card: #111827;
+            --bg-card-hover: #1f2937;
+            --border-color: #374151;
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --accent-cyan: #06b6d4;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-purple: #a855f7;
+            --accent-yellow: #eab308;
+            --bb-body: #1e293b;
+            --bb-hole: #0f172a;
+            --bb-border: #475569;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+        .container { max-width: 1480px; margin: 0 auto; }
+        
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.35rem 1.25rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-green);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            margin-bottom: 0.75rem;
+        }
+        h1 {
+            font-size: 2.3rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        p.subtitle { color: var(--text-secondary); font-size: 1.05rem; }
+
+        .nav-bar {
+            display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; margin-bottom: 2rem;
+        }
+        .nav-link {
+            font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); background: var(--bg-card);
+            padding: 0.5rem 1rem; border-radius: 0.5rem; text-decoration: none; border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #ffffff; background: var(--accent-green); border-color: var(--accent-green);
+        }
+
+        .grid-layout { display: grid; grid-template-columns: 1fr; gap: 2rem; }
+        
+        .card {
+            background-color: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: 1rem; padding: 1.75rem; box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+        }
+        .card-title {
+            font-size: 1.25rem; font-weight: 700; margin-bottom: 1.25rem; display: flex;
+            align-items: center; justify-content: space-between; color: var(--text-primary);
+        }
+        .card-title .title-left { display: flex; align-items: center; gap: 0.75rem; }
+        .card-title .icon {
+            width: 34px; height: 34px; border-radius: 0.5rem; background: rgba(16, 185, 129, 0.2);
+            color: var(--accent-green); display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+        }
+
+        /* SVG Canvas styling */
+        .svg-container {
+            width: 100%; overflow-x: auto; background: #050811; border-radius: 0.75rem;
+            padding: 1.5rem 1rem; border: 1px solid #1f2937; position: relative;
+        }
+        svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+        
+        /* Animated High-Visibility Wires */
+        .wire {
+            stroke-dasharray: 8;
+            animation: dash 35s linear infinite;
+            transition: stroke-width 0.2s ease, stroke 0.2s ease, filter 0.2s ease;
+            cursor: pointer;
+        }
+        .wire:hover {
+            stroke-width: 5px !important;
+            filter: drop-shadow(0 0 8px currentColor);
+        }
+        .wire-solid {
+            transition: stroke-width 0.2s ease, stroke 0.2s ease, filter 0.2s ease;
+            cursor: pointer;
+        }
+        .wire-solid:hover {
+            stroke-width: 5px !important;
+            filter: drop-shadow(0 0 8px currentColor);
+        }
+        @keyframes dash { to { stroke-dashoffset: -1000; } }
+
+        /* Terminal connection pins */
+        .term-dot {
+            transition: r 0.2s ease, fill 0.2s ease;
+            cursor: pointer;
+        }
+        .term-dot:hover {
+            r: 8px;
+            filter: drop-shadow(0 0 6px currentColor);
+        }
+
+        /* Table styling */
+        .table-responsive { overflow-x: auto; margin-top: 1rem; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.92rem; }
+        th {
+            background-color: #0b0f19; color: var(--text-secondary); font-weight: 700;
+            padding: 0.85rem 1rem; border-bottom: 2px solid var(--border-color);
+            text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em;
+        }
+        td { padding: 0.9rem 1rem; border-bottom: 1px solid var(--border-color); color: var(--text-primary); }
+        tr:hover td { background-color: rgba(255, 255, 255, 0.03); }
+        
+        .pin-tag {
+            font-family: 'JetBrains Mono', monospace; padding: 0.2rem 0.55rem; border-radius: 0.35rem;
+            font-size: 0.82rem; font-weight: 700; display: inline-block;
+        }
+        .tag-uno { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
+        .tag-bb { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+        .tag-sensor { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+        .tag-gnd { background: rgba(148, 163, 184, 0.2); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.4); }
+        .tag-pwr { background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.4); }
+        .tag-relay { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+        .tag-batt { background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.4); }
+        .tag-solar { background: rgba(234, 179, 8, 0.2); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.4); }
+
+        .note-box {
+            background: rgba(16, 185, 129, 0.08); border-left: 4px solid var(--accent-green);
+            padding: 1.25rem; border-radius: 0 0.5rem 0.5rem 0; margin-top: 1.5rem;
+        }
+        .note-box h4 {
+            color: var(--accent-green); font-size: 1rem; margin-bottom: 0.5rem;
+            display: flex; align-items: center; gap: 0.5rem; font-weight: 700;
+        }
+        .note-box p, .note-box li { color: var(--text-secondary); font-size: 0.92rem; margin-bottom: 0.4rem; }
+        .note-box ul { padding-left: 1.25rem; }
+
+        .wire-legend {
+            display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1rem; padding: 0.75rem;
+            background: #090d16; border-radius: 0.5rem; border: 1px solid #1f2937;
+        }
+        .legend-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); }
+        .legend-color { width: 14px; height: 14px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <span class="badge">Master Full Controller Wiring Schematic</span>
+        <h1>WBACFSPWI Master Star Breadboard Assembly Guide</h1>
+        <p class="subtitle">Complete High-Visibility Wiring Schematic: 3S Battery + Buck (5V) Main Power | Dark Breadboard | Connected Star Jumpers | HW-080 & Capacitive Dual-Sensor Setup</p>
+    </header>
+
+    <div class="nav-bar">
+        <a href="../index.html" class="nav-link">🏠 Master Hub</a>
+        <a href="../01_soil_root_capacitive_test/wiring_guide.html" class="nav-link">Test 01: Root Soil</a>
+        <a href="../02_surface_water_level_test/wiring_guide.html" class="nav-link">Test 02: HW-080 Surface</a>
+        <a href="../03_relay_pump_test/wiring_guide.html" class="nav-link">Test 03: Relay & Pump</a>
+        <a href="../04_battery_voltage_test/wiring_guide.html" class="nav-link">Test 04: Battery Monitor</a>
+        <a href="../05_solar_voltage_test/wiring_guide.html" class="nav-link">Test 05: Solar Monitor</a>
+        <a href="wiring_guide.html" class="nav-link active">🚀 Full Controller</a>
+    </div>
+
+    <div class="grid-layout">
+        <!-- Visual Schematic Card -->
+        <div class="card">
+            <div class="card-title">
+                <div class="title-left">
+                    <div class="icon">⚡</div>
+                    <span>Master Circuit Schematic (Dark Breadboard with 100% Fully Connected Terminals)</span>
+                </div>
+            </div>
+            
+            <div class="svg-container">
+                <svg viewBox="0 0 1440 920" width="1440" height="920" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Background Grid -->
+                    <defs>
+                        <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.75" opacity="0.6"/>
+                        </pattern>
+                    </defs>
+                    <rect width="1440" height="920" fill="#050811"/>
+                    <rect width="1440" height="920" fill="url(#grid)"/>
+
+                    <!-- ======================================================= -->
+                    <!-- 1. LEFT COLUMN: POWER STAGE & ARDUINO UNO R3           -->
+                    <!-- ======================================================= -->
+                    
+                    <!-- 1A. LM2596 BUCK CONVERTER (MAIN POWER STAGE) -->
+                    <g id="buck-converter">
+                        <rect x="50" y="40" width="280" height="150" rx="10" fill="#111827" stroke="#f59e0b" stroke-width="2"/>
+                        <rect x="70" y="55" width="240" height="30" rx="4" fill="#1f2937"/>
+                        <text x="190" y="75" fill="#fde047" font-size="13" font-weight="800" text-anchor="middle">LM2596 BUCK CONVERTER</text>
+                        <text x="190" y="100" fill="#9ca3af" font-size="10" text-anchor="middle">MAIN SYSTEM POWER (12V IN &rarr; 5.00V OUT)</text>
+
+                        <!-- Input Terminals (from 3S Battery) -->
+                        <circle id="buck-in-pos" cx="50" cy="130" r="6" fill="#f43f5e" class="term-dot"/>
+                        <text x="65" y="134" fill="#fb7185" font-size="10" font-family="JetBrains Mono" font-weight="700">IN+ (12V)</text>
+
+                        <circle id="buck-in-neg" cx="50" cy="160" r="6" fill="#64748b" class="term-dot"/>
+                        <text x="65" y="164" fill="#cbd5e1" font-size="10" font-family="JetBrains Mono" font-weight="700">IN- (GND)</text>
+
+                        <!-- Output Terminals (to Star Breadboard Rails) -->
+                        <circle id="buck-out-pos" cx="330" cy="130" r="7" fill="#f43f5e" class="term-dot"/>
+                        <text x="315" y="134" fill="#fb7185" font-size="10" font-family="JetBrains Mono" font-weight="700" text-anchor="end">OUT+ (5.00V)</text>
+
+                        <circle id="buck-out-neg" cx="330" cy="160" r="7" fill="#3b82f6" class="term-dot"/>
+                        <text x="315" y="164" fill="#93c5fd" font-size="10" font-family="JetBrains Mono" font-weight="700" text-anchor="end">OUT- (Star GND)</text>
+                    </g>
+
+                    <!-- 1B. ARDUINO UNO R3 -->
+                    <g id="arduino-uno">
+                        <rect x="50" y="230" width="280" height="640" rx="14" fill="#0f172a" stroke="#3b82f6" stroke-width="2.5"/>
+                        <rect x="70" y="245" width="240" height="45" rx="6" fill="#1e293b"/>
+                        <text x="190" y="273" fill="#60a5fa" font-size="16" font-weight="800" text-anchor="middle">ARDUINO UNO R3</text>
+                        <text x="190" y="305" fill="#94a3b8" font-size="11" text-anchor="middle">Automation & Telemetry Engine</text>
+
+                        <!-- USB Port Box -->
+                        <rect x="100" y="218" width="180" height="24" rx="4" fill="#0284c7" stroke="#38bdf8"/>
+                        <text x="190" y="234" fill="#ffffff" font-size="9.5" font-family="JetBrains Mono" font-weight="700" text-anchor="middle">USB SERIAL DATA BRIDGE</text>
+
+                        <!-- DIGITAL PINS HEADER (TOP-RIGHT of UNO) -->
+                        <rect x="70" y="330" width="240" height="130" rx="6" fill="#1e293b"/>
+                        <text x="85" y="350" fill="#94a3b8" font-size="10" font-weight="700">DIGITAL I/O</text>
+
+                        <circle id="uno-d2" cx="310" cy="370" r="6" fill="#f59e0b" class="term-dot"/>
+                        <text x="295" y="374" fill="#fbbf24" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">Pin D2 (HW-080 DO)</text>
+
+                        <circle id="uno-d7" cx="310" cy="405" r="6" fill="#f59e0b" class="term-dot"/>
+                        <text x="295" y="409" fill="#fbbf24" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">Pin D7 (Relay Trigger)</text>
+
+                        <circle id="uno-d8" cx="310" cy="440" r="6" fill="#ec4899" class="term-dot"/>
+                        <text x="295" y="444" fill="#f472b6" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">Pin D8 (Capacitive Pwr)</text>
+
+                        <!-- POWER HEADER (BOTTOM-LEFT of UNO) -->
+                        <rect x="70" y="480" width="240" height="130" rx="6" fill="#1e293b"/>
+                        <text x="85" y="500" fill="#94a3b8" font-size="10" font-weight="700">POWER INPUT</text>
+
+                        <circle id="uno-5v" cx="310" cy="530" r="7" fill="#f43f5e" class="term-dot"/>
+                        <text x="295" y="534" fill="#fb7185" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">5V (Main Logic In)</text>
+
+                        <circle id="uno-gnd" cx="310" cy="575" r="7" fill="#3b82f6" class="term-dot"/>
+                        <text x="295" y="579" fill="#93c5fd" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">GND (Common Return)</text>
+
+                        <!-- ANALOG PINS HEADER (BOTTOM-RIGHT of UNO) -->
+                        <rect x="70" y="630" width="240" height="215" rx="6" fill="#1e293b"/>
+                        <text x="85" y="650" fill="#94a3b8" font-size="10" font-weight="700">ANALOG IN (ADC)</text>
+
+                        <circle id="uno-a0" cx="310" cy="680" r="6" fill="#10b981" class="term-dot"/>
+                        <text x="295" y="684" fill="#34d399" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">Pin A0 (Root Moisture)</text>
+
+                        <circle id="uno-a1" cx="310" cy="725" r="6" fill="#06b6d4" class="term-dot"/>
+                        <text x="295" y="729" fill="#67e8f9" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">Pin A1 (HW-080 Surface)</text>
+
+                        <circle id="uno-a2" cx="310" cy="770" r="6" fill="#a855f7" class="term-dot"/>
+                        <text x="295" y="774" fill="#c084fc" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">Pin A2 (Battery Voltage)</text>
+
+                        <circle id="uno-a3" cx="310" cy="815" r="6" fill="#eab308" class="term-dot"/>
+                        <text x="295" y="819" fill="#fde047" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">Pin A3 (Solar Voltage)</text>
+                    </g>
+
+
+                    <!-- ======================================================= -->
+                    <!-- 2. CENTER STAGE: DARK SOLDERLESS BREADBOARD (STAR HUB)  -->
+                    <!-- ======================================================= -->
+                    <g id="master-breadboard">
+                        <!-- Breadboard Base Body (Dark Charcoal) -->
+                        <rect x="410" y="40" width="560" height="830" rx="14" fill="#1e293b" stroke="#475569" stroke-width="2.5"/>
+                        
+                        <!-- Header Banner -->
+                        <rect x="430" y="55" width="520" height="35" rx="5" fill="#0f172a"/>
+                        <text x="690" y="78" fill="#f8fafc" font-size="14" font-weight="800" text-anchor="middle">CENTRAL STAR SOLDERLESS BREADBOARD (FULL PROTOTYPE)</text>
+
+                        <!-- ================= TOP POWER RAILS ================= -->
+                        <rect x="430" y="105" width="520" height="50" rx="4" fill="#0f172a" stroke="#334155"/>
+                        
+                        <!-- Red (+) Star 5V Rail -->
+                        <line x1="450" y1="120" x2="930" y2="120" stroke="#ef4444" stroke-width="3"/>
+                        <text x="440" y="124" fill="#ef4444" font-size="14" font-weight="900" text-anchor="end">+</text>
+                        <text x="690" y="117" fill="#f87171" font-size="9" font-family="JetBrains Mono" font-weight="800" text-anchor="middle">STAR 5V POWER RAIL (REGULATED 5.00V FROM BUCK OUT+)</text>
+                        
+                        <!-- Blue (-) Star GND Rail -->
+                        <line x1="450" y1="142" x2="930" y2="142" stroke="#3b82f6" stroke-width="3"/>
+                        <text x="440" y="146" fill="#3b82f6" font-size="16" font-weight="900" text-anchor="end">-</text>
+                        <text x="690" y="152" fill="#60a5fa" font-size="9" font-family="JetBrains Mono" font-weight="800" text-anchor="middle">STAR COMMON GROUND BUS (0V RETURN FOR ALL MODULES)</text>
+
+                        <!-- Breadboard Column Labels -->
+                        <g fill="#64748b" font-size="9" font-family="JetBrains Mono" font-weight="700">
+                            <text x="470" y="175">A</text><text x="490" y="175">B</text><text x="510" y="175">C</text><text x="530" y="175">D</text><text x="550" y="175">E</text>
+                            <text x="690" y="175" fill="#475569">--- NOTCH ---</text>
+                            <text x="830" y="175">F</text><text x="850" y="175">G</text><text x="870" y="175">H</text><text x="890" y="175">I</text><text x="910" y="175">J</text>
+                        </g>
+
+                        <!-- Center Divider Channel -->
+                        <rect x="680" y="185" width="20" height="610" fill="#0f172a"/>
+
+                        <!-- ================= PHYSICAL ON-BREADBOARD CIRCUITS ================= -->
+
+                        <!-- SECTION 1: BATTERY VOLTAGE DIVIDER (Rows 5 - 15) -->
+                        <g id="bb-batt-divider">
+                            <rect x="445" y="195" width="220" height="155" rx="6" fill="#111827" stroke="#a855f7" stroke-width="1.5"/>
+                            <text x="455" y="215" fill="#c084fc" font-size="11" font-weight="800">1. BATTERY DIVIDER (100k / 33k)</text>
+
+                            <!-- Row 5: Battery (+) Input -->
+                            <circle id="bb-r5-in" cx="470" cy="240" r="5" fill="#f43f5e" class="term-dot"/>
+                            <text x="485" y="244" fill="#fb7185" font-size="10" font-family="JetBrains Mono">Row 5: Batt (+12V In)</text>
+
+                            <!-- Resistor R1 (100kΩ) spanning Row 5 to Row 10 -->
+                            <rect x="520" y="250" width="20" height="35" rx="3" fill="#d97706" stroke="#fbbf24"/>
+                            <text x="550" y="272" fill="#fde047" font-size="9" font-family="JetBrains Mono" font-weight="700">R1 (100kΩ)</text>
+
+                            <!-- Row 10: Junction Tap to Arduino A2 -->
+                            <circle id="bb-r10-tap" cx="470" cy="290" r="6" fill="#a855f7" class="term-dot"/>
+                            <text x="485" y="294" fill="#c084fc" font-size="10" font-family="JetBrains Mono" font-weight="700">Row 10: Tap &rarr; A2</text>
+
+                            <!-- Resistor R2 (33kΩ) spanning Row 10 to Row 15 -->
+                            <rect x="520" y="300" width="20" height="35" rx="3" fill="#d97706" stroke="#fbbf24"/>
+                            <text x="550" y="322" fill="#fde047" font-size="9" font-family="JetBrains Mono" font-weight="700">R2 (33kΩ)</text>
+
+                            <!-- Row 15: Ground Return -->
+                            <circle id="bb-r15-gnd" cx="470" cy="340" r="5" fill="#3b82f6" class="term-dot"/>
+                            <text x="485" y="344" fill="#93c5fd" font-size="10" font-family="JetBrains Mono">Row 15: &rarr; Star GND</text>
+                        </g>
+
+                        <!-- SECTION 2: SOLAR PANEL DIVIDER (Rows 20 - 30) -->
+                        <g id="bb-solar-divider">
+                            <rect x="445" y="365" width="220" height="155" rx="6" fill="#111827" stroke="#eab308" stroke-width="1.5"/>
+                            <text x="455" y="385" fill="#fde047" font-size="11" font-weight="800">2. SOLAR DIVIDER (100k / 20k)</text>
+
+                            <!-- Row 20: Solar (+) Input -->
+                            <circle id="bb-r20-in" cx="470" cy="410" r="5" fill="#f43f5e" class="term-dot"/>
+                            <text x="485" y="414" fill="#fb7185" font-size="10" font-family="JetBrains Mono">Row 20: Solar (+22V In)</text>
+
+                            <!-- Resistor R3 (100kΩ) spanning Row 20 to Row 25 -->
+                            <rect x="520" y="420" width="20" height="35" rx="3" fill="#d97706" stroke="#fbbf24"/>
+                            <text x="550" y="442" fill="#fde047" font-size="9" font-family="JetBrains Mono" font-weight="700">R3 (100kΩ)</text>
+
+                            <!-- Row 25: Junction Tap to Arduino A3 -->
+                            <circle id="bb-r25-tap" cx="470" cy="460" r="6" fill="#eab308" class="term-dot"/>
+                            <text x="485" y="464" fill="#fde047" font-size="10" font-family="JetBrains Mono" font-weight="700">Row 25: Tap &rarr; A3</text>
+
+                            <!-- Resistor R4 (20kΩ) spanning Row 25 to Row 30 -->
+                            <rect x="520" y="470" width="20" height="35" rx="3" fill="#d97706" stroke="#fbbf24"/>
+                            <text x="550" y="492" fill="#fde047" font-size="9" font-family="JetBrains Mono" font-weight="700">R4 (20kΩ)</text>
+
+                            <!-- Row 30: Ground Return -->
+                            <circle id="bb-r30-gnd" cx="470" cy="510" r="5" fill="#3b82f6" class="term-dot"/>
+                            <text x="485" y="514" fill="#93c5fd" font-size="10" font-family="JetBrains Mono">Row 30: &rarr; Star GND</text>
+                        </g>
+
+                        <!-- SECTION 3: FLYBACK DIODE PROTECTION & MOTOR JUNCTION (Rows 35 - 45) -->
+                        <g id="bb-flyback-diode">
+                            <rect x="445" y="535" width="220" height="155" rx="6" fill="#111827" stroke="#f43f5e" stroke-width="1.5"/>
+                            <text x="455" y="555" fill="#fb7185" font-size="11" font-weight="800">3. 1N4007 FLYBACK DIODE</text>
+
+                            <!-- Row 35: Pump (+) & Diode Cathode (Silver Band) -->
+                            <circle id="bb-r35-cath" cx="470" cy="580" r="6" fill="#3b82f6" class="term-dot"/>
+                            <text x="485" y="584" fill="#93c5fd" font-size="10" font-family="JetBrains Mono" font-weight="700">Row 35: Cathode (Silver)</text>
+
+                            <!-- Diode Component Body -->
+                            <rect x="520" y="590" width="26" height="50" rx="4" fill="#0f172a" stroke="#f43f5e" stroke-width="1.5"/>
+                            <line x1="520" y1="600" x2="546" y2="600" stroke="#cbd5e1" stroke-width="3"/>
+                            <text x="555" y="620" fill="#ffffff" font-size="9" font-family="JetBrains Mono" font-weight="800">1N4007</text>
+
+                            <!-- Row 40: Pump (-) & Diode Anode (Ground) -->
+                            <circle id="bb-r40-anode" cx="470" cy="650" r="6" fill="#3b82f6" class="term-dot"/>
+                            <text x="485" y="654" fill="#93c5fd" font-size="10" font-family="JetBrains Mono" font-weight="700">Row 40: Anode &rarr; GND</text>
+                        </g>
+
+                        <!-- SECTION 4: SENSOR POWER GATE & SENSOR HUBS (Rows 50 - 55) -->
+                        <g id="bb-sensor-hubs">
+                            <rect x="445" y="705" width="220" height="90" rx="6" fill="#111827" stroke="#10b981" stroke-width="1.5"/>
+                            <text x="455" y="725" fill="#34d399" font-size="11" font-weight="800">4. SENSOR POWER DISTRIBUTION</text>
+
+                            <!-- Row 50: D8 Power Gate Out to Capacitive VCC -->
+                            <circle id="bb-r50-d8" cx="470" cy="750" r="5" fill="#ec4899" class="term-dot"/>
+                            <text x="485" y="754" fill="#f472b6" font-size="10" font-family="JetBrains Mono">Row 50: D8 Gate &rarr; Cap VCC</text>
+
+                            <!-- Row 55: Sensor Ground Return -->
+                            <circle id="bb-r55-gnd" cx="470" cy="780" r="5" fill="#3b82f6" class="term-dot"/>
+                            <text x="485" y="784" fill="#93c5fd" font-size="10" font-family="JetBrains Mono">Row 55: Sensor GND &rarr; Rail</text>
+                        </g>
+
+                        <!-- ================= BOTTOM POWER RAILS ================= -->
+                        <rect x="430" y="805" width="520" height="50" rx="4" fill="#0f172a" stroke="#334155"/>
+                        <line x1="450" y1="820" x2="930" y2="820" stroke="#ef4444" stroke-width="3"/>
+                        <text x="440" y="824" fill="#ef4444" font-size="14" font-weight="900" text-anchor="end">+</text>
+                        <line x1="450" y1="842" x2="930" y2="842" stroke="#3b82f6" stroke-width="3"/>
+                        <text x="440" y="846" fill="#3b82f6" font-size="16" font-weight="900" text-anchor="end">-</text>
+                    </g>
+
+
+                    <!-- ======================================================= -->
+                    <!-- 3. RIGHT COLUMN: EXTERNAL PERIPHERALS & SENSORS        -->
+                    <!-- ======================================================= -->
+
+                    <!-- 3A. 3S 18650 BATTERY PACK (TOP RIGHT) -->
+                    <g id="battery-pack">
+                        <rect x="1030" y="40" width="360" height="120" rx="10" fill="#111827" stroke="#a855f7" stroke-width="2"/>
+                        <rect x="1050" y="55" width="320" height="30" rx="4" fill="#1f2937"/>
+                        <text x="1210" y="75" fill="#c084fc" font-size="13" font-weight="800" text-anchor="middle">3S 18650 LI-ION BATTERY PACK</text>
+                        <text x="1210" y="100" fill="#9ca3af" font-size="10" text-anchor="middle">11.1V NOMINAL / 12.60V FULL CHARGE</text>
+
+                        <circle id="batt-pos" cx="1030" cy="130" r="7" fill="#f43f5e" class="term-dot"/>
+                        <text x="1045" y="134" fill="#fb7185" font-size="11" font-family="JetBrains Mono" font-weight="700">(+) 12V Main Lead</text>
+
+                        <circle id="batt-neg" cx="1390" cy="130" r="7" fill="#3b82f6" class="term-dot"/>
+                        <text x="1375" y="134" fill="#93c5fd" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">(-) Common Ground</text>
+                    </g>
+
+                    <!-- 3B. 30W SOLAR PANEL (UPPER-MIDDLE RIGHT) -->
+                    <g id="solar-panel">
+                        <rect x="1030" y="180" width="360" height="120" rx="10" fill="#111827" stroke="#eab308" stroke-width="2"/>
+                        <rect x="1050" y="195" width="320" height="30" rx="4" fill="#1f2937"/>
+                        <text x="1210" y="215" fill="#fde047" font-size="13" font-weight="800" text-anchor="middle">30W SOLAR PANEL</text>
+                        <text x="1210" y="240" fill="#9ca3af" font-size="10" text-anchor="middle">18V OPERATING / 21.6V VOC OPEN CIRCUIT</text>
+
+                        <circle id="solar-pos" cx="1030" cy="270" r="7" fill="#f43f5e" class="term-dot"/>
+                        <text x="1045" y="274" fill="#fb7185" font-size="11" font-family="JetBrains Mono" font-weight="700">(+) Solar Pos (0-22V)</text>
+
+                        <circle id="solar-neg" cx="1390" cy="270" r="7" fill="#3b82f6" class="term-dot"/>
+                        <text x="1375" y="274" fill="#93c5fd" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">(-) Solar Ground</text>
+                    </g>
+
+                    <!-- 3C. 5V RELAY MODULE & DC WATER PUMP (MIDDLE RIGHT) -->
+                    <g id="relay-module">
+                        <rect x="1030" y="320" width="360" height="180" rx="10" fill="#0f172a" stroke="#f59e0b" stroke-width="2"/>
+                        <rect x="1050" y="335" width="320" height="30" rx="4" fill="#1e293b"/>
+                        <text x="1210" y="355" fill="#fbbf24" font-size="13" font-weight="800" text-anchor="middle">5V OPTOCOUPLER RELAY MODULE</text>
+
+                        <!-- Low Voltage Control Side (from Star & Arduino) -->
+                        <circle id="relay-vcc" cx="1030" cy="390" r="6" fill="#f43f5e" class="term-dot"/>
+                        <text x="1045" y="394" fill="#fb7185" font-size="10" font-family="JetBrains Mono">VCC (Star 5V)</text>
+
+                        <circle id="relay-gnd" cx="1030" cy="425" r="6" fill="#3b82f6" class="term-dot"/>
+                        <text x="1045" y="429" fill="#93c5fd" font-size="10" font-family="JetBrains Mono">GND (Star GND)</text>
+
+                        <circle id="relay-in" cx="1030" cy="460" r="6" fill="#f59e0b" class="term-dot"/>
+                        <text x="1045" y="464" fill="#fbbf24" font-size="10" font-family="JetBrains Mono">IN (Trigger from D7)</text>
+
+                        <!-- High Voltage Motor Switch Screw Terminals -->
+                        <circle id="relay-com" cx="1390" cy="405" r="7" fill="#a855f7" class="term-dot"/>
+                        <text x="1375" y="409" fill="#c084fc" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">COM (from Batt +12V)</text>
+
+                        <circle id="relay-no" cx="1390" cy="445" r="7" fill="#3b82f6" class="term-dot"/>
+                        <text x="1375" y="449" fill="#93c5fd" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">NO (&rarr; Breadboard Row 35)</text>
+                    </g>
+
+                    <!-- 3D. DC WATER PUMP -->
+                    <g id="pump-unit">
+                        <rect x="1030" y="520" width="360" height="100" rx="10" fill="#111827" stroke="#06b6d4" stroke-width="2"/>
+                        <text x="1210" y="545" fill="#67e8f9" font-size="13" font-weight="800" text-anchor="middle">SUBMERSIBLE DC WATER PUMP</text>
+                        <text x="1210" y="565" fill="#9ca3af" font-size="10" text-anchor="middle">12V DC INDUCTIVE MOTOR</text>
+
+                        <circle id="pump-pos" cx="1030" cy="590" r="6" fill="#3b82f6" class="term-dot"/>
+                        <text x="1045" y="594" fill="#93c5fd" font-size="10" font-family="JetBrains Mono">Pump (+) Lead &larr; Row 35</text>
+
+                        <circle id="pump-neg" cx="1390" cy="590" r="6" fill="#3b82f6" class="term-dot"/>
+                        <text x="1375" y="594" fill="#93c5fd" font-size="10" font-family="JetBrains Mono" text-anchor="end">Pump (-) Lead &rarr; Row 40 (GND)</text>
+                    </g>
+
+                    <!-- 3E. SENSOR 1: CAPACITIVE SOIL MOISTURE SENSOR V1.2 (ROOT ZONE) -->
+                    <g id="capacitive-sensor">
+                        <rect x="1030" y="640" width="360" height="110" rx="10" fill="#0f172a" stroke="#10b981" stroke-width="2"/>
+                        <text x="1210" y="665" fill="#34d399" font-size="13" font-weight="800" text-anchor="middle">CAPACITIVE SOIL MOISTURE V1.2</text>
+                        <text x="1210" y="685" fill="#9ca3af" font-size="10" text-anchor="middle">ROOT ZONE PROBE (CORROSION-RESISTANT)</text>
+
+                        <circle id="cap-vcc" cx="1030" cy="715" r="6" fill="#ec4899" class="term-dot"/>
+                        <text x="1045" y="719" fill="#f472b6" font-size="10" font-family="JetBrains Mono">VCC (D8 Gated)</text>
+
+                        <circle id="cap-gnd" cx="1210" cy="715" r="6" fill="#3b82f6" class="term-dot"/>
+                        <text x="1225" y="719" fill="#93c5fd" font-size="10" font-family="JetBrains Mono">GND</text>
+
+                        <circle id="cap-aout" cx="1390" cy="715" r="6" fill="#10b981" class="term-dot"/>
+                        <text x="1375" y="719" fill="#34d399" font-size="10" font-family="JetBrains Mono" font-weight="700" text-anchor="end">AOUT &rarr; Pin A0</text>
+                    </g>
+
+                    <!-- 3F. SENSOR 2: HW-080 MOISTURE SENSOR (SURFACE PONDING LAYER) -->
+                    <g id="hw080-sensor">
+                        <rect x="1030" y="770" width="360" height="120" rx="10" fill="#0f172a" stroke="#06b6d4" stroke-width="2"/>
+                        <text x="1210" y="795" fill="#67e8f9" font-size="13" font-weight="800" text-anchor="middle">HW-080 MOISTURE SENSOR MODULE</text>
+                        <text x="1210" y="815" fill="#9ca3af" font-size="10" text-anchor="middle">SURFACE PONDING PROBE + LM393 DRIVER</text>
+
+                        <circle id="hw-vcc" cx="1030" cy="850" r="6" fill="#f43f5e" class="term-dot"/>
+                        <text x="1045" y="854" fill="#fb7185" font-size="10" font-family="JetBrains Mono">VCC (Star 5V)</text>
+
+                        <circle id="hw-gnd" cx="1150" cy="850" r="6" fill="#3b82f6" class="term-dot"/>
+                        <text x="1165" y="854" fill="#93c5fd" font-size="10" font-family="JetBrains Mono">GND</text>
+
+                        <circle id="hw-do" cx="1270" cy="850" r="6" fill="#f59e0b" class="term-dot"/>
+                        <text x="1285" y="854" fill="#fbbf24" font-size="10" font-family="JetBrains Mono">DO &rarr; D2</text>
+
+                        <circle id="hw-ao" cx="1390" cy="850" r="6" fill="#06b6d4" class="term-dot"/>
+                        <text x="1375" y="854" fill="#67e8f9" font-size="10" font-family="JetBrains Mono" font-weight="700" text-anchor="end">AO &rarr; Pin A1</text>
+                    </g>
+
+
+                    <!-- ======================================================= -->
+                    <!-- 4. ANIMATED HIGH-VISIBILITY WIRE ROUTING               -->
+                    <!-- ======================================================= -->
+
+                    <!-- [WIRE GROUP A: STAR 5V REGULATED LOGIC POWER (RED)] -->
+                    <!-- A1: Buck OUT+ (330, 130) -> Breadboard Top Star 5V Rail (470, 120) -->
+                    <path class="wire" d="M 330 130 L 400 130 L 400 120 L 470 120" stroke="#f43f5e" stroke-width="3.5" fill="none"/>
+                    
+                    <!-- A2: Top Star 5V Rail (500, 120) -> Arduino 5V Pin (310, 530) -->
+                    <path class="wire" d="M 500 120 L 380 120 L 380 530 L 310 530" stroke="#f43f5e" stroke-width="3.5" fill="none"/>
+
+                    <!-- A3: Top Star 5V Rail (750, 120) -> Relay VCC (1030, 390) -->
+                    <path class="wire" d="M 750 120 L 750 100 L 1000 100 L 1000 390 L 1030 390" stroke="#f43f5e" stroke-width="3" fill="none"/>
+
+                    <!-- A4: Top Star 5V Rail (880, 120) -> HW-080 VCC (1030, 850) -->
+                    <path class="wire" d="M 880 120 L 880 140 L 980 140 L 980 850 L 1030 850" stroke="#f43f5e" stroke-width="3" fill="none"/>
+
+
+                    <!-- [WIRE GROUP B: STAR COMMON GROUND BUS (BLUE)] -->
+                    <!-- B1: Buck OUT- (330, 160) -> Breadboard Top Star GND Rail (470, 142) -->
+                    <path class="wire" d="M 330 160 L 410 160 L 410 142 L 470 142" stroke="#3b82f6" stroke-width="3.5" fill="none"/>
+
+                    <!-- B2: Top Star GND Rail (520, 142) -> Arduino GND Pin (310, 575) -->
+                    <path class="wire" d="M 520 142 L 360 142 L 360 575 L 310 575" stroke="#3b82f6" stroke-width="3.5" fill="none"/>
+
+                    <!-- B3: Top Star GND Rail (780, 142) -> Battery (-) Lead (1390, 130) -->
+                    <path class="wire" d="M 780 142 L 780 80 L 1420 80 L 1420 130 L 1390 130" stroke="#3b82f6" stroke-width="3.5" fill="none"/>
+
+                    <!-- B4: Top Star GND Rail (820, 142) -> Solar (-) Lead (1390, 270) -->
+                    <path class="wire" d="M 820 142 L 820 160 L 1410 160 L 1410 270 L 1390 270" stroke="#3b82f6" stroke-width="3" fill="none"/>
+
+                    <!-- B5: Top Star GND Rail (850, 142) -> Relay GND (1030, 425) -->
+                    <path class="wire" d="M 850 142 L 850 310 L 990 310 L 990 425 L 1030 425" stroke="#3b82f6" stroke-width="3" fill="none"/>
+
+                    <!-- B6: Top Star GND Rail (870, 142) -> Capacitive Sensor GND (1210, 715) -->
+                    <path class="wire" d="M 870 142 L 870 330 L 1010 330 L 1010 740 L 1210 740 L 1210 715" stroke="#3b82f6" stroke-width="3" fill="none"/>
+
+                    <!-- B7: Top Star GND Rail (890, 142) -> HW-080 GND (1150, 850) -->
+                    <path class="wire" d="M 890 142 L 890 340 L 1000 340 L 1000 870 L 1150 870 L 1150 850" stroke="#3b82f6" stroke-width="3" fill="none"/>
+
+                    <!-- B8: On-Breadboard Battery Divider R2 Ground -> Star GND Rail -->
+                    <path class="wire" d="M 470 340 L 430 340 L 430 142 L 470 142" stroke="#3b82f6" stroke-width="3" fill="none"/>
+
+                    <!-- B9: On-Breadboard Solar Divider R4 Ground -> Star GND Rail -->
+                    <path class="wire" d="M 470 510 L 430 510 L 430 340" stroke="#3b82f6" stroke-width="3" fill="none"/>
+
+                    <!-- B10: On-Breadboard Flyback Diode Anode / Pump (-) Ground -> Star GND Rail -->
+                    <path class="wire" d="M 470 650 L 430 650 L 430 510" stroke="#3b82f6" stroke-width="3.5" fill="none"/>
+
+
+                    <!-- [WIRE GROUP C: RAW 12V HIGH-CURRENT POWER & RELAY SWITCHING] -->
+                    <!-- C1: Battery (+) Lead (1030, 130) -> Buck Converter IN+ (50, 130) -->
+                    <path class="wire" d="M 1030 130 L 980 130 L 980 20 L 20 20 L 20 130 L 50 130" stroke="#f43f5e" stroke-width="3.5" fill="none"/>
+
+                    <!-- C2: Battery (-) Lead (1390, 130) -> Buck Converter IN- (50, 160) -->
+                    <path class="wire" d="M 1390 130 L 1430 130 L 1430 10 L 10 10 L 10 160 L 50 160" stroke="#3b82f6" stroke-width="3.5" fill="none"/>
+
+                    <!-- C3: Battery (+) Lead (1030, 130) -> Breadboard Row 5 (Batt Divider Input) -->
+                    <path class="wire" d="M 1030 130 L 960 130 L 960 240 L 470 240" stroke="#a855f7" stroke-width="3" fill="none"/>
+
+                    <!-- C4: Battery (+) Lead (1030, 130) -> Relay COM Screw Terminal (1390, 405) -->
+                    <path class="wire" d="M 1030 130 L 1020 130 L 1020 300 L 1410 300 L 1410 405 L 1390 405" stroke="#a855f7" stroke-width="3.5" fill="none"/>
+
+                    <!-- C5: Relay NO Screw Terminal (1390, 445) -> Breadboard Row 35 (Pump + & Diode Cathode) -->
+                    <path class="wire" d="M 1390 445 L 1400 445 L 1400 580 L 470 580" stroke="#3b82f6" stroke-width="3.5" fill="none"/>
+
+                    <!-- C6: Breadboard Row 35 -> DC Pump (+) Lead (1030, 590) -->
+                    <path class="wire" d="M 470 580 L 670 580 L 670 590 L 1030 590" stroke="#3b82f6" stroke-width="3.5" fill="none"/>
+
+                    <!-- C7: Breadboard Row 40 (Diode Anode) -> DC Pump (-) Lead (1390, 590) -->
+                    <path class="wire" d="M 470 650 L 720 650 L 720 615 L 1410 615 L 1410 590 L 1390 590" stroke="#3b82f6" stroke-width="3.5" fill="none"/>
+
+
+                    <!-- [WIRE GROUP D: SOLAR MONITORING INPUT] -->
+                    <!-- D1: Solar (+) Lead (1030, 270) -> Breadboard Row 20 (Solar Divider Input) -->
+                    <path class="wire" d="M 1030 270 L 970 270 L 970 410 L 470 410" stroke="#eab308" stroke-width="3" fill="none"/>
+
+
+                    <!-- [WIRE GROUP E: SENSORS & ACTUATOR SIGNAL LINES TO ARDUINO] -->
+                    <!-- E1: Arduino D7 (310, 405) -> Relay Module IN (1030, 460) -->
+                    <path class="wire" d="M 310 405 L 390 405 L 390 460 L 1030 460" stroke="#f59e0b" stroke-width="3" fill="none"/>
+
+                    <!-- E2: Arduino D8 (310, 440) -> Capacitive Sensor VCC (1030, 715) -->
+                    <path class="wire" d="M 310 440 L 400 440 L 400 715 L 1030 715" stroke="#ec4899" stroke-width="3" fill="none"/>
+
+                    <!-- E3: Capacitive Sensor AOUT (1390, 715) -> Arduino Pin A0 (310, 680) -->
+                    <path class="wire" d="M 1390 715 L 1420 715 L 1420 680 L 310 680" stroke="#10b981" stroke-width="3" fill="none"/>
+
+                    <!-- E4: HW-080 Sensor AO (1390, 850) -> Arduino Pin A1 (310, 725) -->
+                    <path class="wire" d="M 1390 850 L 1430 850 L 1430 725 L 310 725" stroke="#06b6d4" stroke-width="3" fill="none"/>
+
+                    <!-- E5: HW-080 Sensor DO (1270, 850) -> Arduino Pin D2 (310, 370) [Optional Dashed] -->
+                    <path class="wire" d="M 1270 850 L 1270 890 L 370 890 L 370 370 L 310 370" stroke="#f59e0b" stroke-width="2" stroke-dasharray="5" fill="none"/>
+
+                    <!-- E6: Breadboard Row 10 (Battery Divider Tap) (470, 290) -> Arduino Pin A2 (310, 770) -->
+                    <path class="wire" d="M 470 290 L 350 290 L 350 770 L 310 770" stroke="#a855f7" stroke-width="3" fill="none"/>
+
+                    <!-- E7: Breadboard Row 25 (Solar Divider Tap) (470, 460) -> Arduino Pin A3 (310, 815) -->
+                    <path class="wire" d="M 470 460 L 340 460 L 340 815 L 310 815" stroke="#eab308" stroke-width="3" fill="none"/>
+                </svg>
+            </div>
+
+            <!-- Wire Legend Bar -->
+            <div class="wire-legend">
+                <div class="legend-item"><div class="legend-color" style="background: #f43f5e;"></div> Star 5V Logic Power (Red)</div>
+                <div class="legend-item"><div class="legend-color" style="background: #3b82f6;"></div> Star Common Ground 0V (Blue)</div>
+                <div class="legend-item"><div class="legend-color" style="background: #a855f7;"></div> 12V Battery Power / A2 Divider (Purple)</div>
+                <div class="legend-item"><div class="legend-color" style="background: #eab308;"></div> 22V Solar Power / A3 Divider (Gold)</div>
+                <div class="legend-item"><div class="legend-color" style="background: #f59e0b;"></div> Relay Trigger D7 / DO D2 (Amber)</div>
+                <div class="legend-item"><div class="legend-color" style="background: #ec4899;"></div> Capacitive Power Gate D8 (Pink)</div>
+                <div class="legend-item"><div class="legend-color" style="background: #10b981;"></div> Root Soil Signal A0 (Green)</div>
+                <div class="legend-item"><div class="legend-color" style="background: #06b6d4;"></div> HW-080 Surface Signal A1 (Cyan)</div>
+            </div>
+        </div>
+
+        <!-- Master Breadboard Pin & Component Matrix -->
+        <div class="card">
+            <div class="card-title">
+                <div class="title-left">
+                    <div class="icon">📊</div>
+                    <span>Complete Master Breadboard Pin & Component Connection Matrix</span>
+                </div>
+            </div>
+            
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Wire ID</th>
+                            <th>Origin Node (From)</th>
+                            <th>Breadboard Tie-Point</th>
+                            <th>Destination Node (To)</th>
+                            <th>Wire Color</th>
+                            <th>Signal Type / Voltage</th>
+                            <th>Operational Function & Safety Rule</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- POWER GROUP -->
+                        <tr>
+                            <td><strong style="color: #f43f5e;">PWR-01</strong></td>
+                            <td><span class="pin-tag tag-batt">3S Battery (+) [12.6V]</span></td>
+                            <td>Direct Wire</td>
+                            <td><span class="pin-tag tag-pwr">LM2596 Buck IN+</span></td>
+                            <td><strong style="color: #f43f5e;">Red</strong></td>
+                            <td>11.1V – 12.6V DC</td>
+                            <td>Raw high-capacity battery supply to Buck step-down converter.</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: #f43f5e;">PWR-02</strong></td>
+                            <td><span class="pin-tag tag-pwr">LM2596 Buck OUT+</span></td>
+                            <td><span class="pin-tag tag-bb">Top Red Rail (+)</span></td>
+                            <td><span class="pin-tag tag-uno">Arduino 5V Pin</span></td>
+                            <td><strong style="color: #f43f5e;">Red</strong></td>
+                            <td>5.00V DC Regulated</td>
+                            <td><strong>Primary Logic Power:</strong> Powers Arduino ATmega328P MCU.</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: #f43f5e;">PWR-03</strong></td>
+                            <td><span class="pin-tag tag-bb">Top Red Rail (+)</span></td>
+                            <td>Direct Jumper</td>
+                            <td><span class="pin-tag tag-relay">5V Relay Module VCC</span></td>
+                            <td><strong style="color: #f43f5e;">Red</strong></td>
+                            <td>5.00V DC</td>
+                            <td>Powers optocoupler coil driver circuitry.</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: #f43f5e;">PWR-04</strong></td>
+                            <td><span class="pin-tag tag-bb">Top Red Rail (+)</span></td>
+                            <td>Direct Jumper</td>
+                            <td><span class="pin-tag tag-sensor">HW-080 Driver VCC</span></td>
+                            <td><strong style="color: #f43f5e;">Red</strong></td>
+                            <td>5.00V DC</td>
+                            <td>Powers LM393 surface moisture comparator driver board.</td>
+                        </tr>
+
+                        <!-- GROUND GROUP -->
+                        <tr>
+                            <td><strong style="color: #3b82f6;">GND-01</strong></td>
+                            <td><span class="pin-tag tag-pwr">LM2596 Buck OUT-</span></td>
+                            <td><span class="pin-tag tag-bb">Top Blue Rail (-)</span></td>
+                            <td><span class="pin-tag tag-uno">Arduino GND Pin</span></td>
+                            <td><strong style="color: #3b82f6;">Blue / Slate</strong></td>
+                            <td>0.00V (Star GND)</td>
+                            <td><strong>Star Ground Reference:</strong> Central zero-volt reference point.</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: #3b82f6;">GND-02</strong></td>
+                            <td><span class="pin-tag tag-batt">3S Battery (-) Terminal</span></td>
+                            <td><span class="pin-tag tag-bb">Top Blue Rail (-)</span></td>
+                            <td><span class="pin-tag tag-pwr">Buck IN- Terminal</span></td>
+                            <td><strong style="color: #3b82f6;">Blue / Black</strong></td>
+                            <td>0.00V (Common)</td>
+                            <td>Ties battery negative return directly into central star ground.</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: #3b82f6;">GND-03</strong></td>
+                            <td><span class="pin-tag tag-solar">30W Solar (-) Terminal</span></td>
+                            <td><span class="pin-tag tag-bb">Top Blue Rail (-)</span></td>
+                            <td>Star Common GND</td>
+                            <td><strong style="color: #3b82f6;">Blue / Black</strong></td>
+                            <td>0.00V (Common)</td>
+                            <td>Ties solar panel return into common ground bus.</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: #3b82f6;">GND-04</strong></td>
+                            <td><span class="pin-tag tag-relay">Relay GND</span> & <span class="pin-tag tag-sensor">Sensors GND</span></td>
+                            <td><span class="pin-tag tag-bb">Top Blue Rail (-)</span></td>
+                            <td>Star Common GND</td>
+                            <td><strong style="color: #3b82f6;">Blue / Slate</strong></td>
+                            <td>0.00V</td>
+                            <td>Ground returns for relay coil, capacitive sensor, and HW-080.</td>
+                        </tr>
+
+                        <!-- ACTUATOR & MOTOR GROUP -->
+                        <tr>
+                            <td><strong style="color: #a855f7;">ACT-01</strong></td>
+                            <td><span class="pin-tag tag-batt">3S Battery (+) [12V]</span></td>
+                            <td>Direct Heavy Wire</td>
+                            <td><span class="pin-tag tag-relay">Relay COM Terminal</span></td>
+                            <td><strong style="color: #a855f7;">Purple / Red</strong></td>
+                            <td>12.6V High Current</td>
+                            <td>Feeds raw un-stepped battery power to relay switch contacts.</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: #3b82f6;">ACT-02</strong></td>
+                            <td><span class="pin-tag tag-relay">Relay NO Terminal</span></td>
+                            <td><span class="pin-tag tag-bb">Row 35 (Diode Cathode)</span></td>
+                            <td><span class="pin-tag tag-pump">DC Pump (+) Lead</span></td>
+                            <td><strong style="color: #3b82f6;">Blue</strong></td>
+                            <td>Switched 12V DC</td>
+                            <td>Powers water pump motor when relay is engaged.</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: #3b82f6;">ACT-03</strong></td>
+                            <td><span class="pin-tag tag-pump">DC Pump (-) Lead</span></td>
+                            <td><span class="pin-tag tag-bb">Row 40 (Diode Anode)</span></td>
+                            <td><span class="pin-tag tag-bb">Star GND Rail (-)</span></td>
+                            <td><strong style="color: #3b82f6;">Blue / Black</strong></td>
+                            <td>Motor Return GND</td>
+                            <td>Motor return current flows into Star GND, bypassing Arduino MCU.</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: #f43f5e;">ACT-04</strong></td>
+                            <td><span class="pin-tag tag-bb">Row 35 (Cathode)</span></td>
+                            <td><strong>1N4007 Diode Body</strong></td>
+                            <td><span class="pin-tag tag-bb">Row 40 (Anode)</span></td>
+                            <td>Diode Component</td>
+                            <td>Flyback Clamp</td>
+                            <td><strong>Inductive Spike Suppression:</strong> Clamps reverse-EMF kickback.</td>
+                        </tr>
+
+                        <!-- SENSORS & SIGNALS GROUP -->
+                        <tr>
+                            <td><strong style="color: #f59e0b;">SIG-01</strong></td>
+                            <td><span class="pin-tag tag-uno">Arduino Pin D7</span></td>
+                            <td>Direct Jumper</td>
+                            <td><span class="pin-tag tag-relay">Relay IN Pin</span></td>
+                            <td><strong style="color: #f59e0b;">Amber</strong></td>
+                            <td>5V Digital Out</td>
+                            <td>Active LOW trigger with 3-minute continuous runtime safety cap.</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: #ec4899;">SIG-02</strong></td>
+                            <td><span class="pin-tag tag-uno">Arduino Pin D8</span></td>
+                            <td>Direct Jumper</td>
+                            <td><span class="pin-tag tag-sensor">Capacitive Sensor VCC</span></td>
+                            <td><strong style="color: #ec4899;">Pink / Red</strong></td>
+                            <td>5V Digital Gate</td>
+                            <td>Powers capacitive sensor only during sampling (anti-corrosion).</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: #10b981;">SIG-03</strong></td>
+                            <td><span class="pin-tag tag-sensor">Capacitive Sensor AOUT</span></td>
+                            <td>Direct Jumper</td>
+                            <td><span class="pin-tag tag-uno">Arduino Pin A0</span></td>
+                            <td><strong style="color: #10b981;">Green</strong></td>
+                            <td>0V – 3.0V Analog</td>
+                            <td>Root zone soil moisture reading (Air ~620, Water ~310).</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: #06b6d4;">SIG-04</strong></td>
+                            <td><span class="pin-tag tag-sensor">HW-080 Sensor AO</span></td>
+                            <td>Direct Jumper</td>
+                            <td><span class="pin-tag tag-uno">Arduino Pin A1</span></td>
+                            <td><strong style="color: #06b6d4;">Cyan</strong></td>
+                            <td>0V – 5.0V Analog</td>
+                            <td>Surface ponding depth reading (Dry ~950, Wet ~300). Inhibit &ge; 75%.</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: #a855f7;">SIG-05</strong></td>
+                            <td><span class="pin-tag tag-bb">Row 10 (R1/R2 Junction)</span></td>
+                            <td>100kΩ / 33kΩ Divider</td>
+                            <td><span class="pin-tag tag-uno">Arduino Pin A2</span></td>
+                            <td><strong style="color: #a855f7;">Purple</strong></td>
+                            <td>0V – 3.13V Analog</td>
+                            <td>Battery voltage monitor ($V_{\text{batt}} / 4.0303$). Cutoff &lt; 10.0V.</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: #eab308;">SIG-06</strong></td>
+                            <td><span class="pin-tag tag-bb">Row 25 (R3/R4 Junction)</span></td>
+                            <td>100kΩ / 20kΩ Divider</td>
+                            <td><span class="pin-tag tag-uno">Arduino Pin A3</span></td>
+                            <td><strong style="color: #eab308;">Gold / Yellow</strong></td>
+                            <td>0V – 3.67V Analog</td>
+                            <td>Solar panel monitor ($V_{\text{solar}} / 6.000$). Harvesting &gt; 12.0V.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="note-box">
+                <h4>⚡ Golden Rules for Error-Free Assembly</h4>
+                <ul>
+                    <li><strong>1. Calibrate Buck Converter First:</strong> Disconnect Arduino and modules. Turn on 3S Battery power and adjust Buck potentiometer screw until multimeter reads <code>5.00V &plusmn; 0.05V</code> before connecting to breadboard.</li>
+                    <li><strong>2. Check 1N4007 Diode Stripe:</strong> The silver/white band (Cathode) MUST plug into <strong>Row 35</strong> (switched 12V from relay). Connecting in reverse will short-circuit the relay!</li>
+                    <li><strong>3. Star Ground Rule:</strong> Ensure all module grounds (Buck OUT-, Battery -, Solar -, Arduino GND, Sensor GND, Relay GND) terminate on the blue breadboard rail to eliminate inductive voltage bounce.</li>
+                    <li><strong>4. USB Data Bridge:</strong> Keep USB cable plugged into computer to view live serial telemetry (115200 baud) and web integration.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
