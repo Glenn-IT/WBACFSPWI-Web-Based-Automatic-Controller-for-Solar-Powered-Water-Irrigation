@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WBACFSPWI — Miniature Rice Field Prototype Blueprint</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-page: #0f172a;
+            --bg-card: #1e293b;
+            --border-card: #334155;
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-blue: #0284c7;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-water: #38bdf8;
+            --accent-soil: #a16207;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-light);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .blueprint-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 14px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Interactive Blueprint Canvas Diagram */
+        .diagram-container {
+            background: #090d16;
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+            position: relative;
+            min-height: 480px;
+            overflow: hidden;
+            padding: 1.5rem;
+        }
+
+        .blueprint-grid {
+            background-image: 
+                linear-gradient(to right, rgba(56, 189, 248, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(56, 189, 248, 0.05) 1px, transparent 1px);
+            background-size: 25px 25px;
+        }
+
+        /* Interactive Miniature Components */
+        .mini-block {
+            background: rgba(30, 41, 59, 0.9);
+            border: 2px solid #475569;
+            border-radius: 10px;
+            padding: 1rem;
+            position: absolute;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .mini-block:hover {
+            transform: translateY(-4px) scale(1.02);
+            border-color: var(--accent-water);
+            box-shadow: 0 8px 25px rgba(56, 189, 248, 0.3);
+        }
+
+        /* Specific Component Coordinates */
+        #block-solar {
+            top: 25px;
+            left: 25px;
+            width: 220px;
+            border-color: #eab308;
+        }
+
+        #block-controller {
+            top: 200px;
+            left: 25px;
+            width: 260px;
+            border-color: #3b82f6;
+        }
+
+        #block-tank {
+            top: 25px;
+            right: 25px;
+            width: 250px;
+            border-color: #06b6d4;
+        }
+
+        #block-paddy {
+            top: 215px;
+            right: 25px;
+            width: 320px;
+            min-height: 235px;
+            border-color: #10b981;
+        }
+
+        /* Animated Water Pipe */
+        .pipe-line {
+            position: absolute;
+            height: 6px;
+            background: #1e293b;
+            border-radius: 3px;
+            z-index: 10;
+        }
+
+        .pipe-animated {
+            background: linear-gradient(90deg, #0284c7 0%, #38bdf8 50%, #0284c7 100%);
+            background-size: 200% 100%;
+            animation: waterFlow 1.5s linear infinite;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+        }
+
+        @keyframes waterFlow {
+            0% { background-position: 100% 0; }
+            100% { background-position: -100% 0; }
+        }
+
+        /* Soil and Water Layers inside Paddy */
+        .paddy-water-layer {
+            height: 35px;
+            background: rgba(6, 182, 212, 0.25);
+            border-top: 2px dashed #06b6d4;
+            border-radius: 4px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: #67e8f9;
+            transition: all 0.5s;
+        }
+
+        .paddy-soil-layer {
+            height: 75px;
+            background: linear-gradient(180deg, #78350f 0%, #451a03 100%);
+            border-radius: 6px;
+            padding: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #fde68a;
+            border: 1px solid #92400e;
+        }
+
+        .component-badge {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        /* Pulse */
+        .pulse-active {
+            animation: pulse-glow 1.5s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container-xl">
+        <!-- Header -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom border-secondary">
+            <div>
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1 mb-2">
+                    <i class="bi bi-diagram-3-fill me-1"></i> Physical Prototype Blueprint
+                </span>
+                <h2 class="fw-bold mb-0">Miniature Rice Field Irrigation Model</h2>
+                <p class="text-muted small mb-0">Complete Scale Model Architecture, Wiring Blueprint, & Interactive Flow Simulator</p>
+            </div>
+            <div class="d-flex gap-2 mt-3 mt-md-0">
+                <a href="index.html" class="btn btn-outline-light btn-sm">
+                    <i class="bi bi-window-fullscreen me-1"></i> Open Web Test Panel
+                </a>
+                <button class="btn btn-primary btn-sm" onclick="triggerMiniatureSimulation()">
+                    <i class="bi bi-play-circle-fill me-1"></i> Run Water Flow Simulation
+                </button>
+            </div>
+        </div>
+
+        <!-- Interactive Blueprint Canvas -->
+        <div class="blueprint-card mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0"><i class="bi bi-bounding-box-circles text-info me-2"></i>Physical Miniature Layout (Interactive Blueprint)</h5>
+                <span class="badge bg-secondary-subtle text-secondary" id="sim-status-label">Click components or Run Simulation button</span>
+            </div>
+
+            <div class="diagram-container blueprint-grid" id="blueprint-canvas">
+
+                <!-- 1. SOLAR PANEL (Top Left) -->
+                <div class="mini-block" id="block-solar" onclick="showComponentDetails('solar')">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="component-badge bg-warning text-dark"><i class="bi bi-sun-fill me-1"></i>12V Solar Panel</span>
+                        <span class="badge bg-dark text-warning border border-warning" id="disp-solar-v">17.4V</span>
+                    </div>
+                    <small class="text-muted d-block" style="font-size: 0.72rem;">12V 15W/30W Mounted on 25° Tilt Stand</small>
+                    <div class="mt-2 text-warning small mono"><i class="bi bi-arrow-down-right"></i> Feeds BMS & Pin A3 Divider</div>
+                </div>
+
+                <!-- 2. MAIN CONTROLLER & BATTERY BOX (Bottom Left) -->
+                <div class="mini-block" id="block-controller" onclick="showComponentDetails('controller')">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="component-badge bg-primary text-white"><i class="bi bi-cpu-fill me-1"></i>Control Box</span>
+                        <span class="badge bg-success" id="disp-batt-v">3S 11.85V</span>
+                    </div>
+                    <ul class="list-unstyled small mb-1 text-secondary" style="font-size: 0.72rem;">
+                        <li>• Arduino Uno R3 (ATmega328P)</li>
+                        <li>• 3S 18650 Pack + 3S BMS Board</li>
+                        <li>• LM2596 Step-down (12V $\rightarrow$ 5.0V Logic)</li>
+                        <li>• 5V Relay Module (Pin D7 Pump switch)</li>
+                        <li>• Resistor Dividers (A2 & A3)</li>
+                    </ul>
+                </div>
+
+                <!-- 3. WATER RESERVOIR & SUBMERSIBLE PUMP (Top Right) -->
+                <div class="mini-block" id="block-tank" onclick="showComponentDetails('tank')">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="component-badge bg-info text-dark"><i class="bi bi-droplet-fill me-1"></i>Water Tank</span>
+                        <span class="badge bg-secondary" id="disp-pump-status">Pump: OFF</span>
+                    </div>
+                    <small class="text-muted d-block" style="font-size: 0.72rem;">1.0L - 1.5L Acrylic Reservoir</small>
+                    <div class="p-2 mt-2 bg-dark rounded border border-info small">
+                        <div class="d-flex justify-content-between text-info" style="font-size: 0.75rem;">
+                            <span>12V Mini Submersible DC Pump</span>
+                            <i class="bi bi-fan" id="pump-spinner"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. MINIATURE RICE FIELD CONTAINER (Bottom Right) -->
+                <div class="mini-block" id="block-paddy" onclick="showComponentDetails('paddy')">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="component-badge bg-success text-white"><i class="bi bi-flower1 me-1"></i>Rice Paddy Bed</span>
+                        <span class="badge bg-dark text-info mono" id="disp-paddy-stats">Soil: 42% | Depth: 25%</span>
+                    </div>
+
+                    <!-- Water Ponding Layer -->
+                    <div class="paddy-water-layer" id="layer-water">
+                        <i class="bi bi-water me-1"></i> Surface Water Ponding Depth [Pin A1]
+                    </div>
+
+                    <!-- Soil Layer -->
+                    <div class="paddy-soil-layer" id="layer-soil">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>🌱 Rice Plants (Miniature)</span>
+                            <span class="badge bg-warning-subtle text-dark" style="font-size:0.65rem;">Capacitive Probe [A0]</span>
+                        </div>
+                        <div class="text-muted" style="font-size: 0.65rem;">
+                            Rich Loam / Clay Soil Bed (~5-7cm Depth)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Animated Water Delivery Pipe (Connecting Tank to Paddy) -->
+                <div class="pipe-line" id="pipe-h" style="top: 130px; right: 145px; width: 6px; height: 85px;"></div>
+            </div>
+        </div>
+
+        <!-- Detail Cards & Recommended Physical Dimensions -->
+        <div class="row g-4 mb-4">
+            <!-- Physical Scale Specifications -->
+            <div class="col-lg-6">
+                <div class="blueprint-card h-100">
+                    <h5 class="fw-bold text-primary mb-3">
+                        <i class="bi bi-rulers me-2"></i>Miniature Dimension & Material Guide
+                    </h5>
+                    <table class="table table-sm table-dark table-bordered align-middle">
+                        <thead class="table-secondary text-dark">
+                            <tr>
+                                <th>Section</th>
+                                <th>Recommended Material</th>
+                                <th>Approx. Size</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="fw-bold">Base Board</td>
+                                <td>Plywood or 5mm Acrylic Base</td>
+                                <td>45 cm × 35 cm</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-success">Rice Paddy Box</td>
+                                <td>Clear Acrylic Box (waterproof sealed)</td>
+                                <td>25 cm × 20 cm × 10 cm</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-info">Water Reservoir</td>
+                                <td>Transparent Container with Lid</td>
+                                <td>15 cm × 12 cm × 15 cm (1–2L)</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-warning">Solar Mount</td>
+                                <td>3D Printed or Aluminum 25° Tilt Stand</td>
+                                <td>Matches 15W/30W Panel size</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-primary">Control Enclosure</td>
+                                <td>Plastic Project Box (Ventilated)</td>
+                                <td>18 cm × 12 cm × 6 cm</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Irrigation Tubing</td>
+                                <td>Food-grade Flexible Silicone Tubing</td>
+                                <td>6mm Inner Diameter (ID)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Interactive Details Panel (Updates on Click) -->
+            <div class="col-lg-6">
+                <div class="blueprint-card h-100" id="details-box">
+                    <h5 class="fw-bold text-info mb-2" id="detail-title">
+                        <i class="bi bi-info-circle me-2"></i>Component Information
+                    </h5>
+                    <p class="text-muted small" id="detail-desc">
+                        Click on any component in the blueprint above (Solar Panel, Control Box, Water Tank, or Rice Paddy) to see wiring, specifications, and test results.
+                    </p>
+                    <div id="detail-content" class="bg-dark p-3 rounded border border-secondary">
+                        <div class="text-secondary small mono">Ready for physical assembly. All unit tests passed.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Assembly Checklist -->
+        <div class="blueprint-card">
+            <h5 class="fw-bold text-success mb-3"><i class="bi bi-tools me-2"></i>Miniature Physical Assembly Steps</h5>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="p-3 bg-dark rounded border border-secondary h-100">
+                        <span class="badge bg-primary mb-2">Step 1: Paddy Bed</span>
+                        <p class="small text-muted mb-0">
+                            Fill the bottom 5–7cm of the acrylic box with loam/clay soil. Insert the <strong>Capacitive Sensor (A0)</strong> vertically into the root zone. Mount the <strong>Surface Sensor (A1)</strong> 2cm above the soil to measure ponding depth.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-3 bg-dark rounded border border-secondary h-100">
+                        <span class="badge bg-info text-dark mb-2">Step 2: Water & Pump</span>
+                        <p class="small text-muted mb-0">
+                            Submerge the mini 12V pump into the water reservoir. Connect the 6mm silicone tubing from pump outlet and route it along the top edge of the rice paddy bed with micro-dripper / spray holes.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-3 bg-dark rounded border border-secondary h-100">
+                        <span class="badge bg-warning text-dark mb-2">Step 3: Power & Arduino</span>
+                        <p class="small text-muted mb-0">
+                            Mount Arduino Uno, 3S 18650 Battery, LM2596 (set to 5.0V), and 5V Relay module in the control box. Connect common GND across all modules.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Interactive Script -->
+    <script>
+        const DETAILS = {
+            solar: {
+                title: "☀️ 12V Solar Panel (15W / 30W)",
+                desc: "Supplies daytime charging energy to the 3S Li-Ion battery pack and acts as an autonomous day/night sensor.",
+                content: `
+                    <strong>• Working Voltage (Vmp):</strong> ~17.5V - 18.5V<br>
+                    <strong>• Open Circuit (Voc):</strong> ~21.6V<br>
+                    <strong>• Arduino Pin:</strong> Analog Pin A3 via Voltage Divider (100kΩ / 20kΩ)<br>
+                    <strong>• Status:</strong> Test 05 & 06 PASSED ✅
+                `
+            },
+            controller: {
+                title: "⚡ Control Box (Arduino + 3S Battery + Relay)",
+                desc: "Houses the master brain (Arduino Uno R3) and power regulation circuitry.",
+                content: `
+                    <strong>• Microcontroller:</strong> Arduino Uno R3 (ATmega328P)<br>
+                    <strong>• Battery:</strong> 3x 18650 Li-Ion in Series (Nominal 11.1V, Full 12.6V)<br>
+                    <strong>• Battery Divider:</strong> Pin A2 (100kΩ / 33kΩ)<br>
+                    <strong>• Pump Relay:</strong> Pin D7 (Active LOW trigger for DC pump)<br>
+                    <strong>• Safety Features:</strong> Low Battery Cutoff (<10.0V), Max 180s runtime protection
+                `
+            },
+            tank: {
+                title: "💧 Water Reservoir & Submersible Mini Pump",
+                desc: "Stores fresh irrigation water and delivers it through silicone piping when the relay triggers.",
+                content: `
+                    <strong>• Reservoir Capacity:</strong> 1.0 - 2.0 Liters Acrylic Tank<br>
+                    <strong>• Pump Type:</strong> 12V DC Ultra-quiet Submersible Mini Pump<br>
+                    <strong>• Current Draw:</strong> ~0.4A - 0.8A<br>
+                    <strong>• Piping:</strong> 6mm Inner Diameter (ID) Silicone Tubing with drip outlets
+                `
+            },
+            paddy: {
+                title: "🌾 Miniature Rice Field Bed",
+                desc: "Simulates the actual paddy ecosystem with dual-layer soil moisture and surface water ponding monitoring.",
+                content: `
+                    <strong>• Root Zone Sensor:</strong> Capacitive Soil Moisture Sensor v1.2 (Pin A0)<br>
+                    <strong>• Surface Water Sensor:</strong> HW-080 Depth Sensor (Pin A1)<br>
+                    <strong>• Decision Rule:</strong> Start when Soil < 35% AND Surface < 80% | Stop when Soil >= 65% OR Surface >= 80%
+                `
+            }
+        };
+
+        function showComponentDetails(key) {
+            const item = DETAILS[key];
+            if (!item) return;
+            document.getElementById('detail-title').innerHTML = `<i class="bi bi-info-circle me-2"></i>${item.title}`;
+            document.getElementById('detail-desc').textContent = item.desc;
+            document.getElementById('detail-content').innerHTML = item.content;
+        }
+
+        let simRunning = false;
+        function triggerMiniatureSimulation() {
+            if (simRunning) return;
+            simRunning = true;
+
+            const pipe = document.getElementById('pipe-h');
+            const pumpSpinner = document.getElementById('pump-spinner');
+            const dispPump = document.getElementById('disp-pump-status');
+            const statusLabel = document.getElementById('sim-status-label');
+            const layerWater = document.getElementById('layer-water');
+            const layerSoil = document.getElementById('layer-soil');
+            const dispStats = document.getElementById('disp-paddy-stats');
+
+            statusLabel.textContent = "Simulating: Soil Dry (<35%) -> PUMP TRIGGERED";
+            dispPump.className = "badge bg-success";
+            dispPump.textContent = "Pump: RUNNING";
+            pumpSpinner.className = "bi bi-fan fs-6 text-warning pulse-active";
+            pipe.classList.add('pipe-animated');
+
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                let currentSoil = 30 + (progress * 0.4);
+                let currentWater = 15 + (progress * 0.45);
+                dispStats.textContent = `Soil: ${currentSoil.toFixed(0)}% | Depth: ${currentWater.toFixed(0)}%`;
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    // Target Reached Stop
+                    pipe.classList.remove('pipe-animated');
+                    pumpSpinner.className = "bi bi-fan";
+                    dispPump.className = "badge bg-secondary";
+                    dispPump.textContent = "Pump: OFF";
+                    statusLabel.textContent = "Simulating: Target Moisture >=65% Met -> PUMP STOPPED";
+                    simRunning = false;
+                }
+            }, 500);
+        }
+    </script>
+</body>
+</html>

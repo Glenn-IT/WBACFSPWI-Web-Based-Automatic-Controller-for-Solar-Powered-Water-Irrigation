@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WBACFSPWI — Test Integration Web Panel</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+
+    <style>
+        :root {
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --sidebar-width: 250px;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Sidebar Styling */
+        #sidebar {
+            width: var(--sidebar-width);
+            background: #0f172a;
+            min-height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+
+        #sidebar .nav-link {
+            color: #94a3b8;
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            margin: 0.2rem 0.75rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        #sidebar .nav-link:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        #sidebar .nav-link.active {
+            color: #ffffff;
+            background: #0284c7;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+        }
+
+        /* Main Content */
+        #content {
+            margin-left: var(--sidebar-width);
+            padding: 1.75rem 2rem;
+            transition: all 0.3s;
+        }
+
+        @media (max-width: 991.98px) {
+            #sidebar { margin-left: -var(--sidebar-width); }
+            #sidebar.active { margin-left: 0; }
+            #content { margin-left: 0; padding: 1rem; }
+        }
+
+        /* Cards & Metrics */
+        .metric-card {
+            background: var(--bg-card);
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.25rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        .metric-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+        }
+
+        .metric-val {
+            font-size: 1.85rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-top: 0.25rem;
+        }
+
+        /* Terminal Console */
+        .terminal-window {
+            background: #0b1120;
+            color: #38bdf8;
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.825rem;
+            height: 320px;
+            overflow-y: auto;
+            padding: 1rem;
+            border: 1px solid #1e293b;
+        }
+
+        .terminal-line {
+            margin-bottom: 0.35rem;
+            word-break: break-all;
+        }
+
+        .badge-pulse {
+            animation: pulse-animation 2s infinite;
+        }
+
+        @keyframes pulse-animation {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        .sim-slider {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Navigation -->
+    <nav id="sidebar">
+        <div class="p-3 border-bottom border-secondary-subtle">
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-primary fs-6"><i class="bi bi-droplet-half"></i></span>
+                <div>
+                    <h6 class="text-white mb-0 fw-bold">WBACFSPWI</h6>
+                    <small class="text-muted" style="font-size: 0.725rem;">Test Integration Hub</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-3 py-2 text-uppercase text-muted" style="font-size: 0.68rem; font-weight: 700;">Navigation</div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a href="#tab-dashboard" class="nav-link active" data-bs-toggle="pill" onclick="switchNav(this)">
+                    <i class="bi bi-speedometer2"></i> Live Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#tab-simulator" class="nav-link" data-bs-toggle="pill" onclick="switchNav(this)">
+                    <i class="bi bi-sliders"></i> Sensor Simulator
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#tab-schedules" class="nav-link" data-bs-toggle="pill" onclick="switchNav(this)">
+                    <i class="bi bi-calendar3"></i> Schedule Manager
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#tab-alerts" class="nav-link" data-bs-toggle="pill" onclick="switchNav(this)">
+                    <i class="bi bi-bell"></i> Alerts & Safety
+                    <span class="badge bg-danger ms-auto" id="nav-alert-count">0</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#tab-reports" class="nav-link" data-bs-toggle="pill" onclick="switchNav(this)">
+                    <i class="bi bi-graph-up-arrow"></i> Trends & Reports
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#tab-console" class="nav-link" data-bs-toggle="pill" onclick="switchNav(this)">
+                    <i class="bi bi-terminal"></i> Serial & Audit Log
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#tab-hardware" class="nav-link" data-bs-toggle="pill" onclick="switchNav(this)">
+                    <i class="bi bi-cpu"></i> Hardware Pinouts
+                </a>
+            </li>
+        </ul>
+
+        <div class="mt-auto p-3 text-center border-top border-secondary-subtle">
+            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                <i class="bi bi-check-circle-fill"></i> Standalone Static Mode
+            </span>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <div id="content">
+        <!-- Top Mobile Header -->
+        <div class="d-lg-none d-flex justify-content-between align-items-center mb-3">
+            <button class="btn btn-outline-dark btn-sm" onclick="document.getElementById('sidebar').classList.toggle('active')">
+                <i class="bi bi-list fs-5"></i> Menu
+            </button>
+            <span class="fw-bold">WBACFSPWI Integration</span>
+            <span class="badge bg-info">Static Test</span>
+        </div>
+
+        <div class="tab-content">
+
+            <!-- ========================================================================= -->
+            <!-- TAB 1: LIVE DASHBOARD -->
+            <!-- ========================================================================= -->
+            <div class="tab-pane fade show active" id="tab-dashboard">
+                <!-- Page Title Header -->
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="fw-bold mb-1">System Live Dashboard</h4>
+                        <p class="text-muted small mb-0">Autonomous Solar-Powered Irrigation & Sensor Health Monitor</p>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 mt-2 mt-sm-0">
+                        <span class="badge bg-white text-dark border py-2 px-3 shadow-sm">
+                            <i class="bi bi-clock me-1 text-primary"></i> <span id="clock-display">--:--:--</span>
+                        </span>
+                        <div class="btn-group shadow-sm">
+                            <button class="btn btn-sm btn-outline-primary" id="btn-auto-sim" onclick="toggleAutoSim()">
+                                <i class="bi bi-play-fill"></i> Auto Sim: <span id="sim-status-txt">Running</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alert Banner (Dynamic) -->
+                <div id="live-alert-banner" class="alert alert-warning d-none align-items-center gap-2 py-2 shadow-sm" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill fs-5 text-warning"></i>
+                    <div class="flex-grow-1" id="live-alert-text">Warning message goes here</div>
+                    <button type="button" class="btn-close" onclick="this.parentElement.classList.add('d-none')"></button>
+                </div>
+
+                <!-- Top Sensor Stat Cards (Row 1) -->
+                <div class="row g-3 mb-4">
+                    <!-- Soil Moisture Card -->
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="metric-card h-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <span class="text-muted small fw-semibold">ROOT SOIL MOISTURE</span>
+                                    <div class="metric-val text-primary" id="card-soil-val">42%</div>
+                                    <small class="text-muted" id="card-soil-status">Optimal Moisture</small>
+                                </div>
+                                <div class="metric-icon bg-primary-subtle text-primary">
+                                    <i class="bi bi-moisture"></i>
+                                </div>
+                            </div>
+                            <div class="progress mt-3" style="height: 6px;">
+                                <div class="progress-bar bg-primary" id="card-soil-bar" style="width: 42%;"></div>
+                            </div>
+                            <div class="d-flex justify-content-between text-muted mt-1" style="font-size: 0.7rem;">
+                                <span>Dry (&lt;35%)</span>
+                                <span>Target (65%)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Water Level Card -->
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="metric-card h-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <span class="text-muted small fw-semibold">SURFACE PONDING</span>
+                                    <div class="metric-val text-info" id="card-water-val">25%</div>
+                                    <small class="text-muted" id="card-water-status">Standing Depth Safe</small>
+                                </div>
+                                <div class="metric-icon bg-info-subtle text-info">
+                                    <i class="bi bi-water"></i>
+                                </div>
+                            </div>
+                            <div class="progress mt-3" style="height: 6px;">
+                                <div class="progress-bar bg-info" id="card-water-bar" style="width: 25%;"></div>
+                            </div>
+                            <div class="d-flex justify-content-between text-muted mt-1" style="font-size: 0.7rem;">
+                                <span>0% Dry</span>
+                                <span>80% Max Depth</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Battery Pack (3S 18650) Card -->
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="metric-card h-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <span class="text-muted small fw-semibold">3S 18650 BATTERY</span>
+                                    <div class="metric-val text-success" id="card-batt-val">11.85V</div>
+                                    <small class="text-muted" id="card-batt-pct">~71% Capacity</small>
+                                </div>
+                                <div class="metric-icon bg-success-subtle text-success">
+                                    <i class="bi bi-battery-charging"></i>
+                                </div>
+                            </div>
+                            <div class="progress mt-3" style="height: 6px;">
+                                <div class="progress-bar bg-success" id="card-batt-bar" style="width: 71%;"></div>
+                            </div>
+                            <div class="d-flex justify-content-between text-muted mt-1" style="font-size: 0.7rem;">
+                                <span>Cutoff (10.0V)</span>
+                                <span>Full (12.6V)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Solar Harvest Card -->
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="metric-card h-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <span class="text-muted small fw-semibold">SOLAR HARVEST</span>
+                                    <div class="metric-val text-warning" id="card-solar-val">17.40V</div>
+                                    <small class="text-muted" id="card-solar-status">Active Solar Charging</small>
+                                </div>
+                                <div class="metric-icon bg-warning-subtle text-warning">
+                                    <i class="bi bi-sun-fill"></i>
+                                </div>
+                            </div>
+                            <div class="progress mt-3" style="height: 6px;">
+                                <div class="progress-bar bg-warning" id="card-solar-bar" style="width: 82%;"></div>
+                            </div>
+                            <div class="d-flex justify-content-between text-muted mt-1" style="font-size: 0.7rem;">
+                                <span>Min Harvest (&gt;12V)</span>
+                                <span>Voc (~21V)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pump Controller & Irrigation Status (Row 2) -->
+                <div class="row g-3 mb-4">
+                    <div class="col-lg-8">
+                        <div class="metric-card">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="fw-bold mb-0"><i class="bi bi-gear-wide-connected text-primary me-2"></i>Water Pump & Relay Control</h6>
+                                <span class="badge bg-success" id="badge-system-mode">AUTONOMOUS MODE</span>
+                            </div>
+
+                            <div class="row align-items-center g-3">
+                                <div class="col-md-6 border-end">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div id="pump-state-circle" class="rounded-circle p-3 bg-secondary-subtle text-secondary" style="width: 60px; height: 60px; display:flex; align-items:center; justify-content:center; font-size:1.75rem;">
+                                            <i class="bi bi-power"></i>
+                                        </div>
+                                        <div>
+                                            <div class="small text-muted">PUMP RELAY (PIN D7)</div>
+                                            <h5 class="fw-bold mb-0" id="txt-pump-state">OFF (STANDBY)</h5>
+                                            <small class="text-muted" id="txt-pump-sub">Decision: Root moisture adequate</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="d-flex flex-column gap-2">
+                                        <div class="d-flex justify-content-between small">
+                                            <span class="text-muted">Current Mode:</span>
+                                            <span class="fw-semibold" id="txt-current-mode">Automatic (Sensor Driven)</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between small">
+                                            <span class="text-muted">Continuous Runtime:</span>
+                                            <span class="fw-semibold mono" id="txt-pump-runtime">0s / 180s Max</span>
+                                        </div>
+                                        <div class="d-flex gap-2 mt-2">
+                                            <button class="btn btn-sm btn-outline-success flex-fill" onclick="setManualPump(true)">
+                                                <i class="bi bi-play-circle me-1"></i> Force Pump ON
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger flex-fill" onclick="setManualPump(false)">
+                                                <i class="bi bi-stop-circle me-1"></i> Force Pump OFF
+                                            </button>
+                                            <button class="btn btn-sm btn-primary flex-fill" onclick="setAutoMode()">
+                                                <i class="bi bi-magic me-1"></i> Auto
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="metric-card h-100">
+                            <h6 class="fw-bold mb-3"><i class="bi bi-shield-check text-success me-2"></i>Active Safety Interlocks</h6>
+                            <ul class="list-group list-group-flush small">
+                                <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                                    <span><i class="bi bi-check-circle-fill text-success me-1"></i> Low Battery Protection (&gt;10.0V)</span>
+                                    <span class="badge bg-success-subtle text-success" id="lockout-batt">CLEAR</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                                    <span><i class="bi bi-check-circle-fill text-success me-1"></i> Water Ponding Overflow (&lt;80%)</span>
+                                    <span class="badge bg-success-subtle text-success" id="lockout-water">CLEAR</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                                    <span><i class="bi bi-check-circle-fill text-success me-1"></i> Pump Max Runtime Cap (180s)</span>
+                                    <span class="badge bg-success-subtle text-success" id="lockout-runtime">CLEAR</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mini Trends & Recent Activity (Row 3) -->
+                <div class="row g-3">
+                    <div class="col-lg-8">
+                        <div class="metric-card">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="fw-bold mb-0"><i class="bi bi-graph-up me-2 text-primary"></i>Live Sensor Readings (Past 10 Ticks)</h6>
+                                <span class="badge bg-light text-muted border">Real-time Stream</span>
+                            </div>
+                            <div style="height: 220px;">
+                                <canvas id="chartDashboardLive"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="metric-card h-100">
+                            <h6 class="fw-bold mb-3"><i class="bi bi-calendar-event text-primary me-2"></i>Upcoming Schedules</h6>
+                            <div id="dash-schedule-list" class="d-flex flex-column gap-2">
+                                <!-- Injected via JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================================================= -->
+            <!-- TAB 2: SENSOR SIMULATOR (INTERACTIVE TESTING) -->
+            <!-- ========================================================================= -->
+            <div class="tab-pane fade" id="tab-simulator">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="fw-bold mb-1">Interactive Sensor Simulator</h4>
+                        <p class="text-muted small mb-0">Manually adjust sensor values to test automated irrigation logic and safety triggers.</p>
+                    </div>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="resetSimulatorDefaults()">
+                        <i class="bi bi-arrow-counterclockwise me-1"></i> Reset to Defaults
+                    </button>
+                </div>
+
+                <div class="row g-4">
+                    <!-- Soil Moisture Slider -->
+                    <div class="col-md-6">
+                        <div class="metric-card">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="fw-bold"><i class="bi bi-moisture text-primary me-1"></i> Root Soil Moisture (%)</label>
+                                <span class="badge bg-primary fs-6 mono" id="sim-val-soil">42%</span>
+                            </div>
+                            <input type="range" class="form-range sim-slider" id="slider-soil" min="0" max="100" value="42" oninput="onSimChange()">
+                            <div class="d-flex justify-content-between text-muted small">
+                                <span>0% (Air / Completely Dry)</span>
+                                <span class="text-danger fw-bold">&lt;35% PUMP ON</span>
+                                <span class="text-success fw-bold">&gt;=65% PUMP OFF</span>
+                                <span>100% (Submerged)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Water Level Slider -->
+                    <div class="col-md-6">
+                        <div class="metric-card">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="fw-bold"><i class="bi bi-water text-info me-1"></i> Surface Water Ponding Depth (%)</label>
+                                <span class="badge bg-info fs-6 mono" id="sim-val-water">25%</span>
+                            </div>
+                            <input type="range" class="form-range sim-slider" id="slider-water" min="0" max="100" value="25" oninput="onSimChange()">
+                            <div class="d-flex justify-content-between text-muted small">
+                                <span>0% (No Standing Water)</span>
+                                <span>30% Normal</span>
+                                <span class="text-warning fw-bold">&gt;80% Overfill Lockout</span>
+                                <span>100% Flooded</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Battery Voltage Slider -->
+                    <div class="col-md-6">
+                        <div class="metric-card">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="fw-bold"><i class="bi bi-battery-charging text-success me-1"></i> 3S 18650 Battery Voltage (V)</label>
+                                <span class="badge bg-success fs-6 mono" id="sim-val-batt">11.85 V</span>
+                            </div>
+                            <input type="range" class="form-range sim-slider" id="slider-batt" min="9.0" max="12.6" step="0.05" value="11.85" oninput="onSimChange()">
+                            <div class="d-flex justify-content-between text-muted small">
+                                <span>9.0V</span>
+                                <span class="text-danger fw-bold">&lt;10.0V Lockout</span>
+                                <span>11.1V Nominal</span>
+                                <span>12.6V Full</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Solar Voltage Slider -->
+                    <div class="col-md-6">
+                        <div class="metric-card">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="fw-bold"><i class="bi bi-sun text-warning me-1"></i> Solar Panel Output (V)</label>
+                                <span class="badge bg-warning text-dark fs-6 mono" id="sim-val-solar">17.40 V</span>
+                            </div>
+                            <input type="range" class="form-range sim-slider" id="slider-solar" min="0" max="22.0" step="0.1" value="17.4" oninput="onSimChange()">
+                            <div class="d-flex justify-content-between text-muted small">
+                                <span>0V (Night)</span>
+                                <span>&lt;2V Low</span>
+                                <span class="text-success fw-bold">&gt;12V Active Harvest</span>
+                                <span>~21.6V Open Circuit</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scenario Quick Presets -->
+                <div class="card mt-4 border-0 shadow-sm">
+                    <div class="card-body">
+                        <h6 class="fw-bold mb-3"><i class="bi bi-lightning-charge text-warning me-2"></i>Quick Scenario Presets (Click to Test)</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button class="btn btn-sm btn-outline-danger" onclick="applyPreset('dry')">
+                                🏜️ Dry Soil (&lt;35%) -> Auto Pump Trigger
+                            </button>
+                            <button class="btn btn-sm btn-outline-success" onclick="applyPreset('wet')">
+                                🌿 Moist Soil (&gt;65%) -> Auto Pump Stop
+                            </button>
+                            <button class="btn btn-sm btn-outline-dark" onclick="applyPreset('lowbatt')">
+                                🔴 Critical Low Battery (&lt;10V) -> Lockout
+                            </button>
+                            <button class="btn btn-sm btn-outline-info" onclick="applyPreset('flood')">
+                                🌊 Surface Flooded (&gt;80%) -> Lockout
+                            </button>
+                            <button class="btn btn-sm btn-outline-warning" onclick="applyPreset('sunny')">
+                                ☀️ Full Bright Sun (&gt;18V) -> Solar Charging
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="applyPreset('night')">
+                                🌙 Night Time (0V Solar) -> Battery Run
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================================================= -->
+            <!-- TAB 3: SCHEDULE MANAGER -->
+            <!-- ========================================================================= -->
+            <div class="tab-pane fade" id="tab-schedules">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="fw-bold mb-1">Irrigation Schedule Manager</h4>
+                        <p class="text-muted small mb-0">Configure automated timed irrigation cycles (matches main system database schema).</p>
+                    </div>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalAddSchedule">
+                        <i class="bi bi-plus-circle me-1"></i> Add Schedule
+                    </button>
+                </div>
+
+                <div class="card shadow-sm border-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Status</th>
+                                    <th>Schedule Name</th>
+                                    <th>Start Time</th>
+                                    <th>Duration</th>
+                                    <th>Days Active</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="schedule-table-body">
+                                <!-- Injected via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================================================= -->
+            <!-- TAB 4: ALERTS & NOTIFICATIONS -->
+            <!-- ========================================================================= -->
+            <div class="tab-pane fade" id="tab-alerts">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="fw-bold mb-1">System Alerts & Notifications</h4>
+                        <p class="text-muted small mb-0">Real-time thresholds, warning triggers, and critical hardware condition history.</p>
+                    </div>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="clearAlerts()">
+                        <i class="bi bi-check2-all me-1"></i> Clear All Alerts
+                    </button>
+                </div>
+
+                <div class="row g-3" id="alerts-list-container">
+                    <!-- Injected via JS -->
+                </div>
+            </div>
+
+            <!-- ========================================================================= -->
+            <!-- TAB 5: TRENDS & HISTORICAL REPORTS -->
+            <!-- ========================================================================= -->
+            <div class="tab-pane fade" id="tab-reports">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="fw-bold mb-1">Sensor Trends & Irrigation History</h4>
+                        <p class="text-muted small mb-0">Chart.js multi-axis sensor tracking and downloadable CSV event logs.</p>
+                    </div>
+                    <button class="btn btn-success btn-sm" onclick="exportCsvReport()">
+                        <i class="bi bi-file-earmark-spreadsheet me-1"></i> Export Report (CSV)
+                    </button>
+                </div>
+
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body">
+                        <h6 class="fw-bold mb-3"><i class="bi bi-activity text-primary me-2"></i>24-Hour Historical Sensor Curves</h6>
+                        <div style="height: 320px;">
+                            <canvas id="chartHistoryTrends"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event History Table -->
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white py-3">
+                        <h6 class="fw-bold mb-0">Irrigation Event History</h6>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Event Type</th>
+                                    <th>Trigger Reason</th>
+                                    <th>Duration</th>
+                                    <th>Water Delivered (Est.)</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-table-body">
+                                <tr>
+                                    <td class="mono small">Today 06:00:00</td>
+                                    <td><span class="badge bg-info-subtle text-info">Schedule #1</span></td>
+                                    <td>Morning Rice Root Irrigation</td>
+                                    <td>10 mins</td>
+                                    <td>~35 Liters</td>
+                                    <td><span class="badge bg-success">Completed</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="mono small">Yesterday 16:30:15</td>
+                                    <td><span class="badge bg-primary-subtle text-primary">Autonomous</span></td>
+                                    <td>Root Soil Moisture &lt; 35%</td>
+                                    <td>4 mins 20s</td>
+                                    <td>~15 Liters</td>
+                                    <td><span class="badge bg-success">Target 65% Met</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="mono small">Yesterday 11:15:00</td>
+                                    <td><span class="badge bg-warning-subtle text-warning">Safety Stop</span></td>
+                                    <td>Surface Ponding Limit Reached (82%)</td>
+                                    <td>2 mins 10s</td>
+                                    <td>~7.5 Liters</td>
+                                    <td><span class="badge bg-warning text-dark">Cutoff Safe</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================================================= -->
+            <!-- TAB 6: SERIAL TELEMETRY CONSOLE & AUDIT LOG -->
+            <!-- ========================================================================= -->
+            <div class="tab-pane fade" id="tab-console">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="fw-bold mb-1">Arduino Serial Telemetry Stream</h4>
+                        <p class="text-muted small mb-0">Live formatted 115200 baud serial packets matching tests 01 to 06 and main controller.</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-outline-secondary" onclick="clearTerminal()">
+                            <i class="bi bi-trash me-1"></i> Clear
+                        </button>
+                        <button class="btn btn-sm btn-outline-primary" id="btn-pause-term" onclick="toggleTerminalPause()">
+                            <i class="bi bi-pause-fill"></i> Pause Stream
+                        </button>
+                    </div>
+                </div>
+
+                <div class="terminal-window mb-4" id="serial-terminal">
+                    <div class="text-secondary">[SYSTEM] WBACFSPWI Test Integration Serial Console Initialized...</div>
+                    <div class="text-secondary">[SYSTEM] Baud Rate: 115200 | Flow Control: None | Status: Connected</div>
+                </div>
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white py-3">
+                        <h6 class="fw-bold mb-0"><i class="bi bi-journal-text text-primary me-2"></i>System Audit Log</h6>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Category</th>
+                                    <th>Action / Event</th>
+                                    <th>Actor / Source</th>
+                                </tr>
+                            </thead>
+                            <tbody id="audit-log-body">
+                                <tr>
+                                    <td class="mono small" id="audit-time-init">--:--:--</td>
+                                    <td><span class="badge bg-primary">SYSTEM</span></td>
+                                    <td>Integration Test environment loaded successfully</td>
+                                    <td>Browser Client</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================================================= -->
+            <!-- TAB 7: HARDWARE PINOUTS & REFERENCE -->
+            <!-- ========================================================================= -->
+            <div class="tab-pane fade" id="tab-hardware">
+                <div class="mb-4">
+                    <h4 class="fw-bold mb-1">Hardware Pinouts & Wiring Blueprint</h4>
+                    <p class="text-muted small mb-0">Complete reference for all verified modules from tests 01 through 06.</p>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="metric-card">
+                            <h6 class="fw-bold text-primary mb-3"><i class="bi bi-cpu me-2"></i>Arduino Uno Pin Assignments</h6>
+                            <table class="table table-sm table-bordered mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Pin</th>
+                                        <th>Component</th>
+                                        <th>Type / Circuit</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="fw-bold text-primary">A0</td>
+                                        <td>Capacitive Soil Moisture v1.2</td>
+                                        <td>Analog Input (Root Zone)</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold text-info">A1</td>
+                                        <td>Surface Water Level Sensor</td>
+                                        <td>Analog Input (Surface Ponding)</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold text-success">A2</td>
+                                        <td>3S 18650 Battery Voltage</td>
+                                        <td>Divider: 100kΩ (R1) / 33kΩ (R2)</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold text-warning">A3</td>
+                                        <td>12V Solar Panel Voltage</td>
+                                        <td>Divider: 100kΩ (R3) / 20kΩ (R4)</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold text-danger">D7</td>
+                                        <td>5V Relay Module (DC Pump)</td>
+                                        <td>Digital Output (Active LOW)</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold text-secondary">D8</td>
+                                        <td>Sensor Power Gate (PNP/MOSFET)</td>
+                                        <td>Anti-corrosion Power Duty Cycle</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold text-secondary">D13</td>
+                                        <td>Status / Fault LED</td>
+                                        <td>Onboard Diagnostics</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="metric-card">
+                            <h6 class="fw-bold text-success mb-3"><i class="bi bi-sliders2 me-2"></i>Autonomous Decision Logic Reference</h6>
+                            <ul class="list-group list-group-flush small">
+                                <li class="list-group-item px-0">
+                                    <strong>Pump Trigger Condition:</strong><br>
+                                    <code>(Soil Moisture &lt; 35%) AND (Surface Water &lt; 80%) AND (Battery &gt; 10.0V)</code>
+                                </li>
+                                <li class="list-group-item px-0">
+                                    <strong>Pump Stop Condition:</strong><br>
+                                    <code>(Soil Moisture &gt;= 65%) OR (Surface Water &gt;= 80%) OR (Battery &lt;= 10.0V)</code>
+                                </li>
+                                <li class="list-group-item px-0">
+                                    <strong>Max Runtime Protection:</strong><br>
+                                    Continuous pump run capped at <code>180 seconds</code> with mandatory cooldown.
+                                </li>
+                                <li class="list-group-item px-0">
+                                    <strong>Solar Charging Profile:</strong><br>
+                                    <code>vSolar &gt; 12.0V</code> = Active Solar Harvest | <code>vSolar &lt; 2.0V</code> = Night Mode
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal: Add Schedule -->
+    <div class="modal fade" id="modalAddSchedule" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Add Irrigation Schedule</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Schedule Name</label>
+                        <input type="text" class="form-control" id="sched-input-name" placeholder="e.g. Afternoon Top-up" value="Evening Root Soak">
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <label class="form-label small fw-bold">Start Time</label>
+                            <input type="time" class="form-control" id="sched-input-time" value="17:00">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-bold">Duration (Minutes)</label>
+                            <input type="number" class="form-control" id="sched-input-duration" value="15" min="1" max="180">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Active Days</label>
+                        <div class="d-flex flex-wrap gap-2">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input sched-day" type="checkbox" id="d-mon" value="Mon" checked>
+                                <label class="form-check-label small" for="d-mon">Mon</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input sched-day" type="checkbox" id="d-tue" value="Tue" checked>
+                                <label class="form-check-label small" for="d-tue">Tue</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input sched-day" type="checkbox" id="d-wed" value="Wed" checked>
+                                <label class="form-check-label small" for="d-wed">Wed</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input sched-day" type="checkbox" id="d-thu" value="Thu" checked>
+                                <label class="form-check-label small" for="d-thu">Thu</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input sched-day" type="checkbox" id="d-fri" value="Fri" checked>
+                                <label class="form-check-label small" for="d-fri">Fri</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input sched-day" type="checkbox" id="d-sat" value="Sat" checked>
+                                <label class="form-check-label small" for="d-sat">Sat</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input sched-day" type="checkbox" id="d-sun" value="Sun" checked>
+                                <label class="form-check-label small" for="d-sun">Sun</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="saveNewSchedule()">Save Schedule</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Interactive App Logic -->
+    <script>
+        // ============================================================================
+        // 1. STATE & SIMULATOR CONSTANTS
+        // ============================================================================
+        const STATE = {
+            soilMoisture: 42,
+            waterLevel: 25,
+            batteryVolts: 11.85,
+            solarVolts: 17.40,
+            pumpOn: false,
+            pumpRuntimeSeconds: 0,
+            mode: 'auto', // 'auto', 'manual_on', 'manual_off'
+            autoSimRunning: true,
+            terminalPaused: false,
+            alerts: [
+                { id: 1, type: 'info', text: 'System initialized in Autonomous Mode', time: 'Just now' },
+                { id: 2, type: 'success', text: 'Solar Panel active harvesting: 17.40V', time: '2m ago' }
+            ],
+            schedules: [
+                { id: 1, name: 'Morning Rice Field Soak', time: '06:00', duration: 15, days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], enabled: true },
+                { id: 2, name: 'Afternoon Moisture Top-up', time: '14:30', duration: 10, days: ['Mon', 'Wed', 'Fri'], enabled: true }
+            ]
+        };
+
+        let liveChart = null;
+        let historyChart = null;
+        let chartDataPoints = { labels: [], soil: [], water: [], batt: [] };
+
+        // ============================================================================
+        // 2. INITIALIZATION
+        // ============================================================================
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('audit-time-init').textContent = new Date().toLocaleTimeString();
+            initCharts();
+            renderSchedules();
+            renderAlerts();
+            updateUI();
+
+            // Main 1-Second Timer Tick
+            setInterval(systemTick, 1000);
+        });
+
+        function switchNav(el) {
+            document.querySelectorAll('#sidebar .nav-link').forEach(link => link.classList.remove('active'));
+            el.classList.add('active');
+            if (window.innerWidth < 992) {
+                document.getElementById('sidebar').classList.remove('active');
+            }
+        }
+
+        // ============================================================================
+        // 3. CORE LOGIC ENGINE (MATCHES ARDUINO CONTROLLER)
+        // ============================================================================
+        function systemTick() {
+            // Update Clock
+            const now = new Date();
+            document.getElementById('clock-display').textContent = now.toLocaleTimeString();
+
+            // Auto Simulation Random Fluctuation (if enabled)
+            if (STATE.autoSimRunning) {
+                if (STATE.pumpOn) {
+                    STATE.soilMoisture = Math.min(100, STATE.soilMoisture + 1.2);
+                    STATE.waterLevel = Math.min(100, STATE.waterLevel + 0.8);
+                    STATE.batteryVolts = Math.max(9.0, STATE.batteryVolts - 0.01);
+                } else {
+                    STATE.soilMoisture = Math.max(0, STATE.soilMoisture - 0.15);
+                    STATE.waterLevel = Math.max(0, STATE.waterLevel - 0.1);
+                    if (STATE.solarVolts >= 12.0) {
+                        STATE.batteryVolts = Math.min(12.6, STATE.batteryVolts + 0.005);
+                    }
+                }
+            }
+
+            // Autonomous Decision Rules
+            evaluateIrrigationDecision();
+
+            // Telemetry Serial Output
+            emitTelemetryPacket();
+
+            // Update UI & Live Charts
+            updateUI();
+            recordChartPoint();
+        }
+
+        function evaluateIrrigationDecision() {
+            // Safety Checks
+            const lowBatt = STATE.batteryVolts < 10.0;
+            const overflow = STATE.waterLevel >= 80.0;
+            const maxRuntimeHit = STATE.pumpRuntimeSeconds >= 180;
+
+            document.getElementById('lockout-batt').className = lowBatt ? 'badge bg-danger' : 'badge bg-success-subtle text-success';
+            document.getElementById('lockout-batt').textContent = lowBatt ? 'LOCKOUT (<10.0V)' : 'CLEAR';
+
+            document.getElementById('lockout-water').className = overflow ? 'badge bg-danger' : 'badge bg-success-subtle text-success';
+            document.getElementById('lockout-water').textContent = overflow ? 'OVERFLOW (>80%)' : 'CLEAR';
+
+            document.getElementById('lockout-runtime').className = maxRuntimeHit ? 'badge bg-danger' : 'badge bg-success-subtle text-success';
+            document.getElementById('lockout-runtime').textContent = maxRuntimeHit ? 'LIMIT (180s)' : 'CLEAR';
+
+            if (STATE.mode === 'auto') {
+                if (lowBatt || overflow || maxRuntimeHit) {
+                    if (STATE.pumpOn) {
+                        STATE.pumpOn = false;
+                        addAlert('danger', `Safety Stop: ${lowBatt ? 'Low Battery' : overflow ? 'Water Ponding Overflow' : 'Max Runtime Cap'}`);
+                        logAudit('SAFETY', 'Pump stopped by safety interlock');
+                    }
+                } else if (STATE.soilMoisture < 35.0) {
+                    if (!STATE.pumpOn) {
+                        STATE.pumpOn = true;
+                        STATE.pumpRuntimeSeconds = 0;
+                        addAlert('primary', `Autonomous Pump Trigger: Root Moisture at ${STATE.soilMoisture.toFixed(1)}% (<35%)`);
+                        logAudit('AUTONOMOUS', 'Pump Started (Dry soil detected)');
+                    }
+                } else if (STATE.soilMoisture >= 65.0) {
+                    if (STATE.pumpOn) {
+                        STATE.pumpOn = false;
+                        addAlert('success', `Autonomous Target Reached: Root Moisture at ${STATE.soilMoisture.toFixed(1)}% (>=65%)`);
+                        logAudit('AUTONOMOUS', 'Pump Stopped (Target soil moisture reached)');
+                    }
+                }
+            } else if (STATE.mode === 'manual_on') {
+                if (lowBatt || overflow) {
+                    STATE.pumpOn = false;
+                    STATE.mode = 'manual_off';
+                    addAlert('danger', 'Manual pump stopped: Safety interlock violation');
+                } else {
+                    STATE.pumpOn = true;
+                }
+            } else if (STATE.mode === 'manual_off') {
+                STATE.pumpOn = false;
+            }
+
+            if (STATE.pumpOn) {
+                STATE.pumpRuntimeSeconds++;
+            } else {
+                STATE.pumpRuntimeSeconds = 0;
+            }
+        }
+
+        // ============================================================================
+        // 4. UI UPDATE & RENDERING
+        // ============================================================================
+        function updateUI() {
+            // Soil Card
+            document.getElementById('card-soil-val').textContent = `${STATE.soilMoisture.toFixed(1)}%`;
+            document.getElementById('card-soil-bar').style.width = `${STATE.soilMoisture}%`;
+            document.getElementById('card-soil-status').textContent = STATE.soilMoisture < 35 ? 'Dry (Needs Water)' : STATE.soilMoisture >= 65 ? 'Adequate / Target' : 'Normal Moisture';
+
+            // Water Level Card
+            document.getElementById('card-water-val').textContent = `${STATE.waterLevel.toFixed(1)}%`;
+            document.getElementById('card-water-bar').style.width = `${STATE.waterLevel}%`;
+            document.getElementById('card-water-status').textContent = STATE.waterLevel >= 80 ? 'Water Level High' : 'Safe Surface Depth';
+
+            // Battery Card
+            const battPct = Math.max(0, Math.min(100, ((STATE.batteryVolts - 10.0) / (12.6 - 10.0)) * 100));
+            document.getElementById('card-batt-val').textContent = `${STATE.batteryVolts.toFixed(2)}V`;
+            document.getElementById('card-batt-pct').textContent = `~${battPct.toFixed(0)}% Capacity`;
+            document.getElementById('card-batt-bar').style.width = `${battPct}%`;
+
+            // Solar Card
+            document.getElementById('card-solar-val').textContent = `${STATE.solarVolts.toFixed(2)}V`;
+            const solarPct = Math.min(100, (STATE.solarVolts / 21.6) * 100);
+            document.getElementById('card-solar-bar').style.width = `${solarPct}%`;
+            document.getElementById('card-solar-status').textContent = STATE.solarVolts >= 12.0 ? 'Active Solar Charging' : STATE.solarVolts < 2.0 ? 'Night Discharging' : 'Low Sunlight Standby';
+
+            // Pump State
+            const pumpCircle = document.getElementById('pump-state-circle');
+            const txtPumpState = document.getElementById('txt-pump-state');
+            const txtPumpSub = document.getElementById('txt-pump-sub');
+            const txtRuntime = document.getElementById('txt-pump-runtime');
+
+            if (STATE.pumpOn) {
+                pumpCircle.className = 'rounded-circle p-3 bg-primary text-white badge-pulse';
+                txtPumpState.innerHTML = '<span class="text-primary">RUNNING (PUMPING)</span>';
+                txtPumpSub.textContent = `Pumping water to root zone...`;
+            } else {
+                pumpCircle.className = 'rounded-circle p-3 bg-secondary-subtle text-secondary';
+                txtPumpState.textContent = 'OFF (STANDBY)';
+                txtPumpSub.textContent = STATE.soilMoisture >= 65 ? 'Soil target moisture satisfied' : 'Standby / Waiting trigger';
+            }
+            txtRuntime.textContent = `${STATE.pumpRuntimeSeconds}s / 180s Max`;
+
+            // System Mode Badge
+            const modeBadge = document.getElementById('badge-system-mode');
+            const txtMode = document.getElementById('txt-current-mode');
+            if (STATE.mode === 'auto') {
+                modeBadge.className = 'badge bg-success';
+                modeBadge.textContent = 'AUTONOMOUS MODE';
+                txtMode.textContent = 'Automatic (Sensor Driven)';
+            } else if (STATE.mode === 'manual_on') {
+                modeBadge.className = 'badge bg-warning text-dark';
+                modeBadge.textContent = 'MANUAL OVERRIDE: ON';
+                txtMode.textContent = 'Forced ON by User';
+            } else {
+                modeBadge.className = 'badge bg-danger';
+                modeBadge.textContent = 'MANUAL OVERRIDE: OFF';
+                txtMode.textContent = 'Forced OFF by User';
+            }
+
+            // Sync Simulator Tab Sliders
+            document.getElementById('slider-soil').value = STATE.soilMoisture;
+            document.getElementById('sim-val-soil').textContent = `${STATE.soilMoisture.toFixed(1)}%`;
+
+            document.getElementById('slider-water').value = STATE.waterLevel;
+            document.getElementById('sim-val-water').textContent = `${STATE.waterLevel.toFixed(1)}%`;
+
+            document.getElementById('slider-batt').value = STATE.batteryVolts;
+            document.getElementById('sim-val-batt').textContent = `${STATE.batteryVolts.toFixed(2)} V`;
+
+            document.getElementById('slider-solar').value = STATE.solarVolts;
+            document.getElementById('sim-val-solar').textContent = `${STATE.solarVolts.toFixed(2)} V`;
+        }
+
+        // ============================================================================
+        // 5. SIMULATOR INTERACTIONS & PRESETS
+        // ============================================================================
+        function onSimChange() {
+            STATE.autoSimRunning = false;
+            document.getElementById('sim-status-txt').textContent = 'Paused (Manual Control)';
+            document.getElementById('btn-auto-sim').className = 'btn btn-sm btn-outline-warning';
+
+            STATE.soilMoisture = parseFloat(document.getElementById('slider-soil').value);
+            STATE.waterLevel = parseFloat(document.getElementById('slider-water').value);
+            STATE.batteryVolts = parseFloat(document.getElementById('slider-batt').value);
+            STATE.solarVolts = parseFloat(document.getElementById('slider-solar').value);
+
+            evaluateIrrigationDecision();
+            updateUI();
+        }
+
+        function toggleAutoSim() {
+            STATE.autoSimRunning = !STATE.autoSimRunning;
+            document.getElementById('sim-status-txt').textContent = STATE.autoSimRunning ? 'Running' : 'Paused';
+            document.getElementById('btn-auto-sim').className = STATE.autoSimRunning ? 'btn btn-sm btn-outline-primary' : 'btn btn-sm btn-outline-secondary';
+        }
+
+        function resetSimulatorDefaults() {
+            STATE.soilMoisture = 42;
+            STATE.waterLevel = 25;
+            STATE.batteryVolts = 11.85;
+            STATE.solarVolts = 17.40;
+            STATE.mode = 'auto';
+            STATE.autoSimRunning = true;
+            document.getElementById('sim-status-txt').textContent = 'Running';
+            document.getElementById('btn-auto-sim').className = 'btn btn-sm btn-outline-primary';
+            updateUI();
+            logAudit('SIMULATOR', 'Reset all sensors to default operating conditions');
+        }
+
+        function applyPreset(preset) {
+            STATE.autoSimRunning = false;
+            document.getElementById('sim-status-txt').textContent = 'Paused (Preset Active)';
+            document.getElementById('btn-auto-sim').className = 'btn btn-sm btn-outline-warning';
+
+            if (preset === 'dry') {
+                STATE.soilMoisture = 28.0;
+                STATE.waterLevel = 10.0;
+                STATE.batteryVolts = 11.8;
+                STATE.solarVolts = 16.5;
+            } else if (preset === 'wet') {
+                STATE.soilMoisture = 68.0;
+                STATE.waterLevel = 40.0;
+                STATE.batteryVolts = 12.2;
+                STATE.solarVolts = 17.0;
+            } else if (preset === 'lowbatt') {
+                STATE.batteryVolts = 9.60;
+            } else if (preset === 'flood') {
+                STATE.waterLevel = 88.0;
+            } else if (preset === 'sunny') {
+                STATE.solarVolts = 18.50;
+            } else if (preset === 'night') {
+                STATE.solarVolts = 0.00;
+            }
+
+            evaluateIrrigationDecision();
+            updateUI();
+            logAudit('PRESET', `Applied preset scenario: ${preset}`);
+        }
+
+        function setManualPump(turnOn) {
+            STATE.mode = turnOn ? 'manual_on' : 'manual_off';
+            evaluateIrrigationDecision();
+            updateUI();
+            logAudit('MANUAL_OVERRIDE', `User toggled pump ${turnOn ? 'ON' : 'OFF'}`);
+        }
+
+        function setAutoMode() {
+            STATE.mode = 'auto';
+            evaluateIrrigationDecision();
+            updateUI();
+            logAudit('MODE_CHANGE', 'Switched system to Autonomous Mode');
+        }
+
+        // ============================================================================
+        // 6. SCHEDULE MANAGER LOGIC
+        // ============================================================================
+        function renderSchedules() {
+            const tbody = document.getElementById('schedule-table-body');
+            const dashList = document.getElementById('dash-schedule-list');
+            tbody.innerHTML = '';
+            dashList.innerHTML = '';
+
+            STATE.schedules.forEach(s => {
+                const daysBadge = s.days.map(d => `<span class="badge bg-light text-dark border me-1">${d}</span>`).join('');
+                
+                // Table Row
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" ${s.enabled ? 'checked' : ''} onchange="toggleSchedule(${s.id})">
+                        </div>
+                    </td>
+                    <td class="fw-semibold">${s.name}</td>
+                    <td class="mono fw-bold">${s.time}</td>
+                    <td>${s.duration} mins</td>
+                    <td>${daysBadge}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteSchedule(${s.id})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+
+                // Dashboard upcoming widget
+                const item = document.createElement('div');
+                item.className = 'p-2 border rounded d-flex justify-content-between align-items-center';
+                item.innerHTML = `
+                    <div>
+                        <div class="fw-bold small">${s.name}</div>
+                        <small class="text-muted"><i class="bi bi-clock me-1"></i>${s.time} (${s.duration}m)</small>
+                    </div>
+                    <span class="badge ${s.enabled ? 'bg-success' : 'bg-secondary'}">${s.enabled ? 'Active' : 'Disabled'}</span>
+                `;
+                dashList.appendChild(item);
+            });
+        }
+
+        function toggleSchedule(id) {
+            const sched = STATE.schedules.find(s => s.id === id);
+            if (sched) {
+                sched.enabled = !sched.enabled;
+                renderSchedules();
+                logAudit('SCHEDULE', `Toggled schedule "${sched.name}" ${sched.enabled ? 'ON' : 'OFF'}`);
+            }
+        }
+
+        function deleteSchedule(id) {
+            STATE.schedules = STATE.schedules.filter(s => s.id !== id);
+            renderSchedules();
+            logAudit('SCHEDULE', `Deleted schedule ID #${id}`);
+        }
+
+        function saveNewSchedule() {
+            const name = document.getElementById('sched-input-name').value.trim() || 'Custom Schedule';
+            const time = document.getElementById('sched-input-time').value || '07:00';
+            const duration = parseInt(document.getElementById('sched-input-duration').value) || 10;
+            const days = [];
+            document.querySelectorAll('.sched-day:checked').forEach(cb => days.push(cb.value));
+
+            STATE.schedules.push({
+                id: Date.now(),
+                name,
+                time,
+                duration,
+                days: days.length > 0 ? days : ['Daily'],
+                enabled: true
+            });
+
+            bootstrap.Modal.getInstance(document.getElementById('modalAddSchedule')).hide();
+            renderSchedules();
+            logAudit('SCHEDULE', `Created new schedule "${name}" for ${time}`);
+        }
+
+        // ============================================================================
+        // 7. ALERTS SYSTEM
+        // ============================================================================
+        function addAlert(type, text) {
+            const alertItem = {
+                id: Date.now(),
+                type: type, // 'danger', 'warning', 'info', 'success'
+                text: text,
+                time: new Date().toLocaleTimeString()
+            };
+            STATE.alerts.unshift(alertItem);
+            if (STATE.alerts.length > 15) STATE.alerts.pop();
+
+            // Show top alert banner
+            const banner = document.getElementById('live-alert-banner');
+            document.getElementById('live-alert-text').textContent = text;
+            banner.className = `alert alert-${type} d-flex align-items-center gap-2 py-2 mb-3 shadow-sm`;
+            banner.classList.remove('d-none');
+
+            renderAlerts();
+        }
+
+        function renderAlerts() {
+            const container = document.getElementById('alerts-list-container');
+            container.innerHTML = '';
+            document.getElementById('nav-alert-count').textContent = STATE.alerts.length;
+
+            STATE.alerts.forEach(a => {
+                const col = document.createElement('div');
+                col.className = 'col-12';
+                col.innerHTML = `
+                    <div class="alert alert-${a.type} d-flex justify-content-between align-items-center mb-2 shadow-sm">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi ${a.type === 'danger' ? 'bi-exclamation-octagon-fill' : a.type === 'warning' ? 'bi-exclamation-triangle-fill' : 'bi-info-circle-fill'} fs-5"></i>
+                            <div>
+                                <div class="fw-semibold">${a.text}</div>
+                                <small class="text-muted">${a.time}</small>
+                            </div>
+                        </div>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="dismissAlert(${a.id})"><i class="bi bi-x"></i></button>
+                    </div>
+                `;
+                container.appendChild(col);
+            });
+        }
+
+        function dismissAlert(id) {
+            STATE.alerts = STATE.alerts.filter(a => a.id !== id);
+            renderAlerts();
+        }
+
+        function clearAlerts() {
+            STATE.alerts = [];
+            renderAlerts();
+        }
+
+        // ============================================================================
+        // 8. TELEMETRY & AUDIT CONSOLE
+        // ============================================================================
+        function emitTelemetryPacket() {
+            if (STATE.terminalPaused) return;
+
+            let sysStatus = "STANDBY HARVEST";
+            if (STATE.batteryVolts < 10.0) sysStatus = "CRITICAL LOW BATTERY LOCKOUT! (<10.0V)";
+            else if (STATE.solarVolts >= 12.0 && STATE.batteryVolts < 12.5) sysStatus = "ACTIVE SOLAR CHARGING (>12V)";
+            else if (STATE.batteryVolts >= 12.5) sysStatus = "BATTERY FULLY CHARGED (~12.6V)";
+            else if (STATE.solarVolts < 2.0) sysStatus = "NIGHT / DISCHARGING ON BATTERY";
+
+            const logLine = `[TELEMETRY] Solar Panel: ${STATE.solarVolts.toFixed(2)}V | Battery: ${STATE.batteryVolts.toFixed(2)}V | Soil: ${STATE.soilMoisture.toFixed(1)}% | Water: ${STATE.waterLevel.toFixed(1)}% | Pump: ${STATE.pumpOn ? 'ON' : 'OFF'} | Status: ${sysStatus}`;
+            
+            const term = document.getElementById('serial-terminal');
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+            line.textContent = logLine;
+            term.appendChild(line);
+
+            while (term.children.length > 50) {
+                term.removeChild(term.children[0]);
+            }
+            term.scrollTop = term.scrollHeight;
+        }
+
+        function clearTerminal() {
+            document.getElementById('serial-terminal').innerHTML = '';
+        }
+
+        function toggleTerminalPause() {
+            STATE.terminalPaused = !STATE.terminalPaused;
+            const btn = document.getElementById('btn-pause-term');
+            btn.innerHTML = STATE.terminalPaused ? '<i class="bi bi-play-fill"></i> Resume Stream' : '<i class="bi bi-pause-fill"></i> Pause Stream';
+        }
+
+        function logAudit(category, action) {
+            const tbody = document.getElementById('audit-log-body');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="mono small">${new Date().toLocaleTimeString()}</td>
+                <td><span class="badge bg-secondary">${category}</span></td>
+                <td>${action}</td>
+                <td>System Controller</td>
+            `;
+            tbody.insertBefore(tr, tbody.firstChild);
+            if (tbody.children.length > 20) tbody.removeChild(tbody.lastChild);
+        }
+
+        // ============================================================================
+        // 9. CHARTS & REPORTS (CHART.JS)
+        // ============================================================================
+        function initCharts() {
+            // Live Dashboard Mini Chart
+            const ctxLive = document.getElementById('chartDashboardLive');
+            liveChart = new Chart(ctxLive, {
+                type: 'line',
+                data: {
+                    labels: chartDataPoints.labels,
+                    datasets: [
+                        { label: 'Soil Moisture (%)', data: chartDataPoints.soil, borderColor: '#0284c7', backgroundColor: 'rgba(2,132,199,0.1)', tension: 0.3, fill: true },
+                        { label: 'Battery (V)', data: chartDataPoints.batt, borderColor: '#16a34a', borderDash: [4, 4], tension: 0.3 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { min: 0, max: 100 }
+                    }
+                }
+            });
+
+            // 24H History Trend Chart
+            const ctxHistory = document.getElementById('chartHistoryTrends');
+            const histLabels = ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00'];
+            historyChart = new Chart(ctxHistory, {
+                type: 'line',
+                data: {
+                    labels: histLabels,
+                    datasets: [
+                        { label: 'Soil Moisture (%)', data: [55, 50, 65, 58, 52, 45, 68, 62], borderColor: '#0284c7', tension: 0.4 },
+                        { label: 'Solar Output (V)', data: [0, 0, 8.5, 18.2, 19.4, 16.5, 3.2, 0], borderColor: '#eab308', tension: 0.4 },
+                        { label: 'Battery Voltage (V)', data: [11.8, 11.7, 11.6, 12.4, 12.6, 12.5, 12.2, 12.0], borderColor: '#16a34a', tension: 0.4 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        function recordChartPoint() {
+            if (!liveChart) return;
+            const timeLabel = new Date().toLocaleTimeString();
+            chartDataPoints.labels.push(timeLabel);
+            chartDataPoints.soil.push(STATE.soilMoisture);
+            chartDataPoints.water.push(STATE.waterLevel);
+            chartDataPoints.batt.push(STATE.batteryVolts);
+
+            if (chartDataPoints.labels.length > 10) {
+                chartDataPoints.labels.shift();
+                chartDataPoints.soil.shift();
+                chartDataPoints.water.shift();
+                chartDataPoints.batt.shift();
+            }
+            liveChart.update('none');
+        }
+
+        function exportCsvReport() {
+            let csvContent = "data:text/csv;charset=utf-8,Timestamp,SoilMoisture_Pct,WaterLevel_Pct,Battery_Volts,Solar_Volts,Pump_State\n";
+            const now = new Date();
+            for (let i = 10; i >= 0; i--) {
+                const pastTime = new Date(now.getTime() - i * 60000).toISOString();
+                csvContent += `${pastTime},${(40 + Math.random()*20).toFixed(1)},${(20 + Math.random()*15).toFixed(1)},${(11.5 + Math.random()).toFixed(2)},${(STATE.solarVolts).toFixed(2)},${STATE.pumpOn ? 'ON' : 'OFF'}\n`;
+            }
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `wbacfspwi_report_${Date.now()}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            logAudit('REPORT', 'Exported sensor trend report to CSV');
+        }
+    </script>
+</body>
+</html>
