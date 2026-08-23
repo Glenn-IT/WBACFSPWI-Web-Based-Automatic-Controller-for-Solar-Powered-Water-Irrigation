@@ -52,13 +52,13 @@ const int SOIL_AIR_RAW       = 417;    // 0% moisture in dry air
 const int SOIL_WATER_RAW     = 153;    // 100% moisture in water
 
 // HW-080 Moisture Sensor (Surface Ponding Depth: Inverted ADC mapping)
-const int HW080_RAW_DRY      = 1017;   // Probe in air (0% ponding / surface dry)
-const int HW080_RAW_WET      = 260;    // Probe submerged at full depth in standing water (100% ponding)
+const int HW080_RAW_DRY      = 1019;   // Stage A: Probe in dry air (0% ponding / surface dry)
+const int HW080_RAW_WET      = 508;    // Stage E: Probe fully submerged to 2-pin header (100% full ponding)
 
 // Irrigation Decision Thresholds (for Rice Field)
 const float MOISTURE_START_PCT = 35.0; // Start pumping when root moisture drops below 35%
 const float MOISTURE_STOP_PCT  = 65.0; // Stop pumping when root moisture reaches 65%
-const float SURFACE_MAX_PCT    = 75.0; // Stop pumping if surface water level exceeds 75%
+const float SURFACE_MAX_PCT    = 90.0; // Stop pumping if surface water level exceeds 90% (Stage D/E flood limit)
 
 // Safety & Battery Protection Thresholds
 const float BATT_MIN_LOCKOUT = 10.00;  // 3S Pack cutoff (~3.33V/cell)

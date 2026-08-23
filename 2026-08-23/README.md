@@ -52,14 +52,17 @@
 ---
 
 ### Case 03: Test 02 HW-080 Surface Water Level Sensor Calibration
-* **Symptoms:**
-  - In dry air, probe read `Raw ADC: 1017` (clamped to `0.0%`).
-  - At mid-depth submersion (`Raw ADC: ~520 - 548`), reading computed at $88\%\text{--}97\%$ due to an overly narrow wet span, triggering false flood alarms.
+* **Findings from [`arduino/note.md`](../arduino/note.md):**
+  - **Stage A (Dry Air):** `Raw ADC: 1019` ($4.98\text{V}$) $\rightarrow$ Open circuit between tracks.
+  - **Stage B (First Contact / Low Rise):** `Raw ADC: 660` ($3.23\text{V}$) $\rightarrow$ Water bridges bottom of tracks.
+  - **Stage C (1/3 Rise):** `Raw ADC: 581` ($2.84\text{V}$)
+  - **Stage D (2/3 Rise):** `Raw ADC: 525` ($2.57\text{V}$)
+  - **Stage E (Full Depth / 2-Pin Top):** `Raw ADC: 508` ($2.48\text{V}$) $\rightarrow$ Minimum resistance floor reached.
 * **Applied Fix & Calibrated Parameters:**
-  - `HW080_RAW_DRY`: **`1017`** (0.0% surface water / dry bed)
-  - `HW080_RAW_WET`: **`260`** (100.0% max ponding depth / fully flooded)
-  - Formula: $\text{Ponding \%} = 100 \times \frac{1017 - \text{Raw}}{1017 - 260}$
-  - Mid-level (~`525` ADC) now calculates accurately to $\approx 65.0\%$ ("OPTIMAL RICE PONDING DEPTH").
+  - `HW080_RAW_DRY`: **`1019`** (0.0% surface water / dry bed)
+  - `HW080_RAW_WET`: **`508`** (100.0% max ponding depth / fully flooded)
+  - Formula: $\text{Ponding \%} = 100 \times \frac{1019 - \text{Raw}}{1019 - 508}$
+  - Stage E now maps accurately to $100.0\%$, Stage B/C maintain "OPTIMAL RICE PONDING DEPTH", and Stage D/E (>90%) trigger flood inhibit protection.
 * **Updated Files:**
   - [`arduino/02_surface_water_level_test/02_surface_water_level_test.ino`](../arduino/02_surface_water_level_test/02_surface_water_level_test.ino)
   - [`arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino`](../arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino)

@@ -20,9 +20,9 @@
 const int PIN_HW080_ANALOG = A1;
 const int PIN_HW080_DIGITAL = 2; // Optional DO pin for threshold interrupt
 
-// Calibrated HW-080 constants from physical water tray test:
-int HW080_RAW_DRY = 1017; // Raw ADC reading when probe is completely dry in air (0.0% ponding)
-int HW080_RAW_WET = 260;  // Raw ADC reading at full track submersion (100.0% ponding; ~520 ADC at mid-level = ~65%)
+// Calibrated HW-080 constants from physical water tray test (Stages A to E):
+int HW080_RAW_DRY = 1019; // Stage A: Probe in dry air (0.0% surface water)
+int HW080_RAW_WET = 508;  // Stage E: Probe fully submerged up to 2-pin header (100.0% full ponding)
 
 void setup() {
   Serial.begin(115200);
@@ -72,7 +72,7 @@ void loop() {
 
   if (surfaceMoisturePct < 15.0) {
     Serial.println(F("NO STANDING WATER (Surface Dry)"));
-  } else if (surfaceMoisturePct < 75.0) {
+  } else if (surfaceMoisturePct < 90.0) {
     Serial.println(F("OPTIMAL RICE PONDING DEPTH"));
   } else {
     Serial.println(F("MAX FLOOD LEVEL REACHED (Inhibit Irrigation)"));

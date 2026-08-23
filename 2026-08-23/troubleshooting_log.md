@@ -10,10 +10,13 @@
   - **Formula:** $\text{Moisture \%} = 100 \times \frac{417 - \text{Raw}}{417 - 153}$
   - **Status:** Verified and updated in [`arduino/01_soil_root_capacitive_test/01_soil_root_capacitive_test.ino`](../arduino/01_soil_root_capacitive_test/01_soil_root_capacitive_test.ino) and [`arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino`](../arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino).
 
-- **HW-080 Surface Water Level Sensor:**
-  - **Dry Air Reading:** `1017` ADC $\rightarrow$ Set `HW080_RAW_DRY = 1017` (Maps to **`0.0%` Surface Water**)
-  - **Full Ponding Submersion Reading:** `260` ADC $\rightarrow$ Set `HW080_RAW_WET = 260` (Maps to **`100.0%` Ponding Level**; mid-level readings around `520` ADC scale smoothly to $\approx 65\%$, preventing premature flood trip).
-  - **Formula:** $\text{Ponding \%} = 100 \times \frac{1017 - \text{Raw}}{1017 - 260}$
+- **HW-080 Surface Water Level Sensor (5-Stage Water Rise Calibration from `note.md`):**
+  - **Stage A (Dry Air):** `1019` ADC ($4.98\text{V}$) $\rightarrow$ Set `HW080_RAW_DRY = 1019` (Maps to **`0.0%` Surface Dry**)
+  - **Stage B (First Contact / Low Rise):** `660` ADC ($3.23\text{V}$) $\rightarrow$ Maps to **`70.2%`** (OPTIMAL RICE PONDING DEPTH)
+  - **Stage C (Mid Rise):** `581` ADC ($2.84\text{V}$) $\rightarrow$ Maps to **`85.7%`** (OPTIMAL RICE PONDING DEPTH)
+  - **Stage D (High Rise):** `525` ADC ($2.57\text{V}$) $\rightarrow$ Maps to **`96.6%`**
+  - **Stage E (Full Depth / 2-Pin Header Top):** `508` ADC ($2.48\text{V}$) $\rightarrow$ Set `HW080_RAW_WET = 508` (Maps to **`100.0%` MAX FLOOD LEVEL**)
+  - **Formula:** $\text{Ponding \%} = 100 \times \frac{1019 - \text{Raw}}{1019 - 508}$
   - **Status:** Verified and updated in [`arduino/02_surface_water_level_test/02_surface_water_level_test.ino`](../arduino/02_surface_water_level_test/02_surface_water_level_test.ino) and [`arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino`](../arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino).
 
 ---

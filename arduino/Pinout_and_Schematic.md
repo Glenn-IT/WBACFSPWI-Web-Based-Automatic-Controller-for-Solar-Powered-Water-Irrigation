@@ -67,7 +67,7 @@ To prevent inductive motor spikes and high-current relay switching from causing 
 | **SIG-01** | Arduino Pin D7 | Direct Jumper | Relay IN Pin | **Amber** | 5V Digital Out | Active LOW trigger with 3-minute continuous runtime safety cap. |
 | **SIG-02** | Arduino Pin D8 | Direct Jumper | Capacitive Sensor VCC | **Pink / Red** | 5V Digital Gate | Powers capacitive sensor only during sampling (anti-corrosion). |
 | **SIG-03** | Capacitive Sensor AOUT | Direct Jumper | Arduino Pin A0 | **Green** | 0V – 3.0V Analog | Root zone soil moisture reading (Air ~417, Water ~153). |
-| **SIG-04** | HW-080 Sensor AO | Direct Jumper | Arduino Pin A1 | **Cyan** | 0V – 5.0V Analog | Surface ponding depth reading (Dry ~1017, Wet ~260). Inhibit ≥ 80%. |
+| **SIG-04** | HW-080 Sensor AO | Direct Jumper | Arduino Pin A1 | **Cyan** | 0V – 5.0V Analog | Surface ponding depth reading (Dry ~1019, Wet ~508). Inhibit ≥ 90%. |
 | **SIG-05** | Row 10 (R1/R2 Junction) | 100kΩ / 33kΩ Divider | Arduino Pin A2 | **Purple** | 0V – 3.13V Analog | Battery voltage monitor ($V_{\text{batt}} / 4.0303$). Cutoff < 10.0V. |
 | **SIG-06** | Row 25 (R3/R4 Junction) | 100kΩ / 20kΩ Divider | Arduino Pin A3 | **Gold / Yellow** | 0V – 3.67V Analog | Solar panel monitor ($V_{\text{solar}} / 6.000$). Harvesting > 12.0V. |
 | **COMM-01**| USB Port | Direct USB Cable | Computer / Web Bridge | **Blue Cable** | UART (115200 baud)| **Telemetry & Command Bridge Only** (Not primary power). |
