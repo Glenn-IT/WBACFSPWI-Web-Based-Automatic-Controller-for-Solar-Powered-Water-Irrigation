@@ -55,10 +55,9 @@ const int SOIL_WATER_RAW     = 153;    // 100% moisture in water
 const int HW080_RAW_DRY      = 1019;   // Stage A: Probe in dry air (0% ponding / surface dry)
 const int HW080_RAW_WET      = 508;    // Stage E: Probe fully submerged to 2-pin header (100% full ponding)
 
-// Irrigation Decision Thresholds (for Rice Field)
-const float MOISTURE_START_PCT = 50.0; // Start pumping when root moisture drops below 50%
-const float MOISTURE_STOP_PCT  = 70.0; // Stop pumping when root moisture reaches 70%
-const float SURFACE_MAX_PCT    = 70.0; // Immediately stop pumping if surface water level reaches 70% (Flood Cutoff)
+// Irrigation Decision Thresholds (for Rice Field - HW-080 Water Level Driven)
+const float SURFACE_START_PCT  = 30.0; // Automatically start pump when surface water level drops <= 30%
+const float SURFACE_STOP_PCT   = 85.0; // Automatically stop pump when surface water level reaches >= 85%
 
 // Safety & Battery Protection Thresholds
 const float BATT_MIN_LOCKOUT = 10.00;  // 3S Pack cutoff (~3.33V/cell)
@@ -238,18 +237,18 @@ void loop() {
       Serial.println(F("[SAFETY] Cooldown finished. Resuming normal operations."));
     }
 
-    // 3. Automated Decision Logic
+    // 3. Automated Decision Logic (HW-080 Water Level Driven)
     if (lowBatteryLockout || timeoutLockout) {
       setPump(false);
     } else {
       if (!pumpState) {
-        // Evaluate start condition: Dry root soil AND surface has capacity (< 70%)
-        if (currentRootMoisture < MOISTURE_START_PCT && currentSurfaceWater < SURFACE_MAX_PCT) {
+        // Start pumping when surface ponding drops to or below 30%
+        if (currentSurfaceWater <= SURFACE_START_PCT) {
           setPump(true);
         }
       } else {
-        // Evaluate stop condition: Stop ONLY when surface standing water reaches target (>= 70%)
-        if (currentSurfaceWater >= SURFACE_MAX_PCT) {
+        // Stop pumping when surface ponding fills to 85%
+        if (currentSurfaceWater >= SURFACE_STOP_PCT) {
           setPump(false);
         }
       }

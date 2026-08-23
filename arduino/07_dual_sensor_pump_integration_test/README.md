@@ -5,13 +5,17 @@ This integrated test links **both physical sensors** and the **relay water pump*
 
 ---
 
-## 🌾 Irrigation Decision Logic
+## 🌾 Rice Paddy Water Level Control Logic (HW-080 Driven)
 1. **PUMP ON Trigger:**
-   $$\text{Root Soil Moisture} < 50.0\% \quad\text{AND}\quad \text{Surface Water Level} < 70.0\%$$
-2. **PUMP OFF (Surface Ponding Depth Target):**
-   $$\text{Surface Water Level} \ge 70.0\%$$
-   *(The pump continues filling the paddy until surface water reaches 70.0%. It disregards capacitive root saturation so the required standing ponding layer is achieved!)*
-3. **Continuous Run Protection:**
+   $$\text{Surface Water Level (HW-080)} \le 30.0\%$$
+   *(Automatically turns on the pump when standing water in the paddy drops low)*
+2. **PUMP OFF (Target Ponding Reached):**
+   $$\text{Surface Water Level (HW-080)} \ge 85.0\%$$
+   *(Automatically turns off the pump once the paddy is filled to the 85% target depth)*
+3. **Capacitive Soil Sensor (Root Zone):**
+   - Disregarded for pump switching.
+   - Continuously streams calibrated telemetry ($0\text{--}100\%$) for root zone monitoring and web logging.
+4. **Continuous Run Protection:**
    - Pump is capped at a maximum of **180 seconds continuous run**.
 
 ---

@@ -19,13 +19,14 @@
   - **Formula:** $\text{Ponding \%} = 100 \times \frac{1019 - \text{Raw}}{1019 - 508}$
   - **Status:** Verified and updated in [`arduino/02_surface_water_level_test/02_surface_water_level_test.ino`](../arduino/02_surface_water_level_test/02_surface_water_level_test.ino) and [`arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino`](../arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino).
 
-- **Dual Sensor & Relay Pump Integrated Rules (Test 07):**
-  - **Capacitive Soil Sensor (Pin A0):** Measures Root-Zone Moisture ($0\text{--}100\%$, triggers irrigation start when $< 50.0\%$).
-  - **HW-080 Water Level Sensor (Pin A1):** Measures Surface Standing Water / Ponding Depth ($0\text{--}100\%$).
-  - **Pump ON Trigger:** Root Soil Moisture $< 50.0\%$ **AND** Surface Water Level $< 70.0\%$.
-  - **Pump OFF Cutoff (Paddy Ponding Target):** Surface Water Level $\ge 70.0\%$ (Pump runs continuously until surface ponding depth reaches 70.0%, disregarding early capacitive saturation to 100%).
+- **Dual Sensor & Relay Pump Integrated Rules (Test 07 - HW-080 Driven):**
+  - **HW-080 Surface Water Sensor (Pin A1 - Primary Pump Controller):**
+    - **PUMP ON:** When Surface Water Level drops $\le 30.0\%$.
+    - **PUMP OFF:** When Surface Water Level rises to $\ge 85.0\%$.
+  - **Capacitive Soil Sensor (Pin A0 - Telemetry Monitoring Only):**
+    - Disregarded for pump control. Streams calibrated soil moisture ($0\text{--}100\%$) for root zone health logging.
   - **Safety Limit:** 180 seconds maximum continuous runtime protection.
-  - **Created Test Sketch:** [`arduino/07_dual_sensor_pump_integration_test/07_dual_sensor_pump_integration_test.ino`](../arduino/07_dual_sensor_pump_integration_test/07_dual_sensor_pump_integration_test.ino).
+  - **Updated Sketches:** [`arduino/07_dual_sensor_pump_integration_test/07_dual_sensor_pump_integration_test.ino`](../arduino/07_dual_sensor_pump_integration_test/07_dual_sensor_pump_integration_test.ino) and [`arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino`](../arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino).
 
 ---
 

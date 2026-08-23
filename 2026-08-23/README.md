@@ -71,18 +71,16 @@
 
 ---
 
-### Case 04: Test 07 Integrated Dual Sensor (Capacitive + HW-080) & Relay Pump Logic
-* **Objective & Rice Field Automation Rules:**
-  - **Capacitive Probe (A0):** Root-zone soil moisture ($0\text{--}100\%$, Calibrated: `417` dry, `153` wet).
-  - **HW-080 Probe (A1):** Surface standing water depth ($0\text{--}100\%$, Calibrated: `1019` dry, `508` wet).
-  - **Relay Water Pump (D7):** Active LOW trigger.
-* **Control Conditions:**
-  - **PUMP ON:** `Root Moisture < 50.0%` **AND** `Surface Water < 70.0%`.
-  - **PUMP OFF (Ponding Target Reached):** `Surface Water >= 70.0%` (The pump continues running until the standing ponding layer reaches 70.0%, disregarding early capacitive saturation to 100%).
-  - **Runtime Limit:** 180 seconds continuous run cap.
+### Case 04: Test 07 Integrated Dual Sensor (HW-080 Driven) & Relay Pump Logic
+* **Objective & Control Roles:**
+  - **HW-080 Surface Sensor (A1 - Primary Controller):** Manages standing water level.
+    - **PUMP ON:** `Surface Water <= 30.0%` (Paddy water level low).
+    - **PUMP OFF:** `Surface Water >= 85.0%` (Paddy filled to target depth).
+  - **Capacitive Probe (A0 - Telemetry Only):** Continuously monitors and logs root-zone soil moisture ($0\text{--}100\%$, Calibrated: `417` dry, `153` wet) without interrupting pump operation.
+  - **Relay Water Pump (D7):** Active LOW trigger with 180s continuous run protection.
 * **Created & Updated Files:**
-  - Created [`arduino/07_dual_sensor_pump_integration_test/07_dual_sensor_pump_integration_test.ino`](../arduino/07_dual_sensor_pump_integration_test/07_dual_sensor_pump_integration_test.ino)
-  - Created [`arduino/07_dual_sensor_pump_integration_test/README.md`](../arduino/07_dual_sensor_pump_integration_test/README.md)
+  - Updated [`arduino/07_dual_sensor_pump_integration_test/07_dual_sensor_pump_integration_test.ino`](../arduino/07_dual_sensor_pump_integration_test/07_dual_sensor_pump_integration_test.ino)
+  - Updated [`arduino/07_dual_sensor_pump_integration_test/README.md`](../arduino/07_dual_sensor_pump_integration_test/README.md)
   - Updated [`arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino`](../arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino)
   - Updated [`arduino/Pinout_and_Schematic.md`](../arduino/Pinout_and_Schematic.md)
   - Updated [`arduino/wbacfspwi_arduino_controller/wiring_guide.html`](../arduino/wbacfspwi_arduino_controller/wiring_guide.html)
