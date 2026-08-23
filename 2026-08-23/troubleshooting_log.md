@@ -26,7 +26,9 @@
   - **Capacitive Soil Sensor (Pin A0 - Telemetry Monitoring Only):**
     - Disregarded for pump control. Streams calibrated soil moisture ($0\text{--}100\%$) for root zone health logging.
   - **Safety Limit:** 180 seconds maximum continuous runtime protection.
-  - **Updated Sketches:** [`arduino/07_dual_sensor_pump_integration_test/07_dual_sensor_pump_integration_test.ino`](../arduino/07_dual_sensor_pump_integration_test/07_dual_sensor_pump_integration_test.ino) and [`arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino`](../arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino).
+  - **Live Hardware Telemetry Verification (PASSED ✅):**
+    - `Root Moisture: 100.0%` (Capacitive) properly logged without stopping the pump early.
+    - `Surface Water: 70.6% - 81.8%` (HW-080) correctly maintained `Pump Relay: STANDBY (OFF)` in the optimal buffer band ($30\%\text{--}85\%$).
 
 ---
 
