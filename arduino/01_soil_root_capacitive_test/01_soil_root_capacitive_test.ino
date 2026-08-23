@@ -20,9 +20,9 @@ const int PIN_SOIL_ANALOG = A0;
 const int PIN_SOIL_POWER  = 8;    // Set to -1 if sensor is wired directly to 5V
 const bool USE_POWER_GATE = true;
 
-// Default calibration thresholds (Update with your measured values!)
-int SOIL_AIR_RAW   = 620;  // Raw value in completely dry air (0% moisture)
-int SOIL_WATER_RAW = 310;  // Raw value submerged in water (100% moisture)
+// Calibrated thresholds from physical sensor test
+int SOIL_AIR_RAW   = 417;  // Raw value in completely dry air (0% moisture)
+int SOIL_WATER_RAW = 153;  // Raw value fully submerged in water (100% moisture)
 
 void setup() {
   Serial.begin(115200);

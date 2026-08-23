@@ -48,8 +48,8 @@ const float VBATT_RATIO      = 4.0303; // (100k + 33k) / 33k
 const float VSOLAR_RATIO     = 6.0000; // (100k + 20k) / 20k
 
 // Capacitive Root Sensor (Air vs Water raw ADC)
-const int SOIL_AIR_RAW       = 620;    // 0% moisture in dry air
-const int SOIL_WATER_RAW     = 310;    // 100% moisture in water
+const int SOIL_AIR_RAW       = 417;    // 0% moisture in dry air
+const int SOIL_WATER_RAW     = 153;    // 100% moisture in water
 
 // HW-080 Moisture Sensor (Surface Ponding Depth: Inverted ADC mapping)
 const int HW080_RAW_DRY      = 950;    // Probe in air (0% ponding / surface dry)
