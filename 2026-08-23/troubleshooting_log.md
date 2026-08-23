@@ -19,13 +19,15 @@
   - **Formula:** $\text{Ponding \%} = 100 \times \frac{1019 - \text{Raw}}{1019 - 508}$
   - **Status:** Verified and updated in [`arduino/02_surface_water_level_test/02_surface_water_level_test.ino`](../arduino/02_surface_water_level_test/02_surface_water_level_test.ino) and [`arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino`](../arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino).
 
-- **Constant 85% Surface Water Maintenance & 10s Startup Calibration Window (Test 07):**
-  - **10-Second Startup Stabilization Window:** Controller counts down for 10 seconds on boot to stabilize sensor signals before evaluating pump actions.
-  - **HW-080 Constant Ponding Level Controller:**
-    - **PUMP ON:** Whenever surface water drops $< 80.0\%$ (Refills immediately to target).
-    - **PUMP OFF:** When surface water reaches $\ge 85.0\%$ (Maintains ~85% level).
-  - **Capacitive Soil Sensor:** Pure telemetry feed ($0\text{--}100\%$) for root zone logging.
-  - **Safety Limit:** 180 seconds continuous run protection.
+- **Constant 85% Surface Water Maintenance & Container Full-Depth Calibration (Test 07):**
+  - **HW-080 Recalibrated Endpoints:**
+    - Dry in Air: `1019` ADC $\rightarrow$ **`0.0%`**
+    - Container Full Level: `580` ADC $\rightarrow$ **`100.0%`** (Prevents water from rising past the container rim before reaching 85%).
+  - **10-Second Startup Stabilization Window:** Counts down on boot before actuators engage.
+  - **Maintained Target:**
+    - **PUMP ON:** Surface Water $< 80.0\%$ (Refills to maintain depth).
+    - **PUMP OFF:** Surface Water $\ge 85.0\%$ (Reached safe standing depth).
+  - **Telemetry Enhancement:** Added live `Raw ADC` output in serial stream for easy hardware monitoring.
   - **Updated Sketches:** [`arduino/07_dual_sensor_pump_integration_test/07_dual_sensor_pump_integration_test.ino`](../arduino/07_dual_sensor_pump_integration_test/07_dual_sensor_pump_integration_test.ino) and [`arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino`](../arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino).
 
 ---

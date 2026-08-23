@@ -37,4 +37,4 @@ This integrated test links **both physical sensors** and the **relay water pump*
   - Fully Submerged: `153` ADC $\rightarrow$ **`100.0%` Moisture**
 - **HW-080 Surface Water Level:**
   - Dry Probe in Air: `1019` ADC $\rightarrow$ **`0.0%` Standing Water**
-  - Submerged to Top: `508` ADC $\rightarrow$ **`100.0%` Full Depth**
+  - Container Maximum Ponding Depth: `580` ADC $\rightarrow$ **`100.0%` Full Depth** (Turns pump OFF smoothly at 85% before container overflows)

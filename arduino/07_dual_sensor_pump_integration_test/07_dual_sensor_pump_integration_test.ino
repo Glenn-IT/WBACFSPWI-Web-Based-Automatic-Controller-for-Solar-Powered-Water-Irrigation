@@ -40,8 +40,9 @@ const bool RELAY_ACTIVE_LOW  = true;
 const int SOIL_AIR_RAW       = 417;   // 0% root moisture in dry air
 const int SOIL_WATER_RAW     = 153;   // 100% root moisture submerged in water
 
+// Calibrated HW-080 constants adjusted for container maximum depth:
 const int HW080_RAW_DRY      = 1019;  // 0% surface standing water (dry surface)
-const int HW080_RAW_WET      = 508;   // 100% full ponding depth (top of probe tracks)
+const int HW080_RAW_WET      = 580;   // 100% full container depth (Raw ADC ~580-600 reaches full capacity)
 
 // ============================================================================
 // 3. IRRIGATION CONTROL THRESHOLDS (CONSTANT 85% LEVEL MAINTENANCE)
@@ -57,6 +58,7 @@ const unsigned long MAX_PUMP_RUNTIME_MS = 180000UL; // 180 seconds continuous ru
 bool pumpState = false;
 unsigned long pumpStartTime = 0;
 unsigned long lastLoopTime = 0;
+int lastRawHW080 = 0;
 
 void setPump(bool enable, const char* reason) {
   if (enable != pumpState) {
@@ -100,8 +102,8 @@ float readSurfaceWaterLevel() {
     sum += analogRead(PIN_SURFACE_WATER);
     delay(5);
   }
-  int raw = (int)(sum / 16);
-  float pct = 100.0 * (float)(HW080_RAW_DRY - raw) / (float)(HW080_RAW_DRY - HW080_RAW_WET);
+  lastRawHW080 = (int)(sum / 16);
+  float pct = 100.0 * (float)(HW080_RAW_DRY - lastRawHW080) / (float)(HW080_RAW_DRY - HW080_RAW_WET);
   return constrain(pct, 0.0, 100.0);
 }
 
@@ -125,7 +127,7 @@ void setup() {
   Serial.println(F("  - TARGET LEVEL: Maintain ~85.0% Surface Water"));
   Serial.println(F("  - PUMP ON     : Surface Water < 80.0%"));
   Serial.println(F("  - PUMP OFF    : Surface Water >= 85.0%"));
-  Serial.println(F("  - Capacitive Soil Sensor: Telemetry/Data Monitoring Only (0-100%)"));
+  Serial.println(F("  - Calibrated  : HW080 Dry=1019, Full=580"));
   Serial.println(F("=================================================================="));
   
   // 10-Second Sensor Calibration & Stabilization Window
@@ -134,7 +136,6 @@ void setup() {
     Serial.print(F("  -> Stabilizing sensors... "));
     Serial.print(sec);
     Serial.println(F("s remaining"));
-    // Quick reading test during countdown
     readRootSoilMoisture();
     readSurfaceWaterLevel();
     delay(1000);
@@ -165,12 +166,14 @@ void loop() {
     }
   }
 
-  // Print Formatted Telemetry Line
+  // Print Formatted Telemetry Line with Raw ADC
   Serial.print(F("[LIVE TELEMETRY] Root Moisture: "));
   Serial.print(rootMoisture, 1);
   Serial.print(F("% (Capacitive Data) | Surface Water: "));
   Serial.print(surfaceWater, 1);
-  Serial.print(F("% (HW-080 Control) | Pump Relay: "));
+  Serial.print(F("% (Raw ADC: "));
+  Serial.print(lastRawHW080);
+  Serial.print(F(") | Pump Relay: "));
 
   if (pumpState) {
     unsigned long runSec = (millis() - pumpStartTime) / 1000;
