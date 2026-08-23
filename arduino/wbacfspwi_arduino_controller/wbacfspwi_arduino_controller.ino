@@ -56,9 +56,9 @@ const int HW080_RAW_DRY      = 1019;   // Stage A: Probe in dry air (0% ponding 
 const int HW080_RAW_WET      = 508;    // Stage E: Probe fully submerged to 2-pin header (100% full ponding)
 
 // Irrigation Decision Thresholds (for Rice Field)
-const float MOISTURE_START_PCT = 35.0; // Start pumping when root moisture drops below 35%
-const float MOISTURE_STOP_PCT  = 65.0; // Stop pumping when root moisture reaches 65%
-const float SURFACE_MAX_PCT    = 90.0; // Stop pumping if surface water level exceeds 90% (Stage D/E flood limit)
+const float MOISTURE_START_PCT = 50.0; // Start pumping when root moisture drops below 50%
+const float MOISTURE_STOP_PCT  = 70.0; // Stop pumping when root moisture reaches 70%
+const float SURFACE_MAX_PCT    = 70.0; // Immediately stop pumping if surface water level reaches 70% (Flood Cutoff)
 
 // Safety & Battery Protection Thresholds
 const float BATT_MIN_LOCKOUT = 10.00;  // 3S Pack cutoff (~3.33V/cell)

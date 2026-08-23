@@ -71,6 +71,25 @@
 
 ---
 
+### Case 04: Test 07 Integrated Dual Sensor (Capacitive + HW-080) & Relay Pump Logic
+* **Objective & Rice Field Automation Rules:**
+  - **Capacitive Probe (A0):** Root-zone soil moisture ($0\text{--}100\%$, Calibrated: `417` dry, `153` wet).
+  - **HW-080 Probe (A1):** Surface standing water depth ($0\text{--}100\%$, Calibrated: `1019` dry, `508` wet).
+  - **Relay Water Pump (D7):** Active LOW trigger.
+* **Control Conditions:**
+  - **PUMP ON:** `Root Moisture < 50.0%` **AND** `Surface Water < 70.0%`.
+  - **PUMP OFF (Flood Cutoff):** `Surface Water >= 70.0%` (Highest priority safety cutoff).
+  - **PUMP OFF (Moisture Satisfied):** `Root Moisture >= 70.0%`.
+  - **Runtime Limit:** 180 seconds continuous run cap.
+* **Created & Updated Files:**
+  - Created [`arduino/07_dual_sensor_pump_integration_test/07_dual_sensor_pump_integration_test.ino`](../arduino/07_dual_sensor_pump_integration_test/07_dual_sensor_pump_integration_test.ino)
+  - Created [`arduino/07_dual_sensor_pump_integration_test/README.md`](../arduino/07_dual_sensor_pump_integration_test/README.md)
+  - Updated [`arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino`](../arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino)
+  - Updated [`arduino/Pinout_and_Schematic.md`](../arduino/Pinout_and_Schematic.md)
+  - Updated [`arduino/wbacfspwi_arduino_controller/wiring_guide.html`](../arduino/wbacfspwi_arduino_controller/wiring_guide.html)
+
+---
+
 ## 2. Complete System Files & Functions Audit
 
 ### A. Backend & Database Structure
