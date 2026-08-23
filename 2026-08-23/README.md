@@ -51,6 +51,23 @@
 
 ---
 
+### Case 03: Test 02 HW-080 Surface Water Level Sensor Calibration
+* **Symptoms:**
+  - In dry air, probe read `Raw ADC: 1017` (clamped to `0.0%`).
+  - At mid-depth submersion (`Raw ADC: ~520 - 548`), reading computed at $88\%\text{--}97\%$ due to an overly narrow wet span, triggering false flood alarms.
+* **Applied Fix & Calibrated Parameters:**
+  - `HW080_RAW_DRY`: **`1017`** (0.0% surface water / dry bed)
+  - `HW080_RAW_WET`: **`260`** (100.0% max ponding depth / fully flooded)
+  - Formula: $\text{Ponding \%} = 100 \times \frac{1017 - \text{Raw}}{1017 - 260}$
+  - Mid-level (~`525` ADC) now calculates accurately to $\approx 65.0\%$ ("OPTIMAL RICE PONDING DEPTH").
+* **Updated Files:**
+  - [`arduino/02_surface_water_level_test/02_surface_water_level_test.ino`](../arduino/02_surface_water_level_test/02_surface_water_level_test.ino)
+  - [`arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino`](../arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino)
+  - [`arduino/Pinout_and_Schematic.md`](../arduino/Pinout_and_Schematic.md)
+  - [`arduino/wbacfspwi_arduino_controller/wiring_guide.html`](../arduino/wbacfspwi_arduino_controller/wiring_guide.html)
+
+---
+
 ## 2. Complete System Files & Functions Audit
 
 ### A. Backend & Database Structure

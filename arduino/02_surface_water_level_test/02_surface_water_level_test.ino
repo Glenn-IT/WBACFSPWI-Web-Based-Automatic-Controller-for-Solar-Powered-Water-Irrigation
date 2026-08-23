@@ -20,12 +20,9 @@
 const int PIN_HW080_ANALOG = A1;
 const int PIN_HW080_DIGITAL = 2; // Optional DO pin for threshold interrupt
 
-// HW-080 Calibration Constants:
-// In typical HW-080 resistive probes:
-// - Dry (Air / Dry Surface): High resistance -> AO voltage is HIGH (Raw ADC ~ 850 - 1023)
-// - Submerged (Ponding / Flood): Low resistance -> AO voltage is LOW (Raw ADC ~ 250 - 450)
-int HW080_RAW_DRY = 950;  // Raw ADC reading when probe is completely dry in air
-int HW080_RAW_WET = 300;  // Raw ADC reading when probe is submerged in standing surface water
+// Calibrated HW-080 constants from physical water tray test:
+int HW080_RAW_DRY = 1017; // Raw ADC reading when probe is completely dry in air (0.0% ponding)
+int HW080_RAW_WET = 260;  // Raw ADC reading at full track submersion (100.0% ponding; ~520 ADC at mid-level = ~65%)
 
 void setup() {
   Serial.begin(115200);

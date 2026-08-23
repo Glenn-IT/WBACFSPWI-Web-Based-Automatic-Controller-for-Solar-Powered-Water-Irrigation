@@ -52,8 +52,8 @@ const int SOIL_AIR_RAW       = 417;    // 0% moisture in dry air
 const int SOIL_WATER_RAW     = 153;    // 100% moisture in water
 
 // HW-080 Moisture Sensor (Surface Ponding Depth: Inverted ADC mapping)
-const int HW080_RAW_DRY      = 950;    // Probe in air (0% ponding / surface dry)
-const int HW080_RAW_WET      = 300;    // Probe submerged in standing water (100% ponding)
+const int HW080_RAW_DRY      = 1017;   // Probe in air (0% ponding / surface dry)
+const int HW080_RAW_WET      = 260;    // Probe submerged at full depth in standing water (100% ponding)
 
 // Irrigation Decision Thresholds (for Rice Field)
 const float MOISTURE_START_PCT = 35.0; // Start pumping when root moisture drops below 35%

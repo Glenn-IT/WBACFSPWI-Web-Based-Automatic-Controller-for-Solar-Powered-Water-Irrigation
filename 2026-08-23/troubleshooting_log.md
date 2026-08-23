@@ -10,6 +10,12 @@
   - **Formula:** $\text{Moisture \%} = 100 \times \frac{417 - \text{Raw}}{417 - 153}$
   - **Status:** Verified and updated in [`arduino/01_soil_root_capacitive_test/01_soil_root_capacitive_test.ino`](../arduino/01_soil_root_capacitive_test/01_soil_root_capacitive_test.ino) and [`arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino`](../arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino).
 
+- **HW-080 Surface Water Level Sensor:**
+  - **Dry Air Reading:** `1017` ADC $\rightarrow$ Set `HW080_RAW_DRY = 1017` (Maps to **`0.0%` Surface Water**)
+  - **Full Ponding Submersion Reading:** `260` ADC $\rightarrow$ Set `HW080_RAW_WET = 260` (Maps to **`100.0%` Ponding Level**; mid-level readings around `520` ADC scale smoothly to $\approx 65\%$, preventing premature flood trip).
+  - **Formula:** $\text{Ponding \%} = 100 \times \frac{1017 - \text{Raw}}{1017 - 260}$
+  - **Status:** Verified and updated in [`arduino/02_surface_water_level_test/02_surface_water_level_test.ino`](../arduino/02_surface_water_level_test/02_surface_water_level_test.ino) and [`arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino`](../arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino).
+
 ---
 
 ## 🔍 Pre-Integration System Status
