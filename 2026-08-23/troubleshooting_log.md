@@ -19,16 +19,14 @@
   - **Formula:** $\text{Ponding \%} = 100 \times \frac{1019 - \text{Raw}}{1019 - 508}$
   - **Status:** Verified and updated in [`arduino/02_surface_water_level_test/02_surface_water_level_test.ino`](../arduino/02_surface_water_level_test/02_surface_water_level_test.ino) and [`arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino`](../arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino).
 
-- **Dual Sensor & Relay Pump Integrated Rules (Test 07 - HW-080 Driven):**
-  - **HW-080 Surface Water Sensor (Pin A1 - Primary Pump Controller):**
-    - **PUMP ON:** When Surface Water Level drops $\le 30.0\%$.
-    - **PUMP OFF:** When Surface Water Level rises to $\ge 85.0\%$.
-  - **Capacitive Soil Sensor (Pin A0 - Telemetry Monitoring Only):**
-    - Disregarded for pump control. Streams calibrated soil moisture ($0\text{--}100\%$) for root zone health logging.
-  - **Safety Limit:** 180 seconds maximum continuous runtime protection.
-  - **Live Hardware Telemetry Verification (PASSED ✅):**
-    - `Root Moisture: 100.0%` (Capacitive) properly logged without stopping the pump early.
-    - `Surface Water: 70.6% - 81.8%` (HW-080) correctly maintained `Pump Relay: STANDBY (OFF)` in the optimal buffer band ($30\%\text{--}85\%$).
+- **Constant 85% Surface Water Maintenance & 10s Startup Calibration Window (Test 07):**
+  - **10-Second Startup Stabilization Window:** Controller counts down for 10 seconds on boot to stabilize sensor signals before evaluating pump actions.
+  - **HW-080 Constant Ponding Level Controller:**
+    - **PUMP ON:** Whenever surface water drops $< 80.0\%$ (Refills immediately to target).
+    - **PUMP OFF:** When surface water reaches $\ge 85.0\%$ (Maintains ~85% level).
+  - **Capacitive Soil Sensor:** Pure telemetry feed ($0\text{--}100\%$) for root zone logging.
+  - **Safety Limit:** 180 seconds continuous run protection.
+  - **Updated Sketches:** [`arduino/07_dual_sensor_pump_integration_test/07_dual_sensor_pump_integration_test.ino`](../arduino/07_dual_sensor_pump_integration_test/07_dual_sensor_pump_integration_test.ino) and [`arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino`](../arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino).
 
 ---
 

@@ -5,16 +5,15 @@ This integrated test links **both physical sensors** and the **relay water pump*
 
 ---
 
-## 🌾 Rice Paddy Water Level Control Logic (HW-080 Driven)
-1. **PUMP ON Trigger:**
-   $$\text{Surface Water Level (HW-080)} \le 30.0\%$$
-   *(Automatically turns on the pump when standing water in the paddy drops low)*
-2. **PUMP OFF (Target Ponding Reached):**
-   $$\text{Surface Water Level (HW-080)} \ge 85.0\%$$
-   *(Automatically turns off the pump once the paddy is filled to the 85% target depth)*
+## 🌾 Constant 85% Surface Water Level Maintenance Mode
+1. **Startup Calibration & Stabilization Window (10s):**
+   - On boot, the Arduino counts down for **10 seconds** to allow sensor signals and power rails to stabilize before triggering actuators.
+2. **Constant Level Maintenance:**
+   - **PUMP ON:** $\text{Surface Water Level (HW-080)} < 80.0\%$ (Refills whenever water is not at target depth).
+   - **PUMP OFF:** $\text{Surface Water Level (HW-080)} \ge 85.0\%$ (Maintains standing water at 85%).
 3. **Capacitive Soil Sensor (Root Zone):**
-   - Disregarded for pump switching.
-   - Continuously streams calibrated telemetry ($0\text{--}100\%$) for root zone monitoring and web logging.
+   - Disregarded for pump control.
+   - Continuously streams calibrated telemetry ($0\text{--}100\%$) for root health logging.
 4. **Continuous Run Protection:**
    - Pump is capped at a maximum of **180 seconds continuous run**.
 

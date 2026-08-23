@@ -44,10 +44,10 @@ const int HW080_RAW_DRY      = 1019;  // 0% surface standing water (dry surface)
 const int HW080_RAW_WET      = 508;   // 100% full ponding depth (top of probe tracks)
 
 // ============================================================================
-// 3. IRRIGATION CONTROL THRESHOLDS (HW-080 DRIVEN)
+// 3. IRRIGATION CONTROL THRESHOLDS (CONSTANT 85% LEVEL MAINTENANCE)
 // ============================================================================
-const float SURFACE_START_PCT  = 30.0; // Automatically turn pump ON when surface water drops <= 30.0%
-const float SURFACE_STOP_PCT   = 85.0; // Automatically turn pump OFF when surface water reaches >= 85.0%
+const float WATER_TARGET_MAX   = 85.0; // Turn pump OFF when water level reaches >= 85.0%
+const float WATER_REFILL_MIN   = 80.0; // Turn pump ON whenever water level drops below 80.0% (Maintains ~85% level)
 
 const unsigned long MAX_PUMP_RUNTIME_MS = 180000UL; // 180 seconds continuous run protection
 
@@ -93,7 +93,7 @@ float readRootSoilMoisture() {
   return constrain(pct, 0.0, 100.0);
 }
 
-// Read HW-080 Surface Water Level (Primary Pump Controller)
+// Read HW-080 Surface Water Level (Primary Controller)
 float readSurfaceWaterLevel() {
   long sum = 0;
   for (int i = 0; i < 16; i++) {
@@ -121,12 +121,25 @@ void setup() {
   Serial.println(F("=================================================================="));
   Serial.println(F(" WBACFSPWI: Dual Sensor & Relay Pump Integrated Controller Test  "));
   Serial.println(F("=================================================================="));
-  Serial.println(F("Paddy Water Control Rules (HW-080 Surface Driven):"));
-  Serial.println(F("  - PUMP ON : Surface Water <= 30.0% (Water level low)"));
-  Serial.println(F("  - PUMP OFF: Surface Water >= 85.0% (Paddy flooded / target reached)"));
+  Serial.println(F("Constant 85% Surface Water Level Maintenance Mode:"));
+  Serial.println(F("  - TARGET LEVEL: Maintain ~85.0% Surface Water"));
+  Serial.println(F("  - PUMP ON     : Surface Water < 80.0%"));
+  Serial.println(F("  - PUMP OFF    : Surface Water >= 85.0%"));
   Serial.println(F("  - Capacitive Soil Sensor: Telemetry/Data Monitoring Only (0-100%)"));
   Serial.println(F("=================================================================="));
-  delay(1500);
+  
+  // 10-Second Sensor Calibration & Stabilization Window
+  Serial.println(F("[STARTUP] 10-Second Sensor Calibration & Stabilization Window..."));
+  for (int sec = 10; sec > 0; sec--) {
+    Serial.print(F("  -> Stabilizing sensors... "));
+    Serial.print(sec);
+    Serial.println(F("s remaining"));
+    // Quick reading test during countdown
+    readRootSoilMoisture();
+    readSurfaceWaterLevel();
+    delay(1000);
+  }
+  Serial.println(F("[STARTUP] Calibration window complete! Starting autonomous maintenance...\n"));
 }
 
 void loop() {
@@ -138,17 +151,17 @@ void loop() {
     setPump(false, "Continuous 180s Safety Runtime Cap Hit");
   }
 
-  // HW-080 Driven Rice Field Control Logic:
-  // 1. If Surface Water hits 85.0% -> Turn pump OFF
-  if (surfaceWater >= SURFACE_STOP_PCT) {
+  // Constant 85% Water Level Maintenance Logic:
+  // 1. If Surface Water reaches >= 85.0% -> Turn pump OFF
+  if (surfaceWater >= WATER_TARGET_MAX) {
     if (pumpState) {
       setPump(false, "Surface Water Target Reached (>= 85.0%)");
     }
   } 
-  // 2. If Surface Water drops to 30.0% or below -> Turn pump ON
-  else if (surfaceWater <= SURFACE_START_PCT) {
+  // 2. If Surface Water is below 80.0% -> Turn pump ON to top up to 85.0%
+  else if (surfaceWater < WATER_REFILL_MIN) {
     if (!pumpState) {
-      setPump(true, "Surface Water Level Low (<= 30.0%)");
+      setPump(true, "Surface Water Below Target (< 80.0%) -> Refilling to 85.0%");
     }
   }
 
@@ -169,14 +182,12 @@ void loop() {
   }
 
   Serial.print(F(" | Decision: "));
-  if (surfaceWater >= SURFACE_STOP_PCT) {
-    Serial.println(F("PONDING FULL (>= 85.0%) -> PUMP OFF"));
+  if (surfaceWater >= WATER_TARGET_MAX) {
+    Serial.println(F("TARGET MAINTAINED (>= 85.0%) -> PUMP OFF"));
   } else if (pumpState) {
-    Serial.println(F("IRRIGATING PADDY (Filling until surface water reaches 85.0%)"));
-  } else if (surfaceWater <= SURFACE_START_PCT) {
-    Serial.println(F("LOW WATER LEVEL (<= 30.0%) -> STARTING PUMP"));
+    Serial.println(F("PUMPING WATER (Refilling until surface reaches 85.0%)"));
   } else {
-    Serial.println(F("OPTIMAL WATER LEVEL (30% - 85%) -> STANDBY"));
+    Serial.println(F("WATER LEVEL STABLE (80% - 85%) -> STANDBY"));
   }
 
   delay(1000);

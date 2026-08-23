@@ -55,9 +55,9 @@ const int SOIL_WATER_RAW     = 153;    // 100% moisture in water
 const int HW080_RAW_DRY      = 1019;   // Stage A: Probe in dry air (0% ponding / surface dry)
 const int HW080_RAW_WET      = 508;    // Stage E: Probe fully submerged to 2-pin header (100% full ponding)
 
-// Irrigation Decision Thresholds (for Rice Field - HW-080 Water Level Driven)
-const float SURFACE_START_PCT  = 30.0; // Automatically start pump when surface water level drops <= 30%
-const float SURFACE_STOP_PCT   = 85.0; // Automatically stop pump when surface water level reaches >= 85%
+// Irrigation Decision Thresholds (for Rice Field - Constant 85% Water Level Maintenance)
+const float WATER_TARGET_MAX   = 85.0; // Automatically stop pump when surface water level reaches >= 85%
+const float WATER_REFILL_MIN   = 80.0; // Automatically start pump whenever surface water level drops < 80%
 
 // Safety & Battery Protection Thresholds
 const float BATT_MIN_LOCKOUT = 10.00;  // 3S Pack cutoff (~3.33V/cell)
@@ -202,7 +202,23 @@ void setup() {
   Serial.println(F(" WBACFSPWI: Solar Rice Irrigation Controller     "));
   Serial.println(F(" Standalone Arduino Uno Automation Firmware      "));
   Serial.println(F("=================================================="));
-  delay(1500);
+  Serial.println(F("Constant 85% Surface Water Level Maintenance Mode:"));
+  Serial.println(F("  - TARGET LEVEL: Maintain ~85.0% Surface Water"));
+  Serial.println(F("  - PUMP ON     : Surface Water < 80.0%"));
+  Serial.println(F("  - PUMP OFF    : Surface Water >= 85.0%"));
+  Serial.println(F("=================================================="));
+
+  // 10-Second Sensor Calibration & Stabilization Window
+  Serial.println(F("[STARTUP] 10-Second Sensor Calibration & Stabilization Window..."));
+  for (int sec = 10; sec > 0; sec--) {
+    Serial.print(F("  -> Stabilizing sensors... "));
+    Serial.print(sec);
+    Serial.println(F("s remaining"));
+    readRootMoisture();
+    readSurfaceWater();
+    delay(1000);
+  }
+  Serial.println(F("[STARTUP] Calibration window complete! Starting autonomous maintenance...\n"));
 }
 
 void loop() {
@@ -237,18 +253,18 @@ void loop() {
       Serial.println(F("[SAFETY] Cooldown finished. Resuming normal operations."));
     }
 
-    // 3. Automated Decision Logic (HW-080 Water Level Driven)
+    // 3. Automated Decision Logic (Constant 85% Water Level Maintenance)
     if (lowBatteryLockout || timeoutLockout) {
       setPump(false);
     } else {
       if (!pumpState) {
-        // Start pumping when surface ponding drops to or below 30%
-        if (currentSurfaceWater <= SURFACE_START_PCT) {
+        // Start pumping whenever surface ponding drops below 80%
+        if (currentSurfaceWater < WATER_REFILL_MIN) {
           setPump(true);
         }
       } else {
-        // Stop pumping when surface ponding fills to 85%
-        if (currentSurfaceWater >= SURFACE_STOP_PCT) {
+        // Stop pumping when surface ponding fills to target 85%
+        if (currentSurfaceWater >= WATER_TARGET_MAX) {
           setPump(false);
         }
       }

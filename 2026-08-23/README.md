@@ -71,11 +71,12 @@
 
 ---
 
-### Case 04: Test 07 Integrated Dual Sensor (HW-080 Driven) & Relay Pump Logic
+### Case 04: Test 07 Constant 85% Water Level Maintenance & 10s Startup Calibration
 * **Objective & Control Roles:**
-  - **HW-080 Surface Sensor (A1 - Primary Controller):** Manages standing water level.
-    - **PUMP ON:** `Surface Water <= 30.0%` (Paddy water level low).
-    - **PUMP OFF:** `Surface Water >= 85.0%` (Paddy filled to target depth).
+  - **10-Second Startup Stabilization Window:** 10-second countdown on boot allowing analog power rails and sensor signals to settle before engaging actuators.
+  - **HW-080 Constant Ponding Maintenance:**
+    - **PUMP ON:** `Surface Water < 80.0%` (Automatically tops up water to maintain 85%).
+    - **PUMP OFF:** `Surface Water >= 85.0%` (Paddy at target standing ponding depth).
   - **Capacitive Probe (A0 - Telemetry Only):** Continuously monitors and logs root-zone soil moisture ($0\text{--}100\%$, Calibrated: `417` dry, `153` wet) without interrupting pump operation.
   - **Relay Water Pump (D7):** Active LOW trigger with 180s continuous run protection.
 * **Created & Updated Files:**
