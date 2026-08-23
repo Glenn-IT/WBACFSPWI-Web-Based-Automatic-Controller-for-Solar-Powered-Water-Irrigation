@@ -122,9 +122,10 @@ void setup() {
   Serial.println(F("=================================================================="));
   Serial.println(F(" WBACFSPWI: Dual Sensor & Relay Pump Integrated Controller Test  "));
   Serial.println(F("=================================================================="));
-  Serial.println(F("Rules:"));
-  Serial.println(F("  - Root Moisture < 50.0% AND Surface Water < 70.0% -> PUMP ON"));
-  Serial.println(F("  - Surface Water >= 70.0% OR Root Moisture >= 70.0% -> PUMP OFF"));
+  Serial.println(F("Rice Paddy Rules:"));
+  Serial.println(F("  - PUMP ON: Root Moisture < 50.0% AND Surface Water < 70.0%"));
+  Serial.println(F("  - PUMP OFF: ONLY when Surface Water >= 70.0% (Flood Ponding Target)"));
+  Serial.println(F("  - (Capacitive saturation to 100% does NOT stop the pump early)"));
   Serial.println(F("=================================================================="));
   delay(1500);
 }
@@ -138,22 +139,16 @@ void loop() {
     setPump(false, "Continuous 180s Safety Runtime Cap Hit");
   }
 
-  // Dual Sensor Decision Logic
+  // Rice Field Control Logic:
+  // 1. If Surface Water hits 70.0% -> Turn pump OFF (Ponding layer full)
   if (surfaceWater >= SURFACE_MAX_PCT) {
-    // Cutoff Priority 1: Surface water is at or above 70% (Flood protection)
     if (pumpState) {
-      setPump(false, "Surface Ponding Limit Reached (>= 70.0%)");
+      setPump(false, "Surface Ponding Target Reached (>= 70.0%)");
     }
-  } else if (rootMoisture < MOISTURE_START_PCT && surfaceWater < SURFACE_MAX_PCT) {
-    // Trigger: Root moisture below 50% and surface is not flooded
-    if (!pumpState) {
-      setPump(true, "Dry Root Zone (< 50.0%) & Safe Surface Depth");
-    }
-  } else if (rootMoisture >= MOISTURE_STOP_PCT) {
-    // Cutoff Priority 2: Target root moisture reached (>= 70%)
-    if (pumpState) {
-      setPump(false, "Target Root Moisture Satisfied (>= 70.0%)");
-    }
+  } 
+  // 2. If Pump is OFF and Root Soil drops below 50.0% -> Turn pump ON
+  else if (!pumpState && (rootMoisture < MOISTURE_START_PCT)) {
+    setPump(true, "Dry Root Zone (< 50.0%) detected");
   }
 
   // Print Formatted Telemetry Line
@@ -174,13 +169,13 @@ void loop() {
 
   Serial.print(F(" | Decision: "));
   if (surfaceWater >= SURFACE_MAX_PCT) {
-    Serial.println(F("SURFACE FLOOD CUTOFF (>= 70%)"));
+    Serial.println(F("SURFACE PONDING SATISFIED (>= 70.0%) -> PUMP OFF"));
+  } else if (pumpState) {
+    Serial.println(F("IRRIGATING PADDY (Waiting for surface water to reach 70.0%)"));
   } else if (rootMoisture < MOISTURE_START_PCT) {
-    Serial.println(F("IRRIGATING (Moisture < 50%)"));
-  } else if (rootMoisture >= MOISTURE_STOP_PCT) {
-    Serial.println(F("ADEQUATE MOISTURE (>= 70%)"));
+    Serial.println(F("STARTING IRRIGATION (Root Moisture < 50.0%)"));
   } else {
-    Serial.println(F("NORMAL BUFFER ZONE (50% - 70%)"));
+    Serial.println(F("SOIL MOISTURE SAFE (>= 50.0%) -> STANDBY"));
   }
 
   delay(1000);

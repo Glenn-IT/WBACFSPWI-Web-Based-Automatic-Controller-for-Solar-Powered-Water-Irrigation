@@ -20,11 +20,10 @@
   - **Status:** Verified and updated in [`arduino/02_surface_water_level_test/02_surface_water_level_test.ino`](../arduino/02_surface_water_level_test/02_surface_water_level_test.ino) and [`arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino`](../arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino).
 
 - **Dual Sensor & Relay Pump Integrated Rules (Test 07):**
-  - **Capacitive Soil Sensor (Pin A0):** Measures Root-Zone Moisture ($0\text{--}100\%$).
+  - **Capacitive Soil Sensor (Pin A0):** Measures Root-Zone Moisture ($0\text{--}100\%$, triggers irrigation start when $< 50.0\%$).
   - **HW-080 Water Level Sensor (Pin A1):** Measures Surface Standing Water / Ponding Depth ($0\text{--}100\%$).
   - **Pump ON Trigger:** Root Soil Moisture $< 50.0\%$ **AND** Surface Water Level $< 70.0\%$.
-  - **Pump OFF Cutoff 1 (Flood Prevention):** Surface Water Level $\ge 70.0\%$ (Immediate cutoff regardless of root dryness).
-  - **Pump OFF Cutoff 2 (Target Satisfied):** Root Soil Moisture $\ge 70.0\%$.
+  - **Pump OFF Cutoff (Paddy Ponding Target):** Surface Water Level $\ge 70.0\%$ (Pump runs continuously until surface ponding depth reaches 70.0%, disregarding early capacitive saturation to 100%).
   - **Safety Limit:** 180 seconds maximum continuous runtime protection.
   - **Created Test Sketch:** [`arduino/07_dual_sensor_pump_integration_test/07_dual_sensor_pump_integration_test.ino`](../arduino/07_dual_sensor_pump_integration_test/07_dual_sensor_pump_integration_test.ino).
 

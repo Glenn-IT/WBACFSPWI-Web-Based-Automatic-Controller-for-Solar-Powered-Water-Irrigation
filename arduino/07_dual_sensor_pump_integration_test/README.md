@@ -8,12 +8,10 @@ This integrated test links **both physical sensors** and the **relay water pump*
 ## 🌾 Irrigation Decision Logic
 1. **PUMP ON Trigger:**
    $$\text{Root Soil Moisture} < 50.0\% \quad\text{AND}\quad \text{Surface Water Level} < 70.0\%$$
-2. **PUMP OFF (Flood Cutoff):**
+2. **PUMP OFF (Surface Ponding Depth Target):**
    $$\text{Surface Water Level} \ge 70.0\%$$
-   *(Immediately turns off the pump to prevent overflow regardless of root dryness)*
-3. **PUMP OFF (Target Satisfied):**
-   $$\text{Root Soil Moisture} \ge 70.0\%$$
-4. **Continuous Run Protection:**
+   *(The pump continues filling the paddy until surface water reaches 70.0%. It disregards capacitive root saturation so the required standing ponding layer is achieved!)*
+3. **Continuous Run Protection:**
    - Pump is capped at a maximum of **180 seconds continuous run**.
 
 ---

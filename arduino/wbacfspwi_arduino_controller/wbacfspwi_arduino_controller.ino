@@ -243,13 +243,13 @@ void loop() {
       setPump(false);
     } else {
       if (!pumpState) {
-        // Evaluate start condition: Dry root soil AND surface has capacity
+        // Evaluate start condition: Dry root soil AND surface has capacity (< 70%)
         if (currentRootMoisture < MOISTURE_START_PCT && currentSurfaceWater < SURFACE_MAX_PCT) {
           setPump(true);
         }
       } else {
-        // Evaluate stop condition: Saturated soil OR surface flooded
-        if (currentRootMoisture >= MOISTURE_STOP_PCT || currentSurfaceWater >= SURFACE_MAX_PCT) {
+        // Evaluate stop condition: Stop ONLY when surface standing water reaches target (>= 70%)
+        if (currentSurfaceWater >= SURFACE_MAX_PCT) {
           setPump(false);
         }
       }

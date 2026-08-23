@@ -78,8 +78,7 @@
   - **Relay Water Pump (D7):** Active LOW trigger.
 * **Control Conditions:**
   - **PUMP ON:** `Root Moisture < 50.0%` **AND** `Surface Water < 70.0%`.
-  - **PUMP OFF (Flood Cutoff):** `Surface Water >= 70.0%` (Highest priority safety cutoff).
-  - **PUMP OFF (Moisture Satisfied):** `Root Moisture >= 70.0%`.
+  - **PUMP OFF (Ponding Target Reached):** `Surface Water >= 70.0%` (The pump continues running until the standing ponding layer reaches 70.0%, disregarding early capacitive saturation to 100%).
   - **Runtime Limit:** 180 seconds continuous run cap.
 * **Created & Updated Files:**
   - Created [`arduino/07_dual_sensor_pump_integration_test/07_dual_sensor_pump_integration_test.ino`](../arduino/07_dual_sensor_pump_integration_test/07_dual_sensor_pump_integration_test.ino)
