@@ -23,7 +23,7 @@ const int PIN_HW080_DIGITAL = 2; // Optional DO pin for threshold interrupt
 // Calibrated HW-080 constants (Calibrated to Physical Ruler & Water Height):
 const int HW080_RAW_DRY = 1020; // 0.0% dry air
 const int HW080_RAW_MID = 410;  // 50.0% water at exact middle of sensor (7-8cm mark)
-const int HW080_RAW_WET = 270;  // 100.0% fully submerged to top header (max flood)
+const int HW080_RAW_WET = 355;  // 100.0% fully submerged to top header (max flood)
 
 void setup() {
   Serial.begin(115200);
@@ -57,7 +57,7 @@ float calculateHW080Percent(int raw) {
     float pct = 50.0 * (float)(HW080_RAW_DRY - raw) / (float)(HW080_RAW_DRY - HW080_RAW_MID);
     return constrain(pct, 0.0, 50.0);
   } else {
-    // Stage 2: Middle height (410) down to Full top (270) -> 50.0% to 100.0%
+    // Stage 2: Middle height (410) down to Full top (346) -> 50.0% to 100.0%
     float pct = 50.0 + 50.0 * (float)(HW080_RAW_MID - raw) / (float)(HW080_RAW_MID - HW080_RAW_WET);
     return constrain(pct, 0.0, 100.0);
   }
