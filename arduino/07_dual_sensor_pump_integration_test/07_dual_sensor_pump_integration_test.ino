@@ -40,9 +40,10 @@ const bool RELAY_ACTIVE_LOW  = true;
 const int SOIL_AIR_RAW       = 417;   // 0% root moisture in dry air
 const int SOIL_WATER_RAW     = 153;   // 100% root moisture submerged in water
 
-// Calibrated HW-080 constants adjusted for container maximum depth:
-const int HW080_RAW_DRY      = 1020;  // 0% surface standing water (dry surface)
-const int HW080_RAW_WET      = 360;   // 100% full container depth (Raw ADC ~350-360 reaches full capacity)
+// Calibrated HW-080 constants (Two-Stage Piecewise Curve for Resistive Sensor Physics):
+const int HW080_RAW_DRY      = 1020;  // Stage 0: 0.0% surface standing water (dry surface)
+const int HW080_RAW_TIP      = 530;   // Stage 1: Water just wetting bottom tip (~20.0% entry level)
+const int HW080_RAW_WET      = 350;   // Stage 2: 100.0% full container depth (Raw ADC ~340-360)
 
 // ============================================================================
 // 3. IRRIGATION CONTROL THRESHOLDS (CONSTANT 85% LEVEL MAINTENANCE)
@@ -95,7 +96,7 @@ float readRootSoilMoisture() {
   return constrain(pct, 0.0, 100.0);
 }
 
-// Read HW-080 Surface Water Level (Primary Controller)
+// Read HW-080 Surface Water Level (Primary Controller with Piecewise Resistance Calibration)
 float readSurfaceWaterLevel() {
   long sum = 0;
   for (int i = 0; i < 16; i++) {
@@ -103,8 +104,16 @@ float readSurfaceWaterLevel() {
     delay(5);
   }
   lastRawHW080 = (int)(sum / 16);
-  float pct = 100.0 * (float)(HW080_RAW_DRY - lastRawHW080) / (float)(HW080_RAW_DRY - HW080_RAW_WET);
-  return constrain(pct, 0.0, 100.0);
+
+  if (lastRawHW080 >= HW080_RAW_DRY) {
+    return 0.0;
+  } else if (lastRawHW080 >= HW080_RAW_TIP) {
+    float pct = 20.0 * (float)(HW080_RAW_DRY - lastRawHW080) / (float)(HW080_RAW_DRY - HW080_RAW_TIP);
+    return constrain(pct, 0.0, 20.0);
+  } else {
+    float pct = 20.0 + 80.0 * (float)(HW080_RAW_TIP - lastRawHW080) / (float)(HW080_RAW_TIP - HW080_RAW_WET);
+    return constrain(pct, 0.0, 100.0);
+  }
 }
 
 void setup() {

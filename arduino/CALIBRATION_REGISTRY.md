@@ -7,7 +7,7 @@ This file serves as the single source of truth for physical sensor calibration v
 | Sensor / Measurement | Pin | Raw Dry / Minimum | Raw Wet / Maximum | Scaling Factor | Active Sketches |
 | :--- | :---: | :---: | :---: | :---: | :--- |
 | **Capacitive Soil (Root Zone)** | `A0` | `417` (Air / 0%) | `153` (Water / 100%) | Multi-sample Avg (16x) | `01_soil_root_capacitive_test`<br>`07_dual_sensor_pump_integration_test`<br>`wbacfspwi_arduino_controller` |
-| **HW-080 (Surface Ponding Level)** | `A1` | `1020` (Air / 0%) | `360` (Full Depth / 100%) | Multi-sample Avg (16x) | `02_surface_water_level_test`<br>`07_dual_sensor_pump_integration_test`<br>`wbacfspwi_arduino_controller` |
+| **HW-080 (Surface Ponding Level)** | `A1` | `1020` (Air / 0%)<br>`530` (Tip / 20%) | `350` (Full Depth / 100%) | Piecewise Non-Linear Curve (16x Avg) | `02_surface_water_level_test`<br>`07_dual_sensor_pump_integration_test`<br>`wbacfspwi_arduino_controller` |
 | **Battery Voltage Divider** | `A2` | `0.0V` | `12.6V` (Max 3S) | `4.0303` (100kΩ/33kΩ) | `04_battery_voltage_test`<br>`06_solar_charger_battery_test`<br>`wbacfspwi_arduino_controller` |
 | **Solar Panel Voltage Divider** | `A3` | `0.0V` | `25.0V` (Max Input) | `6.0000` (100kΩ/20kΩ) | `05_solar_voltage_test`<br>`06_solar_charger_battery_test`<br>`wbacfspwi_arduino_controller` |
 
@@ -31,7 +31,7 @@ This file serves as the single source of truth for physical sensor calibration v
 | Date | Sensor | Dry Raw ADC | Wet / Full Raw ADC | Notes |
 | :--- | :--- | :---: | :---: | :--- |
 | Initial | Capacitive Soil (A0) | `417` | `153` | Air (0%) vs Full water submersion (100%) |
-| 2026-08-31 | HW-080 Surface (A1) | `1020` | `360` | Dry air = 1020–1023 (0%), Tip entry = 884–905 (~20%), Submerged full = 348–360 (100%) |
+| 2026-08-31 | HW-080 Surface (A1) | `1020` (Air)<br>`530` (Tip) | `350` (Full) | Two-stage piecewise calibration: Dry air (1020=0%), Tip wetting (530=20%), Full depth (350=100%). Eliminates tip-wetting spike. |
 
 ---
 
