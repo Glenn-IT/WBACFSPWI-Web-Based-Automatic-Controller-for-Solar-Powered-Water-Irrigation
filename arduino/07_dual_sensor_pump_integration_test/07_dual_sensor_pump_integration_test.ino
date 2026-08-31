@@ -62,17 +62,18 @@ unsigned long lastLoopTime = 0;
 int lastRawHW080 = 0;
 
 void setPump(bool enable, const char* reason) {
+  // Always enforce physical GPIO pin state
+  digitalWrite(PIN_RELAY_PUMP, enable ? (RELAY_ACTIVE_LOW ? LOW : HIGH) : (RELAY_ACTIVE_LOW ? HIGH : LOW));
+  digitalWrite(PIN_STATUS_LED, enable ? HIGH : LOW);
+
   if (enable != pumpState) {
     pumpState = enable;
     if (pumpState) {
       pumpStartTime = millis();
-      digitalWrite(PIN_RELAY_PUMP, RELAY_ACTIVE_LOW ? LOW : HIGH);
-      digitalWrite(PIN_STATUS_LED, HIGH);
       Serial.print(F(">>> [ACTION] PUMP STARTED | Reason: "));
       Serial.println(reason);
     } else {
-      digitalWrite(PIN_RELAY_PUMP, RELAY_ACTIVE_LOW ? HIGH : LOW);
-      digitalWrite(PIN_STATUS_LED, LOW);
+      pumpStopTime = millis();
       Serial.print(F(">>> [ACTION] PUMP STOPPED | Reason: "));
       Serial.println(reason);
     }

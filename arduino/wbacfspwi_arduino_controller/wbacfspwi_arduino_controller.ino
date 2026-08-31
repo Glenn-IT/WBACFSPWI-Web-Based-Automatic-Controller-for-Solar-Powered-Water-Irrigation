@@ -92,18 +92,17 @@ float currentSolarVolts   = 0.0;
 // ============================================================================
 
 void setPump(bool enable) {
+  // Always enforce physical GPIO pin state regardless of previous state variable
+  digitalWrite(PIN_RELAY_PUMP, enable ? (RELAY_ACTIVE_LOW ? LOW : HIGH) : (RELAY_ACTIVE_LOW ? HIGH : LOW));
+  digitalWrite(PIN_STATUS_LED, enable ? HIGH : LOW);
+
   if (enable == pumpState) return;
 
-  if (enable) {
-    digitalWrite(PIN_RELAY_PUMP, RELAY_ACTIVE_LOW ? LOW : HIGH);
-    digitalWrite(PIN_STATUS_LED, HIGH);
-    pumpState = true;
+  pumpState = enable;
+  if (pumpState) {
     pumpStartTime = millis();
     Serial.println(F("[EVENT] Pump STARTED."));
   } else {
-    digitalWrite(PIN_RELAY_PUMP, RELAY_ACTIVE_LOW ? HIGH : LOW);
-    digitalWrite(PIN_STATUS_LED, LOW);
-    pumpState = false;
     pumpStopTime = millis();
     Serial.println(F("[EVENT] Pump STOPPED."));
   }
@@ -198,16 +197,18 @@ void setup() {
   Serial.begin(115200);
   while (!Serial) { delay(10); }
 
+  // 1. Initialize relay pin to safe OFF (HIGH for Active LOW) BEFORE pinMode
+  digitalWrite(PIN_RELAY_PUMP, RELAY_ACTIVE_LOW ? HIGH : LOW);
   pinMode(PIN_RELAY_PUMP, OUTPUT);
+  digitalWrite(PIN_RELAY_PUMP, RELAY_ACTIVE_LOW ? HIGH : LOW);
+
   pinMode(PIN_STATUS_LED, OUTPUT);
+  digitalWrite(PIN_STATUS_LED, LOW);
 
   if (USE_SENSOR_PWR && PIN_SENSOR_PWR >= 0) {
     pinMode(PIN_SENSOR_PWR, OUTPUT);
     digitalWrite(PIN_SENSOR_PWR, LOW);
   }
-
-  // Ensure pump is safely OFF on startup
-  setPump(false);
 
   Serial.println(F("=================================================="));
   Serial.println(F(" WBACFSPWI: Solar Rice Irrigation Controller     "));
