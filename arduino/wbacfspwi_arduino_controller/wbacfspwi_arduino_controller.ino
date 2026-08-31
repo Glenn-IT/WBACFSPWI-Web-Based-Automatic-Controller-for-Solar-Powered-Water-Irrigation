@@ -35,7 +35,7 @@ const int PIN_RELAY_PUMP     = 7;
 const int PIN_SENSOR_PWR     = 8;
 const int PIN_STATUS_LED     = 13;
 
-const bool RELAY_ACTIVE_LOW  = true;   // Most 5V relay modules trigger on LOW
+const bool RELAY_ACTIVE_LOW  = false;   // Most 5V relay modules trigger on LOW
 const bool USE_SENSOR_PWR    = true;   // Enable power gating to prevent corrosion
 
 // ============================================================================
