@@ -46,10 +46,10 @@ const int HW080_RAW_MID      = 410;   // 50.0% water at middle of sensor (7-8cm 
 const int HW080_RAW_WET      = 355;   // 100.0% full container depth (top header / max flood)
 
 // ============================================================================
-// 3. IRRIGATION CONTROL THRESHOLDS (CONSTANT 85% LEVEL MAINTENANCE)
+// 3. IRRIGATION CONTROL THRESHOLDS (MAINTAIN 80.0% LEVEL)
 // ============================================================================
-const float WATER_TARGET_MAX   = 85.0; // Turn pump OFF when water level reaches >= 85.0%
-const float WATER_REFILL_MIN   = 80.0; // Turn pump ON whenever water level drops below 80.0% (Maintains ~85% level)
+const float WATER_TARGET_MAX   = 80.0; // Turn pump OFF when water level reaches >= 80.0%
+const float WATER_REFILL_MIN   = 80.0; // Turn pump ON whenever water level drops < 80.0% (e.g. 79%)
 
 const unsigned long MAX_PUMP_RUNTIME_MS = 180000UL; // 180 seconds continuous run protection
 
@@ -132,10 +132,10 @@ void setup() {
   Serial.println(F("=================================================================="));
   Serial.println(F(" WBACFSPWI: Dual Sensor & Relay Pump Integrated Controller Test  "));
   Serial.println(F("=================================================================="));
-  Serial.println(F("Constant 85% Surface Water Level Maintenance Mode:"));
-  Serial.println(F("  - TARGET LEVEL: Maintain ~85.0% Surface Water"));
-  Serial.println(F("  - PUMP ON     : Surface Water < 80.0%"));
-  Serial.println(F("  - PUMP OFF    : Surface Water >= 85.0%"));
+  Serial.println(F("Maintain 80.0% Surface Water Level Mode:"));
+  Serial.println(F("  - TARGET LEVEL: Maintain ~80.0% Surface Water"));
+  Serial.println(F("  - PUMP ON     : Surface Water < 80.0% (e.g. 79%)"));
+  Serial.println(F("  - PUMP OFF    : Surface Water >= 80.0%"));
   Serial.println(F("  - Calibrated  : HW080 Dry=1020, Mid=410, Full=355"));
   Serial.println(F("=================================================================="));
   
@@ -161,17 +161,17 @@ void loop() {
     setPump(false, "Continuous 180s Safety Runtime Cap Hit");
   }
 
-  // Constant 85% Water Level Maintenance Logic:
-  // 1. If Surface Water reaches >= 85.0% -> Turn pump OFF
+  // Maintain 80.0% Water Level Logic:
+  // 1. If Surface Water reaches >= 80.0% -> Turn pump OFF
   if (surfaceWater >= WATER_TARGET_MAX) {
     if (pumpState) {
-      setPump(false, "Surface Water Target Reached (>= 85.0%)");
+      setPump(false, "Surface Water Target Reached (>= 80.0%)");
     }
   } 
-  // 2. If Surface Water is below 80.0% -> Turn pump ON to top up to 85.0%
+  // 2. If Surface Water drops below 80.0% -> Turn pump ON
   else if (surfaceWater < WATER_REFILL_MIN) {
     if (!pumpState) {
-      setPump(true, "Surface Water Below Target (< 80.0%) -> Refilling to 85.0%");
+      setPump(true, "Surface Water Below Target (< 80.0%) -> Pumping to 80.0%");
     }
   }
 
@@ -195,11 +195,11 @@ void loop() {
 
   Serial.print(F(" | Decision: "));
   if (surfaceWater >= WATER_TARGET_MAX) {
-    Serial.println(F("TARGET MAINTAINED (>= 85.0%) -> PUMP OFF"));
+    Serial.println(F("TARGET MAINTAINED (>= 80.0%) -> PUMP OFF"));
   } else if (pumpState) {
-    Serial.println(F("PUMPING WATER (Refilling until surface reaches 85.0%)"));
+    Serial.println(F("PUMPING WATER (Refilling until surface reaches 80.0%)"));
   } else {
-    Serial.println(F("WATER LEVEL STABLE (80% - 85%) -> STANDBY"));
+    Serial.println(F("WATER LEVEL STABLE (80.0%) -> STANDBY"));
   }
 
   delay(1000);

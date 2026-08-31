@@ -56,9 +56,9 @@ const int HW080_RAW_DRY      = 1020;   // Stage 0: Probe in dry air (0.0% surfac
 const int HW080_RAW_MID      = 410;    // Stage 1: Water at middle of sensor 7-8cm mark (50.0% depth)
 const int HW080_RAW_WET      = 355;    // Stage 2: Probe at container maximum depth (100% full ponding)
 
-// Irrigation Decision Thresholds (for Rice Field - Constant 85% Water Level Maintenance)
-const float WATER_TARGET_MAX   = 85.0; // Automatically stop pump when surface water level reaches >= 85%
-const float WATER_REFILL_MIN   = 80.0; // Automatically start pump whenever surface water level drops < 80%
+// Irrigation Decision Thresholds (Maintain 80.0% Surface Water Level)
+const float WATER_TARGET_MAX   = 80.0; // Automatically stop pump when surface water level reaches >= 80.0%
+const float WATER_REFILL_MIN   = 80.0; // Automatically start pump whenever surface water level drops < 80.0% (e.g. 79%)
 
 // Safety & Battery Protection Thresholds
 const float BATT_MIN_LOCKOUT = 10.00;  // 3S Pack cutoff (~3.33V/cell)
@@ -213,10 +213,10 @@ void setup() {
   Serial.println(F(" WBACFSPWI: Solar Rice Irrigation Controller     "));
   Serial.println(F(" Standalone Arduino Uno Automation Firmware      "));
   Serial.println(F("=================================================="));
-  Serial.println(F("Constant 85% Surface Water Level Maintenance Mode:"));
-  Serial.println(F("  - TARGET LEVEL: Maintain ~85.0% Surface Water"));
-  Serial.println(F("  - PUMP ON     : Surface Water < 80.0%"));
-  Serial.println(F("  - PUMP OFF    : Surface Water >= 85.0%"));
+  Serial.println(F("Maintain 80.0% Surface Water Level Mode:"));
+  Serial.println(F("  - TARGET LEVEL: Maintain ~80.0% Surface Water"));
+  Serial.println(F("  - PUMP ON     : Surface Water < 80.0% (e.g. 79%)"));
+  Serial.println(F("  - PUMP OFF    : Surface Water >= 80.0%"));
   Serial.println(F("=================================================="));
 
   // 10-Second Sensor Calibration & Stabilization Window

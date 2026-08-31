@@ -17,8 +17,8 @@ This file serves as the single source of truth for physical sensor calibration v
 
 | Parameter | Value | Behavior |
 | :--- | :---: | :--- |
-| **Target Surface Water Level** | `85.0%` | Pump turns **OFF** when surface ponding depth reaches $\ge 85.0\%$ |
-| **Refill Surface Water Level** | `80.0%` | Pump turns **ON** when surface ponding depth drops $< 80.0\%$ |
+| **Target Surface Water Level** | `80.0%` | Pump turns **OFF** when surface ponding depth reaches $\ge 80.0\%$ |
+| **Refill Surface Water Level** | `80.0%` | Pump turns **ON** when surface ponding depth drops $< 80.0\%$ (e.g. 79%) |
 | **Low Battery Lockout** | `10.00V` | Irrigation inhibited if battery drops $< 10.0\text{V}$ |
 | **Battery Resume Voltage** | `10.50V` | Hysteresis recovery voltage before permitting irrigation |
 | **Max Continuous Pump Runtime** | `180s` | Safety timeout to protect DC motor and prevent overflow |
