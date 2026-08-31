@@ -41,8 +41,8 @@ const int SOIL_AIR_RAW       = 417;   // 0% root moisture in dry air
 const int SOIL_WATER_RAW     = 153;   // 100% root moisture submerged in water
 
 // Calibrated HW-080 constants adjusted for container maximum depth:
-const int HW080_RAW_DRY      = 1019;  // 0% surface standing water (dry surface)
-const int HW080_RAW_WET      = 580;   // 100% full container depth (Raw ADC ~580-600 reaches full capacity)
+const int HW080_RAW_DRY      = 1020;  // 0% surface standing water (dry surface)
+const int HW080_RAW_WET      = 360;   // 100% full container depth (Raw ADC ~350-360 reaches full capacity)
 
 // ============================================================================
 // 3. IRRIGATION CONTROL THRESHOLDS (CONSTANT 85% LEVEL MAINTENANCE)
@@ -127,7 +127,7 @@ void setup() {
   Serial.println(F("  - TARGET LEVEL: Maintain ~85.0% Surface Water"));
   Serial.println(F("  - PUMP ON     : Surface Water < 80.0%"));
   Serial.println(F("  - PUMP OFF    : Surface Water >= 85.0%"));
-  Serial.println(F("  - Calibrated  : HW080 Dry=1019, Full=580"));
+  Serial.println(F("  - Calibrated  : HW080 Dry=1020, Full=360"));
   Serial.println(F("=================================================================="));
   
   // 10-Second Sensor Calibration & Stabilization Window

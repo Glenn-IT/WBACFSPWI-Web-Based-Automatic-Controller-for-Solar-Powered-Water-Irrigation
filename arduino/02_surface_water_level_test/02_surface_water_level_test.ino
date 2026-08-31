@@ -20,9 +20,9 @@
 const int PIN_HW080_ANALOG = A1;
 const int PIN_HW080_DIGITAL = 2; // Optional DO pin for threshold interrupt
 
-// Calibrated HW-080 constants from physical water tray test (Stages A to E):
-int HW080_RAW_DRY = 1019; // Stage A: Probe in dry air (0.0% surface water)
-int HW080_RAW_WET = 508;  // Stage E: Probe fully submerged up to 2-pin header (100.0% full ponding)
+// Calibrated HW-080 constants from physical water test:
+int HW080_RAW_DRY = 1020; // Probe in dry air (0.0% surface water)
+int HW080_RAW_WET = 360;  // Probe at full target submergence (100.0% full ponding depth)
 
 void setup() {
   Serial.begin(115200);
