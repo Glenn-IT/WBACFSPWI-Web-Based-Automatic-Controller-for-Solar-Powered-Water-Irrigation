@@ -20,10 +20,10 @@
 const int PIN_HW080_ANALOG = A1;
 const int PIN_HW080_DIGITAL = 2; // Optional DO pin for threshold interrupt
 
-// Calibrated HW-080 constants (Two-Stage Piecewise Curve for Resistive Sensor Physics):
-const int HW080_RAW_DRY = 1020; // Stage 0: Probe in dry air (0.0% surface water)
-const int HW080_RAW_TIP = 530;  // Stage 1: Water just wetting bottom tip (~20.0% entry level)
-const int HW080_RAW_WET = 350;  // Stage 2: Probe at full target submergence (100.0% full ponding depth)
+// Calibrated HW-080 constants (Calibrated to Physical Ruler & Water Height):
+const int HW080_RAW_DRY = 1020; // 0.0% dry air
+const int HW080_RAW_MID = 410;  // 50.0% water at exact middle of sensor (7-8cm mark)
+const int HW080_RAW_WET = 270;  // 100.0% fully submerged to top header (max flood)
 
 void setup() {
   Serial.begin(115200);
@@ -48,17 +48,17 @@ int readRawHW080() {
   return (int)(sum / 16);
 }
 
-// Piecewise resistance calibration to prevent tip wetting from reading as 70-100%
+// True 3-point calibration curve (0% Dry -> 50% Middle -> 100% Full Top)
 float calculateHW080Percent(int raw) {
   if (raw >= HW080_RAW_DRY) {
     return 0.0;
-  } else if (raw >= HW080_RAW_TIP) {
-    // Stage 1: Dry air to bottom tip wetting (0.0% -> 20.0%)
-    float pct = 20.0 * (float)(HW080_RAW_DRY - raw) / (float)(HW080_RAW_DRY - HW080_RAW_TIP);
-    return constrain(pct, 0.0, 20.0);
+  } else if (raw >= HW080_RAW_MID) {
+    // Stage 1: Dry air (1020) down to Middle height (410) -> 0.0% to 50.0%
+    float pct = 50.0 * (float)(HW080_RAW_DRY - raw) / (float)(HW080_RAW_DRY - HW080_RAW_MID);
+    return constrain(pct, 0.0, 50.0);
   } else {
-    // Stage 2: Tip rising to full maximum submergence (20.0% -> 100.0%)
-    float pct = 20.0 + 80.0 * (float)(HW080_RAW_TIP - raw) / (float)(HW080_RAW_TIP - HW080_RAW_WET);
+    // Stage 2: Middle height (410) down to Full top (270) -> 50.0% to 100.0%
+    float pct = 50.0 + 50.0 * (float)(HW080_RAW_MID - raw) / (float)(HW080_RAW_MID - HW080_RAW_WET);
     return constrain(pct, 0.0, 100.0);
   }
 }

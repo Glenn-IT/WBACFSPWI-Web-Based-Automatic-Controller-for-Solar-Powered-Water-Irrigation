@@ -51,10 +51,10 @@ const float VSOLAR_RATIO     = 6.0000; // (100k + 20k) / 20k
 const int SOIL_AIR_RAW       = 417;    // 0% moisture in dry air
 const int SOIL_WATER_RAW     = 153;    // 100% moisture in water
 
-// HW-080 Moisture Sensor (Piecewise Resistance Calibration for Surface Ponding Depth)
+// HW-080 Moisture Sensor (Physical Ruler 3-Point Calibration for Surface Ponding Depth)
 const int HW080_RAW_DRY      = 1020;   // Stage 0: Probe in dry air (0.0% surface water)
-const int HW080_RAW_TIP      = 530;    // Stage 1: Water just wetting bottom tip (~20.0% entry level)
-const int HW080_RAW_WET      = 350;    // Stage 2: Probe at container maximum depth (100% full ponding)
+const int HW080_RAW_MID      = 410;    // Stage 1: Water at middle of sensor 7-8cm mark (50.0% depth)
+const int HW080_RAW_WET      = 270;    // Stage 2: Probe at container maximum depth (100% full ponding)
 
 // Irrigation Decision Thresholds (for Rice Field - Constant 85% Water Level Maintenance)
 const float WATER_TARGET_MAX   = 85.0; // Automatically stop pump when surface water level reaches >= 85%
@@ -140,13 +140,13 @@ float readSurfaceWater() {
 
   if (raw >= HW080_RAW_DRY) {
     return 0.0;
-  } else if (raw >= HW080_RAW_TIP) {
-    // Stage 1: Dry air to tip contact (0.0% -> 20.0%)
-    float pct = 20.0 * (float)(HW080_RAW_DRY - raw) / (float)(HW080_RAW_DRY - HW080_RAW_TIP);
-    return constrain(pct, 0.0, 20.0);
+  } else if (raw >= HW080_RAW_MID) {
+    // Stage 1: Dry air (1020) down to Middle height (410) -> 0.0% to 50.0%
+    float pct = 50.0 * (float)(HW080_RAW_DRY - raw) / (float)(HW080_RAW_DRY - HW080_RAW_MID);
+    return constrain(pct, 0.0, 50.0);
   } else {
-    // Stage 2: Tip contact rising to full depth (20.0% -> 100.0%)
-    float pct = 20.0 + 80.0 * (float)(HW080_RAW_TIP - raw) / (float)(HW080_RAW_TIP - HW080_RAW_WET);
+    // Stage 2: Middle height (410) down to Full top (270) -> 50.0% to 100.0%
+    float pct = 50.0 + 50.0 * (float)(HW080_RAW_MID - raw) / (float)(HW080_RAW_MID - HW080_RAW_WET);
     return constrain(pct, 0.0, 100.0);
   }
 }

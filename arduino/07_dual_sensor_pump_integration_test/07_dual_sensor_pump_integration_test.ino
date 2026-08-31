@@ -40,10 +40,10 @@ const bool RELAY_ACTIVE_LOW  = true;
 const int SOIL_AIR_RAW       = 417;   // 0% root moisture in dry air
 const int SOIL_WATER_RAW     = 153;   // 100% root moisture submerged in water
 
-// Calibrated HW-080 constants (Two-Stage Piecewise Curve for Resistive Sensor Physics):
-const int HW080_RAW_DRY      = 1020;  // Stage 0: 0.0% surface standing water (dry surface)
-const int HW080_RAW_TIP      = 530;   // Stage 1: Water just wetting bottom tip (~20.0% entry level)
-const int HW080_RAW_WET      = 350;   // Stage 2: 100.0% full container depth (Raw ADC ~340-360)
+// Calibrated HW-080 constants (Calibrated to Physical Ruler & Water Height):
+const int HW080_RAW_DRY      = 1020;  // 0.0% surface standing water (dry surface)
+const int HW080_RAW_MID      = 410;   // 50.0% water at middle of sensor (7-8cm mark)
+const int HW080_RAW_WET      = 270;   // 100.0% full container depth (top header)
 
 // ============================================================================
 // 3. IRRIGATION CONTROL THRESHOLDS (CONSTANT 85% LEVEL MAINTENANCE)
@@ -96,7 +96,7 @@ float readRootSoilMoisture() {
   return constrain(pct, 0.0, 100.0);
 }
 
-// Read HW-080 Surface Water Level (Primary Controller with Piecewise Resistance Calibration)
+// Read HW-080 Surface Water Level (Primary Controller with Physical Ruler 3-Point Calibration)
 float readSurfaceWaterLevel() {
   long sum = 0;
   for (int i = 0; i < 16; i++) {
@@ -107,11 +107,11 @@ float readSurfaceWaterLevel() {
 
   if (lastRawHW080 >= HW080_RAW_DRY) {
     return 0.0;
-  } else if (lastRawHW080 >= HW080_RAW_TIP) {
-    float pct = 20.0 * (float)(HW080_RAW_DRY - lastRawHW080) / (float)(HW080_RAW_DRY - HW080_RAW_TIP);
-    return constrain(pct, 0.0, 20.0);
+  } else if (lastRawHW080 >= HW080_RAW_MID) {
+    float pct = 50.0 * (float)(HW080_RAW_DRY - lastRawHW080) / (float)(HW080_RAW_DRY - HW080_RAW_MID);
+    return constrain(pct, 0.0, 50.0);
   } else {
-    float pct = 20.0 + 80.0 * (float)(HW080_RAW_TIP - lastRawHW080) / (float)(HW080_RAW_TIP - HW080_RAW_WET);
+    float pct = 50.0 + 50.0 * (float)(HW080_RAW_MID - lastRawHW080) / (float)(HW080_RAW_MID - HW080_RAW_WET);
     return constrain(pct, 0.0, 100.0);
   }
 }
