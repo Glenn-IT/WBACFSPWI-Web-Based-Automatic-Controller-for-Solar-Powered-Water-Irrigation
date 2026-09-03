@@ -46,18 +46,22 @@ const int HW080_RAW_MID      = 410;   // 50.0% water at middle of sensor (7-8cm 
 const int HW080_RAW_WET      = 355;   // 100.0% full container depth (top header / max flood)
 
 // ============================================================================
-// 3. IRRIGATION CONTROL THRESHOLDS (MAINTAIN 80.0% LEVEL)
+// 3. IRRIGATION CONTROL THRESHOLDS (MAINTAIN 50.0% LEVEL WITH 10S SETTLING)
 // ============================================================================
-const float WATER_TARGET_MAX   = 80.0; // Turn pump OFF when water level reaches >= 80.0%
-const float WATER_REFILL_MIN   = 80.0; // Turn pump ON whenever water level drops < 80.0% (e.g. 79%)
+const float WATER_TARGET_MAX   = 50.0; // Turn pump OFF when water level reaches >= 50.0%
+const float WATER_REFILL_MIN   = 50.0; // Turn pump ON whenever water level drops < 50.0%
 
 const unsigned long MAX_PUMP_RUNTIME_MS = 180000UL; // 180 seconds continuous run protection
+const unsigned long SETTLING_DELAY_MS   = 10000UL;  // 10 seconds water stabilization / settling window
 
 // ============================================================================
 // 4. SYSTEM STATE VARIABLES
 // ============================================================================
 bool pumpState = false;
+bool isSettling = false;
 unsigned long pumpStartTime = 0;
+unsigned long pumpStopTime = 0;
+unsigned long settlingStartTime = 0;
 unsigned long lastLoopTime = 0;
 int lastRawHW080 = 0;
 
@@ -133,10 +137,10 @@ void setup() {
   Serial.println(F("=================================================================="));
   Serial.println(F(" WBACFSPWI: Dual Sensor & Relay Pump Integrated Controller Test  "));
   Serial.println(F("=================================================================="));
-  Serial.println(F("Maintain 80.0% Surface Water Level Mode:"));
-  Serial.println(F("  - TARGET LEVEL: Maintain ~80.0% Surface Water"));
-  Serial.println(F("  - PUMP ON     : Surface Water < 80.0% (e.g. 79%)"));
-  Serial.println(F("  - PUMP OFF    : Surface Water >= 80.0%"));
+  Serial.println(F("Maintain 50.0% Surface Water Level Mode:"));
+  Serial.println(F("  - TARGET LEVEL: Maintain ~50.0% Surface Water"));
+  Serial.println(F("  - PUMP ON     : Surface Water < 50.0% (e.g. 49%)"));
+  Serial.println(F("  - PUMP OFF    : Surface Water >= 50.0%"));
   Serial.println(F("  - Calibrated  : HW080 Dry=1020, Mid=410, Full=355"));
   Serial.println(F("=================================================================="));
   
@@ -156,51 +160,76 @@ void setup() {
 void loop() {
   float rootMoisture = readRootSoilMoisture();
   float surfaceWater = readSurfaceWaterLevel();
+  unsigned long now = millis();
 
   // Safety: Continuous Runtime Limit check
-  if (pumpState && (millis() - pumpStartTime >= MAX_PUMP_RUNTIME_MS)) {
+  if (pumpState && (now - pumpStartTime >= MAX_PUMP_RUNTIME_MS)) {
     setPump(false, "Continuous 180s Safety Runtime Cap Hit");
+    isSettling = false;
   }
 
-  // Maintain 80.0% Water Level Logic:
-  // 1. If Surface Water reaches >= 80.0% -> Turn pump OFF
-  if (surfaceWater >= WATER_TARGET_MAX) {
-    if (pumpState) {
-      setPump(false, "Surface Water Target Reached (>= 80.0%)");
+  // ==========================================================================
+  // Automated Decision Logic with 10s Wave Settling Safety Net
+  // ==========================================================================
+  if (isSettling) {
+    // 1. Water is currently settling (10-second stabilization window)
+    unsigned long elapsedSettling = now - settlingStartTime;
+    if (elapsedSettling >= SETTLING_DELAY_MS) {
+      isSettling = false;
+      // Re-evaluate with settled surface water
+      if (surfaceWater >= WATER_TARGET_MAX) {
+        Serial.println(F(">>> [STABLE] 10s Settling complete! Level verified >= 50.0% -> Pump stays OFF"));
+      } else {
+        Serial.println(F(">>> [REFILL] 10s Settling complete! Level settled < 50.0% -> Restarting pump to reach 50.0%"));
+        setPump(true, "Post-settling reading below 50.0%");
+      }
     }
-  } 
-  // 2. If Surface Water drops below 80.0% -> Turn pump ON
-  else if (surfaceWater < WATER_REFILL_MIN) {
-    if (!pumpState) {
-      setPump(true, "Surface Water Below Target (< 80.0%) -> Pumping to 80.0%");
+  } else if (pumpState) {
+    // 2. Pump is running: Check if target water level reached
+    if (surfaceWater >= WATER_TARGET_MAX) {
+      setPump(false, "Surface Reached Target (>= 50.0%) -> Starting 10s Settling Check");
+      isSettling = true;
+      settlingStartTime = now;
+    }
+  } else {
+    // 3. Pump is idle & not settling: Start pump if below target
+    if (surfaceWater < WATER_REFILL_MIN) {
+      setPump(true, "Surface Water Below Target (< 50.0%) -> Pumping to 50.0%");
     }
   }
 
   // Print Formatted Telemetry Line with Raw ADC
   Serial.print(F("[LIVE TELEMETRY] Root Moisture: "));
   Serial.print(rootMoisture, 1);
-  Serial.print(F("% (Capacitive Data) | Surface Water: "));
+  Serial.print(F("% | Surface Water: "));
   Serial.print(surfaceWater, 1);
   Serial.print(F("% (Raw ADC: "));
   Serial.print(lastRawHW080);
   Serial.print(F(") | Pump Relay: "));
 
   if (pumpState) {
-    unsigned long runSec = (millis() - pumpStartTime) / 1000;
+    unsigned long runSec = (now - pumpStartTime) / 1000;
     Serial.print(F("RUNNING (ON for "));
     Serial.print(runSec);
     Serial.print(F("s)"));
+  } else if (isSettling) {
+    unsigned long remainSec = (SETTLING_DELAY_MS - (now - settlingStartTime)) / 1000 + 1;
+    Serial.print(F("SETTLING (OFF - "));
+    Serial.print(remainSec);
+    Serial.print(F("s remain)"));
   } else {
     Serial.print(F("STANDBY (OFF)"));
   }
 
-  Serial.print(F(" | Decision: "));
-  if (surfaceWater >= WATER_TARGET_MAX) {
-    Serial.println(F("TARGET MAINTAINED (>= 80.0%) -> PUMP OFF"));
+  Serial.print(F(" | Status: "));
+  if (isSettling) {
+    Serial.println(F("SETTLING WATER (Waiting 10s for ripples to settle before re-check)"));
   } else if (pumpState) {
-    Serial.println(F("PUMPING WATER (Refilling until surface reaches 80.0%)"));
+    Serial.println(F("PUMPING WATER (Refilling until surface reaches 50.0%)"));
+  } else if (surfaceWater >= WATER_TARGET_MAX) {
+    Serial.println(F("TARGET MAINTAINED (>= 50.0%) -> STABLE"));
   } else {
-    Serial.println(F("WATER LEVEL STABLE (80.0%) -> STANDBY"));
+    Serial.println(F("STANDBY"));
   }
 
   delay(1000);

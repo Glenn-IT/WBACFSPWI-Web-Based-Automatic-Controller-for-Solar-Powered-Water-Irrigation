@@ -57,7 +57,7 @@ const int HW080_RAW_MID      = 410;    // Stage 1: Water at middle of sensor 7-8
 const int HW080_RAW_WET      = 355;    // Stage 2: Probe at container maximum depth (100% full ponding)
 
 // Irrigation Decision Thresholds (Surface Water Level Control with Hysteresis)
-const float WATER_TARGET_MAX   = 70.0; // Automatically stop pump when surface water level reaches >= 70.0%
+const float WATER_TARGET_MAX   = 50.0; // Automatically stop pump when surface water level reaches >= 50.0%
 const float WATER_REFILL_MIN   = 50.0; // Automatically start pump only when surface water level drops < 50.0%
 
 // Safety & Battery Protection Thresholds
@@ -67,6 +67,7 @@ const float BATT_RESUME_VOLTS = 8.50;  // Voltage needed to clear lockout and re
 // Timing Protections (in milliseconds)
 const unsigned long MAX_PUMP_RUN_MS  = 180000UL; // 3 minutes maximum continuous runtime
 const unsigned long PUMP_COOLDOWN_MS = 60000UL;  // 1 minute mandatory cooldown after timeout
+const unsigned long SETTLING_DELAY_MS= 10000UL;  // 10 seconds water settling / stabilization window
 const unsigned long SAMPLE_INTERVAL  = 3000UL;   // Read sensors & evaluate logic every 3s
 const unsigned long TELEMETRY_PERIOD = 5000UL;   // Print telemetry every 5s
 
@@ -74,13 +75,15 @@ const unsigned long TELEMETRY_PERIOD = 5000UL;   // Print telemetry every 5s
 // 3. SYSTEM STATE VARIABLES
 // ============================================================================
 bool  pumpState          = false;
+bool  isSettling         = false;
 bool  lowBatteryLockout  = false;
 bool  timeoutLockout     = false;
 
-unsigned long pumpStartTime   = 0;
-unsigned long pumpStopTime    = 0;
-unsigned long lastSampleTime  = 0;
-unsigned long lastTeleTime    = 0;
+unsigned long pumpStartTime     = 0;
+unsigned long pumpStopTime      = 0;
+unsigned long settlingStartTime = 0;
+unsigned long lastSampleTime    = 0;
+unsigned long lastTeleTime      = 0;
 
 float currentRootMoisture = 0.0;
 float currentSurfaceWater = 0.0;
@@ -181,7 +184,14 @@ void printTelemetry() {
   Serial.println();
   
   Serial.print(F("Solar Output    : ")); Serial.print(currentSolarVolts, 2); Serial.println(F(" V"));
-  Serial.print(F("Pump Relay State: ")); Serial.println(pumpState ? F("ON (Irrigating)") : F("OFF"));
+  Serial.print(F("Pump Relay State: ")); 
+  if (pumpState) {
+    Serial.println(F("ON (Irrigating)"));
+  } else if (isSettling) {
+    Serial.println(F("OFF (10s Settling Verification)"));
+  } else {
+    Serial.println(F("OFF (Standby)"));
+  }
   
   if (timeoutLockout) {
     Serial.println(F("[ALERT] Pump Timeout Cooldown in effect!"));
@@ -214,7 +224,7 @@ void setup() {
   Serial.println(F(" WBACFSPWI: Solar Rice Irrigation Controller     "));
   Serial.println(F(" Standalone Arduino Uno Automation Firmware      "));
   Serial.println(F("Automatic Surface Water Level Maintenance:"));
-  Serial.println(F("  - TARGET MAX (PUMP OFF) : >= 70.0% Surface Water"));
+  Serial.println(F("  - TARGET MAX (PUMP OFF) : >= 50.0% Surface Water"));
   Serial.println(F("  - REFILL MIN (PUMP ON)  : < 50.0% Surface Water"));
   Serial.println(F("=================================================="));
 
@@ -263,20 +273,32 @@ void loop() {
       Serial.println(F("[SAFETY] Cooldown finished. Resuming normal operations."));
     }
 
-    // 3. Automated Decision Logic (Constant 85% Water Level Maintenance)
+    // 3. Automated Decision Logic with 10s Settling Safety Net
     if (lowBatteryLockout || timeoutLockout) {
       setPump(false);
-    } else {
-      if (!pumpState) {
-        // Start pumping whenever surface ponding drops below 80%
-        if (currentSurfaceWater < WATER_REFILL_MIN) {
+      isSettling = false;
+    } else if (isSettling) {
+      if (now - settlingStartTime >= SETTLING_DELAY_MS) {
+        isSettling = false;
+        if (currentSurfaceWater >= WATER_TARGET_MAX) {
+          Serial.println(F(">>> [STABLE] 10s Settling verified >= 50.0% -> Pump stays OFF"));
+        } else {
+          Serial.println(F(">>> [REFILL] 10s Settling settled < 50.0% -> Resuming pump"));
           setPump(true);
         }
-      } else {
-        // Stop pumping when surface ponding fills to target 85%
-        if (currentSurfaceWater >= WATER_TARGET_MAX) {
-          setPump(false);
-        }
+      }
+    } else if (pumpState) {
+      // Pump is running: if target reached, stop and enter 10s settling period
+      if (currentSurfaceWater >= WATER_TARGET_MAX) {
+        setPump(false);
+        isSettling = true;
+        settlingStartTime = now;
+        Serial.println(F(">>> [TARGET REACHED] Starting 10s settling verification..."));
+      }
+    } else {
+      // Pump is idle and not settling: start pump if below threshold
+      if (currentSurfaceWater < WATER_REFILL_MIN) {
+        setPump(true);
       }
     }
   }
