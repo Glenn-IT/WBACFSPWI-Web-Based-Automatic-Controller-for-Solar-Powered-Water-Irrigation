@@ -35,7 +35,7 @@ const int PIN_RELAY_PUMP     = 7;
 const int PIN_SENSOR_PWR     = 8;
 const int PIN_STATUS_LED     = 13;
 
-const bool RELAY_ACTIVE_LOW  = true;   // Most 5V relay modules trigger on LOW
+const bool RELAY_ACTIVE_LOW  = false;   // Most 5V relay modules trigger on LOW
 const bool USE_SENSOR_PWR    = true;   // Enable power gating to prevent corrosion
 
 // ============================================================================
@@ -57,8 +57,8 @@ const int HW080_RAW_MID      = 410;    // Stage 1: Water at middle of sensor 7-8
 const int HW080_RAW_WET      = 355;    // Stage 2: Probe at container maximum depth (100% full ponding)
 
 // Irrigation Decision Thresholds (Maintain 80.0% Surface Water Level)
-const float WATER_TARGET_MAX   = 80.0; // Automatically stop pump when surface water level reaches >= 80.0%
-const float WATER_REFILL_MIN   = 80.0; // Automatically start pump whenever surface water level drops < 80.0% (e.g. 79%)
+const float WATER_TARGET_MAX   = 70.0; // Automatically stop pump when surface water level reaches >= 80.0%
+const float WATER_REFILL_MIN   = 70.0; // Automatically start pump whenever surface water level drops < 80.0% (e.g. 79%)
 
 // Safety & Battery Protection Thresholds
 const float BATT_MIN_LOCKOUT = 10.00;  // 3S Pack cutoff (~3.33V/cell)
@@ -214,10 +214,10 @@ void setup() {
   Serial.println(F(" WBACFSPWI: Solar Rice Irrigation Controller     "));
   Serial.println(F(" Standalone Arduino Uno Automation Firmware      "));
   Serial.println(F("=================================================="));
-  Serial.println(F("Maintain 80.0% Surface Water Level Mode:"));
-  Serial.println(F("  - TARGET LEVEL: Maintain ~80.0% Surface Water"));
-  Serial.println(F("  - PUMP ON     : Surface Water < 80.0% (e.g. 79%)"));
-  Serial.println(F("  - PUMP OFF    : Surface Water >= 80.0%"));
+  Serial.println(F("Maintain 70.0% Surface Water Level Mode:"));
+  Serial.println(F("  - TARGET LEVEL: Maintain ~70.0% Surface Water"));
+  Serial.println(F("  - PUMP ON     : Surface Water < 70.0% (e.g. 79%)"));
+  Serial.println(F("  - PUMP OFF    : Surface Water >= 70.0%"));
   Serial.println(F("=================================================="));
 
   // 10-Second Sensor Calibration & Stabilization Window
