@@ -46,11 +46,12 @@ const int HW080_RAW_MID      = 410;   // 50.0% water at middle of sensor (7-8cm 
 const int HW080_RAW_WET      = 355;   // 100.0% full container depth (top header / max flood)
 
 // ============================================================================
-// 3. IRRIGATION CONTROL THRESHOLDS (MAINTAIN 50.0% LEVEL WITH 10S SETTLING)
+// 3. IRRIGATION CONTROL THRESHOLDS (3-LAYER SAFETY: HYSTERESIS + MIN RUN + SETTLING)
 // ============================================================================
 const float WATER_TARGET_MAX   = 50.0; // Turn pump OFF when water level reaches >= 50.0%
-const float WATER_REFILL_MIN   = 50.0; // Turn pump ON whenever water level drops < 50.0%
+const float WATER_REFILL_MIN   = 45.0; // Turn pump ON whenever water level drops < 45.0% (5% Hysteresis Gap)
 
+const unsigned long MIN_PUMP_RUN_MS     = 5000UL;   // 5 seconds minimum runtime (prevents momentary splash cutoffs)
 const unsigned long MAX_PUMP_RUNTIME_MS = 180000UL; // 180 seconds continuous run protection
 const unsigned long SETTLING_DELAY_MS   = 10000UL;  // 10 seconds water stabilization / settling window
 
@@ -137,11 +138,12 @@ void setup() {
   Serial.println(F("=================================================================="));
   Serial.println(F(" WBACFSPWI: Dual Sensor & Relay Pump Integrated Controller Test  "));
   Serial.println(F("=================================================================="));
-  Serial.println(F("Maintain 50.0% Surface Water Level Mode:"));
-  Serial.println(F("  - TARGET LEVEL: Maintain ~50.0% Surface Water"));
-  Serial.println(F("  - PUMP ON     : Surface Water < 50.0% (e.g. 49%)"));
-  Serial.println(F("  - PUMP OFF    : Surface Water >= 50.0%"));
-  Serial.println(F("  - Calibrated  : HW080 Dry=1020, Mid=410, Full=355"));
+  Serial.println(F("3-Layer Automatic Surface Water Level Maintenance:"));
+  Serial.println(F("  - TARGET MAX (PUMP OFF) : >= 50.0% Surface Water"));
+  Serial.println(F("  - REFILL MIN (PUMP ON)  : < 45.0% Surface Water (5% Hysteresis Gap)"));
+  Serial.println(F("  - MINIMUM RUNTIME       : 5 Seconds (Anti-Splash Protection)"));
+  Serial.println(F("  - SETTLING WINDOW       : 10 Seconds Wave Stabilization"));
+  Serial.println(F("  - Calibrated            : HW080 Dry=1020, Mid=410, Full=355"));
   Serial.println(F("=================================================================="));
   
   // 10-Second Sensor Calibration & Stabilization Window
@@ -169,10 +171,10 @@ void loop() {
   }
 
   // ==========================================================================
-  // Automated Decision Logic with 10s Wave Settling Safety Net
+  // Automated Decision Logic: 3-Layer Protection (Hysteresis + Min Run + Settling)
   // ==========================================================================
   if (isSettling) {
-    // 1. Water is currently settling (10-second stabilization window)
+    // Layer 3: Water is settling (10-second stabilization window)
     unsigned long elapsedSettling = now - settlingStartTime;
     if (elapsedSettling >= SETTLING_DELAY_MS) {
       isSettling = false;
@@ -180,21 +182,24 @@ void loop() {
       if (surfaceWater >= WATER_TARGET_MAX) {
         Serial.println(F(">>> [STABLE] 10s Settling complete! Level verified >= 50.0% -> Pump stays OFF"));
       } else {
-        Serial.println(F(">>> [REFILL] 10s Settling complete! Level settled < 50.0% -> Restarting pump to reach 50.0%"));
+        Serial.println(F(">>> [REFILL] 10s Settling complete! Level settled < 50.0% -> Resuming pump"));
         setPump(true, "Post-settling reading below 50.0%");
       }
     }
   } else if (pumpState) {
-    // 2. Pump is running: Check if target water level reached
-    if (surfaceWater >= WATER_TARGET_MAX) {
-      setPump(false, "Surface Reached Target (>= 50.0%) -> Starting 10s Settling Check");
-      isSettling = true;
-      settlingStartTime = now;
+    // Layer 2: Minimum Run Time Check (Enforce at least 5s before allowing target shutoff)
+    if (now - pumpStartTime >= MIN_PUMP_RUN_MS) {
+      // Layer 1: Target Reached Check
+      if (surfaceWater >= WATER_TARGET_MAX) {
+        setPump(false, "Surface Reached Target (>= 50.0%) -> Starting 10s Settling Check");
+        isSettling = true;
+        settlingStartTime = now;
+      }
     }
   } else {
-    // 3. Pump is idle & not settling: Start pump if below target
+    // Pump is idle and not settling: Start pump when below 45% hysteresis refill line
     if (surfaceWater < WATER_REFILL_MIN) {
-      setPump(true, "Surface Water Below Target (< 50.0%) -> Pumping to 50.0%");
+      setPump(true, "Surface Water Below Refill Level (< 45.0%) -> Pumping to 50.0%");
     }
   }
 
@@ -223,13 +228,13 @@ void loop() {
 
   Serial.print(F(" | Status: "));
   if (isSettling) {
-    Serial.println(F("SETTLING WATER (Waiting 10s for ripples to settle before re-check)"));
+    Serial.println(F("SETTLING WATER (Waiting 10s for ripples to settle)"));
   } else if (pumpState) {
     Serial.println(F("PUMPING WATER (Refilling until surface reaches 50.0%)"));
   } else if (surfaceWater >= WATER_TARGET_MAX) {
     Serial.println(F("TARGET MAINTAINED (>= 50.0%) -> STABLE"));
   } else {
-    Serial.println(F("STANDBY"));
+    Serial.println(F("BUFFER ZONE (45.0% - 50.0%) -> STANDBY"));
   }
 
   delay(1000);

@@ -32,6 +32,8 @@ Whenever any sensor calibration constant, voltage divider factor, or control thr
   - `arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino`
 
 ### 4. Irrigation Control Thresholds
-- `WATER_TARGET_MAX` (e.g., 85.0%): Pump OFF threshold
-- `WATER_REFILL_MIN` (e.g., 80.0%): Pump ON threshold
-- Must remain synchronized between Test 07 and `wbacfspwi_arduino_controller.ino`.
+- `WATER_TARGET_MAX` (50.0%): Pump OFF threshold
+- `WATER_REFILL_MIN` (45.0%): Pump ON threshold (5% Hysteresis Gap)
+- `MIN_PUMP_RUN_MS` (5000ms): Anti-splash minimum runtime
+- `SETTLING_DELAY_MS` (10000ms): Wave stabilization settling window
+- Must remain synchronized between Test 07, `Water_Irigation_Final.ino`, and `wbacfspwi_arduino_controller.ino`.

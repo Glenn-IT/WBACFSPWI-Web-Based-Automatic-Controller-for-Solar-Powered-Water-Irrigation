@@ -56,15 +56,16 @@ const int HW080_RAW_DRY      = 1020;   // Stage 0: Probe in dry air (0.0% surfac
 const int HW080_RAW_MID      = 410;    // Stage 1: Water at middle of sensor 7-8cm mark (50.0% depth)
 const int HW080_RAW_WET      = 355;    // Stage 2: Probe at container maximum depth (100% full ponding)
 
-// Irrigation Decision Thresholds (Surface Water Level Control with Hysteresis)
+// Irrigation Decision Thresholds (Surface Water Level Control with 5% Hysteresis)
 const float WATER_TARGET_MAX   = 50.0; // Automatically stop pump when surface water level reaches >= 50.0%
-const float WATER_REFILL_MIN   = 50.0; // Automatically start pump only when surface water level drops < 50.0%
+const float WATER_REFILL_MIN   = 45.0; // Automatically start pump only when surface water level drops < 45.0%
 
 // Safety & Battery Protection Thresholds
 const float BATT_MIN_LOCKOUT = 8.00;   // Low battery lockout cutoff (8.0V)
 const float BATT_RESUME_VOLTS = 8.50;  // Voltage needed to clear lockout and resume operation
 
 // Timing Protections (in milliseconds)
+const unsigned long MIN_PUMP_RUN_MS  = 5000UL;   // 5 seconds minimum runtime (prevents momentary splash cutoffs)
 const unsigned long MAX_PUMP_RUN_MS  = 180000UL; // 3 minutes maximum continuous runtime
 const unsigned long PUMP_COOLDOWN_MS = 60000UL;  // 1 minute mandatory cooldown after timeout
 const unsigned long SETTLING_DELAY_MS= 10000UL;  // 10 seconds water settling / stabilization window
@@ -223,9 +224,11 @@ void setup() {
   Serial.println(F("=================================================="));
   Serial.println(F(" WBACFSPWI: Solar Rice Irrigation Controller     "));
   Serial.println(F(" Standalone Arduino Uno Automation Firmware      "));
-  Serial.println(F("Automatic Surface Water Level Maintenance:"));
+  Serial.println(F("3-Layer Automatic Surface Water Level Control:"));
   Serial.println(F("  - TARGET MAX (PUMP OFF) : >= 50.0% Surface Water"));
-  Serial.println(F("  - REFILL MIN (PUMP ON)  : < 50.0% Surface Water"));
+  Serial.println(F("  - REFILL MIN (PUMP ON)  : < 45.0% Surface Water (5% Hysteresis Gap)"));
+  Serial.println(F("  - MINIMUM RUNTIME       : 5 Seconds Anti-Splash Protection"));
+  Serial.println(F("  - SETTLING WINDOW       : 10 Seconds Wave Stabilization"));
   Serial.println(F("=================================================="));
 
   // 10-Second Sensor Calibration & Stabilization Window
@@ -288,15 +291,18 @@ void loop() {
         }
       }
     } else if (pumpState) {
-      // Pump is running: if target reached, stop and enter 10s settling period
-      if (currentSurfaceWater >= WATER_TARGET_MAX) {
-        setPump(false);
-        isSettling = true;
-        settlingStartTime = now;
-        Serial.println(F(">>> [TARGET REACHED] Starting 10s settling verification..."));
+      // Layer 2: Minimum Run Time Check (Enforce at least 5s before allowing target shutoff)
+      if (now - pumpStartTime >= MIN_PUMP_RUN_MS) {
+        // Layer 1: Target Reached Check
+        if (currentSurfaceWater >= WATER_TARGET_MAX) {
+          setPump(false);
+          isSettling = true;
+          settlingStartTime = now;
+          Serial.println(F(">>> [TARGET REACHED] Starting 10s settling verification..."));
+        }
       }
     } else {
-      // Pump is idle and not settling: start pump if below threshold
+      // Pump is idle and not settling: start pump if below threshold (< 45.0%)
       if (currentSurfaceWater < WATER_REFILL_MIN) {
         setPump(true);
       }
