@@ -42,6 +42,9 @@ This directory contains the standalone Arduino Uno hardware sketches, component 
 | [`03_relay_pump_test/`](./03_relay_pump_test/03_relay_pump_test.ino) | Relay & Pump Test | Safe pulse testing of relay module and DC water pump with runtime protections. |
 | [`04_battery_voltage_test/`](./04_battery_voltage_test/04_battery_voltage_test.ino) | Battery Monitor Test | Reads and calibrates 3S 18650 pack voltage (11.1V - 12.6V) via resistor voltage divider. |
 | [`05_solar_voltage_test/`](./05_solar_voltage_test/05_solar_voltage_test.ino) | Solar Monitor Test | Reads and calibrates 30W solar panel open circuit / operating voltage via voltage divider. |
+| [`06_solar_charger_battery_test/`](./06_solar_charger_battery_test/06_solar_charger_battery_test.ino) | Charger System Test | Integrated test of solar panel, 3S charger/BMS, battery pack, and buck converter. |
+| [`07_dual_sensor_pump_integration_test/`](./07_dual_sensor_pump_integration_test/07_dual_sensor_pump_integration_test.ino) | Dual Sensor & Pump Test | Integration test for Capacitive Soil + HW-080 Water Level sensors controlling 12V pump. |
+| [`08_dc_adapter_presentation_test/`](./08_dc_adapter_presentation_test/08_dc_adapter_presentation_test.ino) | **12V DC Presentation Test** | Bench/Presentation mode using 12V DC power adapter (no battery needed) with interactive serial controls. |
 | [`wbacfspwi_arduino_controller/`](./wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino) | **Full Controller** | Complete automated controller featuring dual-sensor logic, safety cutoffs, relay hysteresis, and serial telemetry. |
 
 ---

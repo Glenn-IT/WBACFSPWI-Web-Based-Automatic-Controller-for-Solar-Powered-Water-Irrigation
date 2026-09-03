@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test 08: 12V DC Power Adapter & 5A Step-Down Module Wiring Guide — WBACFSPWI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-hover: #334155;
+            --border-color: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-cyan: #06b6d4;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-purple: #8b5cf6;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+        .container { max-width: 1240px; margin: 0 auto; }
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.35rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: rgba(6, 182, 212, 0.15);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            margin-bottom: 0.75rem;
+        }
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        p.subtitle { color: var(--text-secondary); font-size: 1.05rem; }
+        
+        .nav-bar {
+            display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; margin-bottom: 2rem;
+        }
+        .nav-link {
+            font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); background: var(--bg-card);
+            padding: 0.5rem 1rem; border-radius: 0.5rem; text-decoration: none; border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #ffffff; background: var(--accent-cyan); border-color: var(--accent-cyan);
+        }
+
+        .grid-layout { display: grid; grid-template-columns: 1fr; gap: 2rem; }
+        .card {
+            background-color: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: 1rem; padding: 1.75rem; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+        .card-title {
+            font-size: 1.25rem; font-weight: 700; margin-bottom: 1.25rem; display: flex;
+            align-items: center; gap: 0.75rem; color: var(--text-primary);
+        }
+        .card-title .icon {
+            width: 32px; height: 32px; border-radius: 0.5rem; background: rgba(6, 182, 212, 0.2);
+            color: var(--accent-cyan); display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+        }
+        .svg-container {
+            width: 100%; overflow-x: auto; background: #090d16; border-radius: 0.75rem;
+            padding: 1.5rem 1rem; border: 1px solid #1e293b;
+        }
+        svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+        .wire {
+            stroke-dasharray: 8; animation: dash 30s linear infinite;
+            transition: stroke-width 0.2s ease, stroke 0.2s ease; cursor: pointer;
+        }
+        .wire:hover { stroke-width: 4.5px !important; filter: drop-shadow(0 0 6px currentColor); }
+        @keyframes dash { to { stroke-dashoffset: -1000; } }
+
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.95rem; }
+        th {
+            background-color: #0f172a; color: var(--text-secondary); font-weight: 600;
+            padding: 0.85rem 1rem; border-bottom: 2px solid var(--border-color);
+            text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em;
+        }
+        td { padding: 1rem; border-bottom: 1px solid var(--border-color); color: var(--text-primary); }
+        tr:hover td { background-color: rgba(255, 255, 255, 0.02); }
+        
+        .pin-tag {
+            font-family: 'JetBrains Mono', monospace; padding: 0.2rem 0.5rem; border-radius: 0.35rem;
+            font-size: 0.85rem; font-weight: 600;
+        }
+        .tag-uno { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
+        .tag-bb { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+        .tag-relay { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+        .tag-gnd { background: rgba(148, 163, 184, 0.2); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.4); }
+        .tag-pwr { background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.4); }
+        .tag-pump { background: rgba(6, 182, 212, 0.2); color: #67e8f9; border: 1px solid rgba(6, 182, 212, 0.4); }
+        .tag-sensor { background: rgba(139, 92, 246, 0.2); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.4); }
+
+        .note-box {
+            background: rgba(6, 182, 212, 0.1); border-left: 4px solid var(--accent-cyan);
+            padding: 1.25rem; border-radius: 0 0.5rem 0.5rem 0; margin-top: 1.5rem;
+        }
+        .note-box h4 {
+            color: var(--accent-cyan); font-size: 1rem; margin-bottom: 0.5rem;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .note-box p, .note-box li { color: var(--text-secondary); font-size: 0.92rem; margin-bottom: 0.4rem; }
+        .note-box ul { padding-left: 1.25rem; }
+        
+        code {
+            font-family: 'JetBrains Mono', monospace; background: #0f172a;
+            color: var(--accent-cyan); padding: 0.15rem 0.4rem; border-radius: 0.3rem; font-size: 0.88em;
+        }
+
+        .step-list { list-style: none; counter-reset: steps; }
+        .step-list li {
+            position: relative; padding-left: 2.5rem; margin-bottom: 1.25rem; color: var(--text-secondary);
+        }
+        .step-list li strong { color: var(--text-primary); }
+        .step-list li::before {
+            counter-increment: steps; content: counter(steps); position: absolute; left: 0; top: 0;
+            width: 1.8rem; height: 1.8rem; background: rgba(6, 182, 212, 0.2); color: var(--accent-cyan);
+            border: 1px solid var(--accent-cyan); border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; font-weight: 700; font-size: 0.85rem;
+        }
+
+        .cmd-table code {
+            font-family: 'JetBrains Mono', monospace; background: #020617; padding: 0.2rem 0.5rem;
+            border-radius: 0.3rem; color: #38bdf8; font-size: 0.9rem; border: 1px solid #1e293b;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <span class="badge">Star Wiring Test 08</span>
+        <h1>12V DC Power Adapter & 5A Step-Down Module</h1>
+        <p class="subtitle">Direct Current Presentation Mode | Plug & Play 12V Adapter | Fixed 5.0V Buck Output | Dual Sensors & 12V DC Pump</p>
+    </header>
+
+    <div class="nav-bar">
+        <a href="../index.html" class="nav-link">🏠 Master Hub</a>
+        <a href="../01_soil_root_capacitive_test/wiring_guide.html" class="nav-link">Test 01: Root Soil</a>
+        <a href="../02_surface_water_level_test/wiring_guide.html" class="nav-link">Test 02: Surface Water</a>
+        <a href="../03_relay_pump_test/wiring_guide.html" class="nav-link">Test 03: Relay & Pump</a>
+        <a href="../04_battery_voltage_test/wiring_guide.html" class="nav-link">Test 04: Battery Monitor</a>
+        <a href="../05_solar_voltage_test/wiring_guide.html" class="nav-link">Test 05: Solar Monitor</a>
+        <a href="../06_solar_charger_battery_test/wiring_guide.html" class="nav-link">Test 06: Solar Charger</a>
+        <a href="wiring_guide.html" class="nav-link active">Test 08: 12V DC Presentation</a>
+        <a href="../wbacfspwi_arduino_controller/wiring_guide.html" class="nav-link">🚀 Full Controller</a>
+    </div>
+
+    <div class="grid-layout">
+        <!-- Interactive Vector Diagram -->
+        <div class="card">
+            <div class="card-title">
+                <div class="icon">⚡</div>
+                Interactive Star Breadboard Diagram (12V Adapter + 5A Step-Down Module + Sensors & Pump)
+            </div>
+            
+            <div class="svg-container">
+                <svg viewBox="0 0 1180 720" width="1180" height="720" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Background Grid Pattern -->
+                    <g opacity="0.05">
+                        <path d="M 0 0 L 1180 0 M 0 50 L 1180 50 M 0 100 L 1180 100 M 0 150 L 1180 150 M 0 200 L 1180 200 M 0 250 L 1180 250 M 0 300 L 1180 300 M 0 350 L 1180 350 M 0 400 L 1180 400 M 0 450 L 1180 450 M 0 500 L 1180 500 M 0 550 L 1180 550 M 0 600 L 1180 600 M 0 650 L 1180 650 M 0 700 L 1180 700" stroke="#ffffff" stroke-width="1"/>
+                    </g>
+
+                    <!-- 5A DC-DC Step-Down Power Module (Top Left) -->
+                    <g id="power-module-5a">
+                        <rect x="40" y="30" width="280" height="130" rx="10" fill="#0f172a" stroke="#06b6d4" stroke-width="2.5"/>
+                        <text x="180" y="55" fill="#67e8f9" font-size="13" font-weight="800" text-anchor="middle">5A DC-DC STEP-DOWN (12V -> 5V)</text>
+                        <text x="180" y="72" fill="#94a3b8" font-size="10" text-anchor="middle">Fixed 5.0V Regulated (No Potentiometer Tuning)</text>
+
+                        <!-- DC Barrel Jack -->
+                        <rect x="55" y="85" width="45" height="35" rx="5" fill="#020617" stroke="#38bdf8" stroke-width="1.5"/>
+                        <circle cx="77" cy="102" r="6" fill="#38bdf8"/>
+                        <text x="77" y="132" fill="#38bdf8" font-size="8.5" font-weight="bold" text-anchor="middle">12V DC JACK</text>
+
+                        <!-- 12V Input Screw Terminal -->
+                        <rect x="110" y="85" width="55" height="35" rx="4" fill="#1e293b" stroke="#f59e0b"/>
+                        <circle cx="123" cy="102" r="5" fill="#f43f5e"/>
+                        <text x="123" y="132" fill="#fb7185" font-size="8" font-weight="bold" text-anchor="middle">IN+ (12V)</text>
+                        <circle cx="150" cy="102" r="5" fill="#64748b"/>
+                        <text x="150" y="132" fill="#cbd5e1" font-size="8" font-weight="bold" text-anchor="middle">IN- (GND)</text>
+
+                        <!-- 5V Output Screw Terminal -->
+                        <rect x="180" y="85" width="55" height="35" rx="4" fill="#1e293b" stroke="#10b981"/>
+                        <circle cx="193" cy="102" r="5" fill="#f43f5e"/>
+                        <text x="193" y="132" fill="#fb7185" font-size="8" font-weight="bold" text-anchor="middle">5V+ OUT</text>
+                        <circle cx="220" cy="102" r="5" fill="#64748b"/>
+                        <text x="220" y="132" fill="#cbd5e1" font-size="8" font-weight="bold" text-anchor="middle">GND OUT</text>
+
+                        <!-- USB-A Port -->
+                        <rect x="250" y="85" width="55" height="35" rx="4" fill="#1e293b" stroke="#3b82f6"/>
+                        <text x="277" y="106" fill="#93c5fd" font-size="8.5" font-weight="bold" text-anchor="middle">USB-A</text>
+                        <text x="277" y="132" fill="#93c5fd" font-size="8" font-weight="bold" text-anchor="middle">5V / 5A</text>
+                    </g>
+
+                    <!-- 12V Power Adapter Plug Symbol -->
+                    <g id="adapter-plug">
+                        <rect x="10" y="88" width="30" height="28" rx="4" fill="#334155" stroke="#94a3b8"/>
+                        <line x1="2" y1="102" x2="10" y2="102" stroke="#f59e0b" stroke-width="3"/>
+                        <text x="20" y="80" fill="#fde047" font-size="9" font-weight="bold">12V PLUG</text>
+                    </g>
+
+                    <!-- Arduino Uno R3 (Left) -->
+                    <g id="arduino-uno">
+                        <rect x="40" y="190" width="280" height="490" rx="14" fill="#1e293b" stroke="#3b82f6" stroke-width="2.5"/>
+                        <rect x="60" y="205" width="240" height="45" rx="6" fill="#0f172a"/>
+                        <text x="180" y="233" fill="#3b82f6" font-size="16" font-weight="800" text-anchor="middle">Arduino Uno R3</text>
+                        <text x="180" y="265" fill="#94a3b8" font-size="11" text-anchor="middle">Presentation Controller</text>
+
+                        <!-- USB Data Bridge -->
+                        <rect x="110" y="172" width="140" height="22" rx="4" fill="#0284c7" stroke="#38bdf8"/>
+                        <text x="180" y="187" fill="#ffffff" font-size="9" font-weight="700" text-anchor="middle">USB Serial Bridge (115200)</text>
+
+                        <!-- Digital Pin D7 (Relay) -->
+                        <rect x="60" y="285" width="240" height="35" rx="4" fill="#0f172a"/>
+                        <circle cx="280" cy="302" r="7" fill="#f59e0b"/>
+                        <text x="265" y="306" fill="#fbbf24" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">Pin D7 (Relay)</text>
+
+                        <!-- Digital Pin D8 (Soil Power Gate) -->
+                        <rect x="60" y="330" width="240" height="35" rx="4" fill="#0f172a"/>
+                        <circle cx="280" cy="347" r="7" fill="#ec4899"/>
+                        <text x="265" y="351" fill="#f472b6" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">Pin D8 (Sensor Gate)</text>
+
+                        <!-- Analog Pin A0 (Capacitive Soil) -->
+                        <rect x="60" y="380" width="240" height="35" rx="4" fill="#0f172a"/>
+                        <circle cx="80" cy="397" r="7" fill="#10b981"/>
+                        <text x="95" y="401" fill="#34d399" font-size="11" font-family="JetBrains Mono" font-weight="700">Pin A0 (Soil Moisture)</text>
+
+                        <!-- Analog Pin A1 (HW-080 Surface Water) -->
+                        <rect x="60" y="425" width="240" height="35" rx="4" fill="#0f172a"/>
+                        <circle cx="80" cy="442" r="7" fill="#06b6d4"/>
+                        <text x="95" y="446" fill="#67e8f9" font-size="11" font-family="JetBrains Mono" font-weight="700">Pin A1 (Water Level)</text>
+
+                        <!-- Power Rail Terminals -->
+                        <rect x="60" y="480" width="240" height="95" rx="6" fill="#0f172a"/>
+                        <circle cx="80" cy="505" r="7" fill="#f43f5e"/>
+                        <text x="95" y="509" fill="#fb7185" font-size="11" font-family="JetBrains Mono" font-weight="700">5V (Logic In)</text>
+
+                        <circle cx="80" cy="545" r="7" fill="#64748b"/>
+                        <text x="95" y="549" fill="#cbd5e1" font-size="11" font-family="JetBrains Mono" font-weight="700">GND (Star Reference)</text>
+                    </g>
+
+                    <!-- Central Breadboard (Center) -->
+                    <g id="breadboard">
+                        <rect x="370" y="40" width="370" height="640" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+                        <rect x="390" y="55" width="330" height="30" rx="4" fill="#e2e8f0"/>
+                        <text x="555" y="75" fill="#334155" font-size="13" font-weight="800" text-anchor="middle">CENTRAL STAR BREADBOARD</text>
+
+                        <!-- Top Power Rail (+) Star 5V and (-) Star GND -->
+                        <line x1="400" y1="105" x2="710" y2="105" stroke="#ef4444" stroke-width="3.5"/>
+                        <text x="385" y="109" fill="#ef4444" font-size="12" font-weight="bold">+</text>
+                        <text x="555" y="100" fill="#ef4444" font-size="9" font-weight="bold" text-anchor="middle">STAR 5V POWER RAIL</text>
+
+                        <line x1="400" y1="135" x2="710" y2="135" stroke="#3b82f6" stroke-width="3.5"/>
+                        <text x="385" y="139" fill="#3b82f6" font-size="12" font-weight="bold">-</text>
+                        <text x="555" y="130" fill="#3b82f6" font-size="9" font-weight="bold" text-anchor="middle">STAR COMMON GROUND RAIL (0V)</text>
+
+                        <!-- On-Breadboard Flyback Diode (1N4007) spanning Row 20 to Row 25 -->
+                        <rect x="535" y="245" width="50" height="24" rx="4" fill="#0f172a" stroke="#f43f5e" stroke-width="1.5"/>
+                        <line x1="545" y1="245" x2="545" y2="269" stroke="#cbd5e1" stroke-width="3"/>
+                        <text x="563" y="261" fill="#ffffff" font-size="9" font-weight="700">1N4007</text>
+
+                        <circle cx="545" cy="230" r="5" fill="#3b82f6"/>
+                        <text x="470" y="222" fill="#3b82f6" font-size="10" font-weight="bold">Row 20 (Pump + & Cathode)</text>
+
+                        <circle cx="545" cy="290" r="5" fill="#64748b"/>
+                        <text x="470" y="308" fill="#64748b" font-size="10" font-weight="bold">Row 25 (Star GND & Anode)</text>
+                    </g>
+
+                    <!-- 5V Relay Module (Top Right) -->
+                    <g id="relay-module">
+                        <rect x="790" y="40" width="180" height="230" rx="10" fill="#0f172a" stroke="#f59e0b" stroke-width="2"/>
+                        <text x="880" y="65" fill="#fbbf24" font-size="13" font-weight="800" text-anchor="middle">5V Relay Module</text>
+
+                        <circle cx="790" cy="100" r="6" fill="#f59e0b"/><text x="805" y="104" fill="#fbbf24" font-size="10" font-family="JetBrains Mono">IN (from D7)</text>
+                        <circle cx="790" cy="130" r="6" fill="#f43f5e"/><text x="805" y="134" fill="#fb7185" font-size="10" font-family="JetBrains Mono">VCC (Star 5V)</text>
+                        <circle cx="790" cy="160" r="6" fill="#64748b"/><text x="805" y="164" fill="#cbd5e1" font-size="10" font-family="JetBrains Mono">GND (Star)</text>
+
+                        <circle cx="970" cy="120" r="7" fill="#3b82f6"/><text x="955" y="124" fill="#93c5fd" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">NO</text>
+                        <circle cx="970" cy="160" r="7" fill="#ec4899"/><text x="955" y="164" fill="#f472b6" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">COM (12V)</text>
+                    </g>
+
+                    <!-- DC Submersible Water Pump (Middle Right) -->
+                    <g id="dc-pump">
+                        <rect x="790" y="295" width="350" height="150" rx="10" fill="#1e293b" stroke="#06b6d4" stroke-width="2"/>
+                        <text x="965" y="325" fill="#67e8f9" font-size="14" font-weight="800" text-anchor="middle">12V DC Submersible Pump</text>
+                        <circle cx="790" cy="370" r="7" fill="#3b82f6"/><text x="805" y="374" fill="#93c5fd" font-size="11" font-family="JetBrains Mono">Pump (+) Lead</text>
+                        <circle cx="790" cy="410" r="7" fill="#64748b"/><text x="805" y="414" fill="#cbd5e1" font-size="11" font-family="JetBrains Mono">Pump (-) Return</text>
+                    </g>
+
+                    <!-- Capacitive Soil Moisture Sensor (Bottom Center/Right) -->
+                    <g id="cap-sensor">
+                        <rect x="790" y="465" width="350" height="105" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="2"/>
+                        <text x="965" y="490" fill="#34d399" font-size="12" font-weight="800" text-anchor="middle">Capacitive Soil Sensor v1.2 (Root Zone)</text>
+                        <circle cx="790" cy="520" r="6" fill="#10b981"/><text x="805" y="524" fill="#34d399" font-size="10" font-family="JetBrains Mono">AOUT (to A0)</text>
+                        <circle cx="790" cy="545" r="6" fill="#ec4899"/><text x="805" y="549" fill="#f472b6" font-size="10" font-family="JetBrains Mono">VCC (from D8 Gate)</text>
+                        <circle cx="940" cy="545" r="6" fill="#64748b"/><text x="955" y="549" fill="#cbd5e1" font-size="10" font-family="JetBrains Mono">GND (Star)</text>
+                    </g>
+
+                    <!-- HW-080 Surface Water Level Sensor (Bottom Right) -->
+                    <g id="hw080-sensor">
+                        <rect x="790" y="585" width="350" height="95" rx="8" fill="#1e293b" stroke="#06b6d4" stroke-width="2"/>
+                        <text x="965" y="610" fill="#67e8f9" font-size="12" font-weight="800" text-anchor="middle">HW-080 Surface Sensor (Ponding Depth)</text>
+                        <circle cx="790" cy="640" r="6" fill="#06b6d4"/><text x="805" y="644" fill="#67e8f9" font-size="10" font-family="JetBrains Mono">AO (to A1)</text>
+                        <circle cx="790" cy="665" r="6" fill="#f43f5e"/><text x="805" y="669" fill="#fb7185" font-size="10" font-family="JetBrains Mono">VCC (Star 5V)</text>
+                        <circle cx="940" cy="665" r="6" fill="#64748b"/><text x="955" y="669" fill="#cbd5e1" font-size="10" font-family="JetBrains Mono">GND (Star)</text>
+                    </g>
+
+                    <!-- Animated Wire Routing Connections -->
+                    <!-- 1. Module 5V+ OUT -> Star 5V Rail -->
+                    <path class="wire" d="M 193 102 L 193 20 L 410 20 L 410 105" stroke="#f43f5e" stroke-width="3.5" fill="none"/>
+
+                    <!-- 2. Module GND OUT -> Star GND Rail -->
+                    <path class="wire" d="M 220 102 L 220 15 L 440 15 L 440 135" stroke="#94a3b8" stroke-width="3.5" fill="none"/>
+
+                    <!-- 3. Module IN+ (12V) -> Relay COM Terminal -->
+                    <path class="wire" d="M 123 102 L 123 5 L 970 5 L 970 160" stroke="#ec4899" stroke-width="3.5" fill="none"/>
+
+                    <!-- 4. Module IN- (GND) -> Star GND Rail -->
+                    <path class="wire" d="M 150 102 L 150 10 L 460 10 L 460 135" stroke="#94a3b8" stroke-width="3.5" fill="none"/>
+
+                    <!-- 5. Star 5V Rail -> Arduino 5V Pin -->
+                    <path class="wire" d="M 400 105 L 340 105 L 340 505 L 80 505" stroke="#f43f5e" stroke-width="3" fill="none"/>
+
+                    <!-- 6. Star GND Rail -> Arduino GND Pin -->
+                    <path class="wire" d="M 400 135 L 330 135 L 330 545 L 80 545" stroke="#94a3b8" stroke-width="3" fill="none"/>
+
+                    <!-- 7. Arduino D7 -> Relay IN -->
+                    <path class="wire" d="M 280 302 L 350 302 L 350 100 L 790 100" stroke="#f59e0b" stroke-width="3" fill="none"/>
+
+                    <!-- 8. Star 5V -> Relay VCC -->
+                    <path class="wire" d="M 710 105 L 750 105 L 750 130 L 790 130" stroke="#f43f5e" stroke-width="3" fill="none"/>
+
+                    <!-- 9. Star GND -> Relay GND -->
+                    <path class="wire" d="M 710 135 L 760 135 L 760 160 L 790 160" stroke="#94a3b8" stroke-width="3" fill="none"/>
+
+                    <!-- 10. Relay NO -> Row 20 (Diode Cathode) -> Pump (+) -->
+                    <path class="wire" d="M 970 120 L 1000 120 L 1000 230 L 545 230" stroke="#3b82f6" stroke-width="3.5" fill="none"/>
+                    <path class="wire" d="M 545 230 L 760 230 L 760 370 L 790 370" stroke="#3b82f6" stroke-width="3.5" fill="none"/>
+
+                    <!-- 11. Row 25 (Diode Anode) -> Star GND & Pump (-) -->
+                    <path class="wire" d="M 545 290 L 500 290 L 500 135" stroke="#94a3b8" stroke-width="3.5" fill="none"/>
+                    <path class="wire" d="M 545 290 L 760 290 L 760 410 L 790 410" stroke="#94a3b8" stroke-width="3.5" fill="none"/>
+
+                    <!-- 12. Arduino A0 -> Capacitive AOUT -->
+                    <path class="wire" d="M 80 397 L 355 397 L 355 520 L 790 520" stroke="#10b981" stroke-width="3" fill="none"/>
+
+                    <!-- 13. Arduino D8 -> Capacitive VCC (Power Gate) -->
+                    <path class="wire" d="M 280 347 L 365 347 L 365 545 L 790 545" stroke="#ec4899" stroke-width="3" fill="none"/>
+
+                    <!-- 14. Star GND -> Capacitive GND -->
+                    <path class="wire" d="M 710 135 L 775 135 L 775 545 L 940 545" stroke="#94a3b8" stroke-width="3" fill="none"/>
+
+                    <!-- 15. Arduino A1 -> HW-080 AO -->
+                    <path class="wire" d="M 80 442 L 345 442 L 345 640 L 790 640" stroke="#06b6d4" stroke-width="3" fill="none"/>
+
+                    <!-- 16. Star 5V -> HW-080 VCC -->
+                    <path class="wire" d="M 710 105 L 770 105 L 770 665 L 790 665" stroke="#f43f5e" stroke-width="3" fill="none"/>
+
+                    <!-- 17. Star GND -> HW-080 GND -->
+                    <path class="wire" d="M 710 135 L 780 135 L 780 665 L 940 665" stroke="#94a3b8" stroke-width="3" fill="none"/>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Master Connection Table -->
+        <div class="card">
+            <div class="card-title">
+                <div class="icon">📊</div>
+                Star Wiring & Power Architecture Reference Table
+            </div>
+            
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>From (Origin Node)</th>
+                            <th>Breadboard Star Node</th>
+                            <th>Destination Component</th>
+                            <th>Wire Color</th>
+                            <th>Power / Signal Role</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="pin-tag tag-pwr">12V Power Adapter</span></td>
+                            <td><span class="pin-tag tag-pwr">Direct DC Barrel Jack</span></td>
+                            <td><span class="pin-tag tag-pwr">5A Step-Down Module</span></td>
+                            <td><strong style="color: #fb7185;">Barrel Plug</strong></td>
+                            <td><strong>Primary DC Supply:</strong> 12.0V DC regulated wall power.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="pin-tag tag-pwr">Module IN+ (12V)</span></td>
+                            <td><span class="pin-tag tag-pwr">Direct Wire</span></td>
+                            <td><span class="pin-tag tag-relay">Relay COM Terminal</span></td>
+                            <td><strong style="color: #ec4899;">Pink / Red</strong></td>
+                            <td><strong>Raw 12V Pass-Through:</strong> Feeds full 12V directly to relay contact.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="pin-tag tag-gnd">Module IN- (GND)</span></td>
+                            <td><span class="pin-tag tag-bb">Star GND Blue Rail (-)</span></td>
+                            <td><span class="pin-tag tag-gnd">Common Ground</span></td>
+                            <td><strong style="color: #94a3b8;">Black / Slate</strong></td>
+                            <td>Ties adapter ground return directly into central star ground.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="pin-tag tag-pwr">Module 5V+ OUT</span></td>
+                            <td><span class="pin-tag tag-bb">Star 5V Red Rail (+)</span></td>
+                            <td><span class="pin-tag tag-uno">Arduino 5V, Relay VCC, HW080 VCC</span></td>
+                            <td><strong style="color: #f43f5e;">Red</strong></td>
+                            <td><strong>Logic Supply:</strong> Clean, fixed 5.00V DC regulated power (up to 5A).</td>
+                        </tr>
+                        <tr>
+                            <td><span class="pin-tag tag-gnd">Module GND OUT</span></td>
+                            <td><span class="pin-tag tag-bb">Star GND Blue Rail (-)</span></td>
+                            <td><span class="pin-tag tag-uno">Arduino GND & Sensors GND</span></td>
+                            <td><strong style="color: #94a3b8;">Black / Slate</strong></td>
+                            <td><strong>Star Ground Reference:</strong> Central 0V reference eliminating sensor noise.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="pin-tag tag-uno">Arduino Pin D7</span></td>
+                            <td><span class="pin-tag tag-uno">Direct Jumper</span></td>
+                            <td><span class="pin-tag tag-relay">Relay IN Terminal</span></td>
+                            <td><strong style="color: #f59e0b;">Amber</strong></td>
+                            <td>Active LOW 5V control pulse triggering 12V pump relay.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="pin-tag tag-uno">Arduino Pin D8</span></td>
+                            <td><span class="pin-tag tag-uno">Direct Jumper</span></td>
+                            <td><span class="pin-tag tag-sensor">Capacitive Sensor VCC</span></td>
+                            <td><strong style="color: #ec4899;">Pink</strong></td>
+                            <td><strong>Anti-Corrosion Gate:</strong> Powers sensor only during 50ms read cycle.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="pin-tag tag-sensor">Capacitive Sensor AOUT</span></td>
+                            <td><span class="pin-tag tag-uno">Direct Jumper</span></td>
+                            <td><span class="pin-tag tag-uno">Arduino Pin A0</span></td>
+                            <td><strong style="color: #10b981;">Green</strong></td>
+                            <td>Analog root zone soil moisture telemetry (0V–3.0V).</td>
+                        </tr>
+                        <tr>
+                            <td><span class="pin-tag tag-sensor">HW-080 Sensor AO</span></td>
+                            <td><span class="pin-tag tag-uno">Direct Jumper</span></td>
+                            <td><span class="pin-tag tag-uno">Arduino Pin A1</span></td>
+                            <td><strong style="color: #06b6d4;">Cyan</strong></td>
+                            <td>Analog surface water ponding level (0V–5.0V).</td>
+                        </tr>
+                        <tr>
+                            <td><span class="pin-tag tag-pwr">Relay NO Terminal</span></td>
+                            <td><span class="pin-tag tag-bb">Row 20 (Diode Cathode)</span></td>
+                            <td><span class="pin-tag tag-pump">DC Pump (+) Lead</span></td>
+                            <td><strong style="color: #3b82f6;">Blue</strong></td>
+                            <td>Switched 12V DC power to pump motor with flyback diode clamp.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="pin-tag tag-gnd">Star GND Rail</span></td>
+                            <td><span class="pin-tag tag-bb">Row 25 (Diode Anode)</span></td>
+                            <td><span class="pin-tag tag-pump">DC Pump (-) Return</span></td>
+                            <td><strong style="color: #94a3b8;">Black / Slate</strong></td>
+                            <td>Motor ground return path returning directly to Star GND rail.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="note-box">
+                <h4>⚡ Star Wiring & Presentation Mode Architecture</h4>
+                <p><strong>Main Power:</strong> 12V DC Power Adapter + 5A Step-Down Module (Fixed 5.00V) powers the entire system with unlimited runtime.<br>
+                <strong>Isolated Motor Current:</strong> Motor return current flows strictly through Breadboard Row 20 & 25 back to Star GND, completely isolating the Arduino ATmega328P microcontroller from motor noise and inductive spikes.<br>
+                <strong>USB Connection:</strong> Used only as a <strong>Serial Data Bridge</strong> (115200 baud) for live evaluation telemetry.</p>
+            </div>
+        </div>
+
+        <!-- Interactive Serial Console Reference -->
+        <div class="card">
+            <div class="card-title">
+                <div class="icon">⌨️</div>
+                Live Serial Console Interactive Commands (115200 Baud)
+            </div>
+            <div class="table-responsive">
+                <table class="cmd-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 12%;">Key</th>
+                            <th style="width: 32%;">Action</th>
+                            <th>Presentation / Defense Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>1</code></td>
+                            <td><strong>5-Second Safe Demo Pulse</strong></td>
+                            <td>Runs the 12V water pump for exactly 5 seconds, then automatically stops to prevent water spills on your presentation table.</td>
+                        </tr>
+                        <tr>
+                            <td><code>0</code></td>
+                            <td><strong>Emergency Stop</strong></td>
+                            <td>Immediately de-energizes the relay and turns the water pump off.</td>
+                        </tr>
+                        <tr>
+                            <td><code>A</code></td>
+                            <td><strong>Autonomous Irrigation Mode</strong></td>
+                            <td>Auto-controls the pump based on HW-080 ponding level (Refills when &lt;75%, Stops when &ge;80%).</td>
+                        </tr>
+                        <tr>
+                            <td><code>M</code></td>
+                            <td><strong>Manual Standby Mode</strong></td>
+                            <td>Disables automatic pumping so you can dip sensors into test cups without sudden motor activation.</td>
+                        </tr>
+                        <tr>
+                            <td><code>T</code></td>
+                            <td><strong>5-Second Hardware Self-Test</strong></td>
+                            <td>Tests both analog sensors and clicks the relay once to confirm circuit integrity for the panel.</td>
+                        </tr>
+                        <tr>
+                            <td><code>S</code></td>
+                            <td><strong>Status Summary Card</strong></td>
+                            <td>Prints a formatted snapshot card of all sensor percentages and raw ADC readings.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Step-by-Step Presentation Checklist -->
+        <div class="card">
+            <div class="card-title">
+                <div class="icon">🎯</div>
+                Step-by-Step Presentation Procedure
+            </div>
+            <ol class="step-list">
+                <li>
+                    <strong>Plug In 12V Power Adapter</strong>: Plug the adapter into the wall and connect the barrel plug directly into the module's DC jack.
+                </li>
+                <li>
+                    <strong>Connect USB Data Cable</strong>: Connect the Arduino Uno to your laptop/PC and open the Serial Monitor at <code>115200 baud</code>.
+                </li>
+                <li>
+                    <strong>Test Soil Sensor (Air vs Soil/Water)</strong>: Hold the capacitive sensor probe in air (0%) and then dip it into moist soil or a cup of water (70–80%).
+                </li>
+                <li>
+                    <strong>Test HW-080 Water Level Sensor</strong>: Submerge the probe in water and observe the live ASCII gauge bar fill up on screen in real time.
+                </li>
+                <li>
+                    <strong>Demonstrate Automated Pump Trigger</strong>: Switch to Auto Mode (<code>A</code>) and lift the sensor out of the water to demonstrate automated pump refilling.
+                </li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

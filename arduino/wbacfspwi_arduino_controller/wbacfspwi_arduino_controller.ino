@@ -56,13 +56,13 @@ const int HW080_RAW_DRY      = 1020;   // Stage 0: Probe in dry air (0.0% surfac
 const int HW080_RAW_MID      = 410;    // Stage 1: Water at middle of sensor 7-8cm mark (50.0% depth)
 const int HW080_RAW_WET      = 355;    // Stage 2: Probe at container maximum depth (100% full ponding)
 
-// Irrigation Decision Thresholds (Maintain 80.0% Surface Water Level)
-const float WATER_TARGET_MAX   = 70.0; // Automatically stop pump when surface water level reaches >= 80.0%
-const float WATER_REFILL_MIN   = 70.0; // Automatically start pump whenever surface water level drops < 80.0% (e.g. 79%)
+// Irrigation Decision Thresholds (Surface Water Level Control with Hysteresis)
+const float WATER_TARGET_MAX   = 70.0; // Automatically stop pump when surface water level reaches >= 70.0%
+const float WATER_REFILL_MIN   = 50.0; // Automatically start pump only when surface water level drops < 50.0%
 
 // Safety & Battery Protection Thresholds
-const float BATT_MIN_LOCKOUT = 10.00;  // 3S Pack cutoff (~3.33V/cell)
-const float BATT_RESUME_VOLTS = 10.50; // Hysteresis before allowing pump to resume
+const float BATT_MIN_LOCKOUT = 8.00;   // Low battery lockout cutoff (8.0V)
+const float BATT_RESUME_VOLTS = 8.50;  // Voltage needed to clear lockout and resume operation
 
 // Timing Protections (in milliseconds)
 const unsigned long MAX_PUMP_RUN_MS  = 180000UL; // 3 minutes maximum continuous runtime
@@ -213,11 +213,9 @@ void setup() {
   Serial.println(F("=================================================="));
   Serial.println(F(" WBACFSPWI: Solar Rice Irrigation Controller     "));
   Serial.println(F(" Standalone Arduino Uno Automation Firmware      "));
-  Serial.println(F("=================================================="));
-  Serial.println(F("Maintain 70.0% Surface Water Level Mode:"));
-  Serial.println(F("  - TARGET LEVEL: Maintain ~70.0% Surface Water"));
-  Serial.println(F("  - PUMP ON     : Surface Water < 70.0% (e.g. 79%)"));
-  Serial.println(F("  - PUMP OFF    : Surface Water >= 70.0%"));
+  Serial.println(F("Automatic Surface Water Level Maintenance:"));
+  Serial.println(F("  - TARGET MAX (PUMP OFF) : >= 70.0% Surface Water"));
+  Serial.println(F("  - REFILL MIN (PUMP ON)  : < 50.0% Surface Water"));
   Serial.println(F("=================================================="));
 
   // 10-Second Sensor Calibration & Stabilization Window
