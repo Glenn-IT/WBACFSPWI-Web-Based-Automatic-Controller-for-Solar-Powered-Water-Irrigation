@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test 09: NodeMCU ESP8266MOD WiFi Bridge Wiring Guide — WBACFSPWI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-hover: #334155;
+            --border-color: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-cyan: #06b6d4;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-purple: #8b5cf6;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+        .container { max-width: 1240px; margin: 0 auto; }
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.35rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: rgba(6, 182, 212, 0.15);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            margin-bottom: 0.75rem;
+        }
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        p.subtitle { color: var(--text-secondary); font-size: 1.05rem; }
+        
+        .nav-bar {
+            display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; margin-bottom: 2rem;
+        }
+        .nav-link {
+            font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); background: var(--bg-card);
+            padding: 0.5rem 1rem; border-radius: 0.5rem; text-decoration: none; border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #ffffff; background: var(--accent-cyan); border-color: var(--accent-cyan);
+        }
+
+        .grid-layout { display: grid; grid-template-columns: 1fr; gap: 2rem; }
+        .card {
+            background-color: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: 1rem; padding: 1.75rem; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+        .card-title {
+            font-size: 1.25rem; font-weight: 700; margin-bottom: 1.25rem; display: flex;
+            align-items: center; gap: 0.75rem; color: var(--text-primary);
+        }
+        .card-title .icon {
+            width: 32px; height: 32px; border-radius: 0.5rem; background: rgba(6, 182, 212, 0.2);
+            color: var(--accent-cyan); display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+        }
+        .svg-container {
+            width: 100%; overflow-x: auto; background: #090d16; border-radius: 0.75rem;
+            padding: 1.5rem 1rem; border: 1px solid #1e293b;
+        }
+        svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+        .wire {
+            stroke-dasharray: 8; animation: dash 30s linear infinite;
+            transition: stroke-width 0.2s ease, stroke 0.2s ease; cursor: pointer;
+        }
+        .wire:hover { stroke-width: 4.5px !important; filter: drop-shadow(0 0 6px currentColor); }
+        @keyframes dash { to { stroke-dashoffset: -1000; } }
+
+        .wire-legend {
+            display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1.25rem; padding-top: 1.25rem;
+            border-top: 1px solid var(--border-color); font-size: 0.85rem; color: var(--text-secondary);
+        }
+        .legend-item { display: flex; align-items: center; gap: 0.5rem; }
+        .legend-color { width: 14px; height: 14px; border-radius: 3px; }
+
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.95rem; }
+        th {
+            background-color: #0f172a; color: var(--text-secondary); font-weight: 600;
+            padding: 0.85rem 1rem; border-bottom: 2px solid var(--border-color);
+            text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em;
+        }
+        td { padding: 1rem; border-bottom: 1px solid var(--border-color); color: var(--text-primary); }
+        tr:hover td { background-color: rgba(255, 255, 255, 0.02); }
+        
+        .pin-tag {
+            font-family: 'JetBrains Mono', monospace; padding: 0.2rem 0.5rem; border-radius: 0.35rem;
+            font-size: 0.85rem; font-weight: 600;
+        }
+        .tag-uno { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
+        .tag-bb { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+        .tag-nodemcu { background: rgba(6, 182, 212, 0.2); color: #67e8f9; border: 1px solid rgba(6, 182, 212, 0.4); }
+        .tag-gnd { background: rgba(148, 163, 184, 0.2); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.4); }
+        .tag-pwr { background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.4); }
+        .tag-sig { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+
+        .note-box {
+            background: rgba(6, 182, 212, 0.1); border-left: 4px solid var(--accent-cyan);
+            padding: 1.25rem; border-radius: 0 0.5rem 0.5rem 0; margin-top: 1.5rem;
+        }
+        .note-box h4 {
+            color: var(--accent-cyan); font-size: 1rem; margin-bottom: 0.5rem;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .note-box p, .note-box li { color: var(--text-secondary); font-size: 0.92rem; margin-bottom: 0.4rem; }
+        .note-box ul { padding-left: 1.25rem; }
+        
+        code {
+            font-family: 'JetBrains Mono', monospace; background: #0f172a;
+            color: var(--accent-cyan); padding: 0.15rem 0.4rem; border-radius: 0.3rem; font-size: 0.88em;
+        }
+
+        .step-list { list-style: none; counter-reset: steps; }
+        .step-list li {
+            position: relative; padding-left: 2.5rem; margin-bottom: 1.25rem; color: var(--text-secondary);
+        }
+        .step-list li strong { color: var(--text-primary); }
+        .step-list li::before {
+            counter-increment: steps; content: counter(steps); position: absolute; left: 0; top: 0;
+            width: 1.8rem; height: 1.8rem; background: rgba(6, 182, 212, 0.2); color: var(--accent-cyan);
+            border: 1px solid var(--accent-cyan); border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; font-weight: 700; font-size: 0.85rem;
+        }
+
+        .cmd-table code {
+            font-family: 'JetBrains Mono', monospace; background: #020617; padding: 0.2rem 0.5rem;
+            border-radius: 0.3rem; color: #38bdf8; font-size: 0.9rem; border: 1px solid #1e293b;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <span class="badge">Hardware Verification Test 09</span>
+        <h1>NodeMCU ESP8266MOD WiFi Bridge Wiring Guide</h1>
+        <p class="subtitle">Complete High-Visibility Breadboard Schematic: Arduino Uno R3 + NodeMCU ESP-12E (CP2102) | 5V-to-3.3V Logic Shifting | Star Power Distribution | Wireless Web Integration</p>
+    </header>
+
+    <div class="nav-bar">
+        <a href="../index.html" class="nav-link">🏠 Master Hub</a>
+        <a href="../01_soil_root_capacitive_test/wiring_guide.html" class="nav-link">Test 01: Root Soil</a>
+        <a href="../02_surface_water_level_test/wiring_guide.html" class="nav-link">Test 02: Surface Water</a>
+        <a href="../03_relay_pump_test/wiring_guide.html" class="nav-link">Test 03: Relay & Pump</a>
+        <a href="../04_battery_voltage_test/wiring_guide.html" class="nav-link">Test 04: Battery Monitor</a>
+        <a href="../05_solar_voltage_test/wiring_guide.html" class="nav-link">Test 05: Solar Monitor</a>
+        <a href="../06_solar_charger_battery_test/wiring_guide.html" class="nav-link">⚡ Test 06: Solar Charger</a>
+        <a href="../08_dc_adapter_presentation_test/wiring_guide.html" class="nav-link">🔬 Test 08: Presentation</a>
+        <a href="wiring_guide.html" class="nav-link active">📡 Test 09: ESP8266 WiFi</a>
+        <a href="../wbacfspwi_arduino_controller/wiring_guide.html" class="nav-link">🚀 Full Controller</a>
+    </div>
+
+    <div class="grid-layout">
+        <!-- Interactive Circuit Schematic Card -->
+        <div class="card">
+            <div class="card-title">
+                <div class="icon">📡</div>
+                <span>Interactive Star Breadboard Diagram (NodeMCU ESP8266MOD WiFi Serial Bridge)</span>
+            </div>
+            
+            <div class="svg-container">
+                <svg viewBox="0 0 1180 720" width="1180" height="720" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Background Grid Pattern -->
+                    <g opacity="0.05">
+                        <path d="M 0 0 L 1180 0 M 0 50 L 1180 50 M 0 100 L 1180 100 M 0 150 L 1180 150 M 0 200 L 1180 200 M 0 250 L 1180 250 M 0 300 L 1180 300 M 0 350 L 1180 350 M 0 400 L 1180 400 M 0 450 L 1180 450 M 0 500 L 1180 500 M 0 550 L 1180 550 M 0 600 L 1180 600 M 0 650 L 1180 650 M 0 700 L 1180 700" stroke="#ffffff" stroke-width="1"/>
+                    </g>
+
+                    <!-- ======================================================= -->
+                    <!-- 1. LEFT COLUMN: POWER STAGE & ARDUINO UNO R3           -->
+                    <!-- ======================================================= -->
+
+                    <!-- 1A. LM2596 BUCK CONVERTER (MAIN SYSTEM POWER) -->
+                    <g id="buck-converter">
+                        <rect x="40" y="30" width="280" height="135" rx="10" fill="#0f172a" stroke="#f59e0b" stroke-width="2.5"/>
+                        <rect x="55" y="45" width="250" height="30" rx="4" fill="#1e293b"/>
+                        <text x="180" y="65" fill="#fde047" font-size="13" font-weight="800" text-anchor="middle">LM2596 DC-DC BUCK CONVERTER</text>
+                        <text x="180" y="90" fill="#94a3b8" font-size="10" text-anchor="middle">12V BATTERY / ADAPTER &rarr; 5.00V REGULATED</text>
+
+                        <!-- Input Terminals -->
+                        <circle cx="55" cy="115" r="6" fill="#f43f5e"/>
+                        <text x="68" y="119" fill="#fb7185" font-size="9.5" font-family="JetBrains Mono" font-weight="700">IN+ (12V)</text>
+                        <circle cx="55" cy="142" r="6" fill="#64748b"/>
+                        <text x="68" y="146" fill="#cbd5e1" font-size="9.5" font-family="JetBrains Mono" font-weight="700">IN- (GND)</text>
+
+                        <!-- Output Terminals -->
+                        <circle cx="305" cy="115" r="7" fill="#f43f5e"/>
+                        <text x="290" y="119" fill="#fb7185" font-size="10" font-family="JetBrains Mono" font-weight="700" text-anchor="end">OUT+ (5.0V Star)</text>
+                        <circle cx="305" cy="142" r="7" fill="#3b82f6"/>
+                        <text x="290" y="146" fill="#93c5fd" font-size="10" font-family="JetBrains Mono" font-weight="700" text-anchor="end">OUT- (Star GND)</text>
+                    </g>
+
+                    <!-- 1B. ARDUINO UNO R3 (CONTROLLER & TELEMETRY SOURCE) -->
+                    <g id="arduino-uno">
+                        <rect x="40" y="195" width="280" height="490" rx="14" fill="#1e293b" stroke="#3b82f6" stroke-width="2.5"/>
+                        <rect x="60" y="210" width="240" height="45" rx="6" fill="#0f172a"/>
+                        <text x="180" y="238" fill="#60a5fa" font-size="16" font-weight="800" text-anchor="middle">Arduino Uno R3</text>
+                        <text x="180" y="270" fill="#94a3b8" font-size="11" text-anchor="middle">Automation &amp; Sensor Engine</text>
+
+                        <!-- USB Port Box -->
+                        <rect x="110" y="178" width="140" height="22" rx="4" fill="#0284c7" stroke="#38bdf8"/>
+                        <text x="180" y="193" fill="#ffffff" font-size="9" font-family="JetBrains Mono" font-weight="700" text-anchor="middle">USB SERIAL (DEBUG/FLASH)</text>
+
+                        <!-- SoftwareSerial Digital Header -->
+                        <rect x="60" y="295" width="240" height="150" rx="6" fill="#0f172a"/>
+                        <text x="75" y="315" fill="#94a3b8" font-size="10" font-weight="700">SOFTWARESERIAL BUS</text>
+
+                        <!-- Pin D9 (RX) -->
+                        <circle id="uno-d9" cx="280" cy="350" r="7" fill="#06b6d4"/>
+                        <text x="265" y="354" fill="#67e8f9" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">Pin D9 (RX &larr; ESP TX)</text>
+
+                        <!-- Pin D10 (TX) -->
+                        <circle id="uno-d10" cx="280" cy="405" r="7" fill="#f59e0b"/>
+                        <text x="265" y="409" fill="#fbbf24" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">Pin D10 (TX 5V &rarr; Div)</text>
+
+                        <!-- Power Header -->
+                        <rect x="60" y="470" width="240" height="120" rx="6" fill="#0f172a"/>
+                        <text x="75" y="490" fill="#94a3b8" font-size="10" font-weight="700">STAR POWER INPUT</text>
+
+                        <circle id="uno-5v" cx="80" cy="520" r="7" fill="#f43f5e"/>
+                        <text x="95" y="524" fill="#fb7185" font-size="11" font-family="JetBrains Mono" font-weight="700">5V (Main Logic In)</text>
+
+                        <circle id="uno-gnd" cx="80" cy="560" r="7" fill="#3b82f6"/>
+                        <text x="95" y="564" fill="#93c5fd" font-size="11" font-family="JetBrains Mono" font-weight="700">GND (Common Star)</text>
+
+                        <!-- Sensor Reference Note -->
+                        <rect x="60" y="610" width="240" height="55" rx="6" fill="#0f172a" stroke="#334155"/>
+                        <text x="180" y="632" fill="#10b981" font-size="10" font-weight="700" text-anchor="middle">SENSORS: A0 (Soil) | A1 (Water)</text>
+                        <text x="180" y="650" fill="#94a3b8" font-size="9" text-anchor="middle">ACTUATOR: D7 (Relay / Pump)</text>
+                    </g>
+
+                    <!-- ======================================================= -->
+                    <!-- 2. CENTER STAGE: CENTRAL STAR BREADBOARD & DIVIDER     -->
+                    <!-- ======================================================= -->
+                    <g id="breadboard">
+                        <rect x="365" y="30" width="370" height="655" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+                        <rect x="385" y="45" width="330" height="30" rx="4" fill="#e2e8f0"/>
+                        <text x="550" y="65" fill="#334155" font-size="13" font-weight="800" text-anchor="middle">CENTRAL STAR BREADBOARD</text>
+
+                        <!-- Top Red Rail (+) Star 5V -->
+                        <line x1="390" y1="95" x2="710" y2="95" stroke="#ef4444" stroke-width="3.5"/>
+                        <text x="375" y="99" fill="#ef4444" font-size="13" font-weight="bold">+</text>
+                        <text x="550" y="90" fill="#ef4444" font-size="9" font-family="JetBrains Mono" font-weight="bold" text-anchor="middle">STAR 5V POWER RAIL (FROM BUCK OUT+)</text>
+
+                        <!-- Top Blue Rail (-) Star GND -->
+                        <line x1="390" y1="125" x2="710" y2="125" stroke="#3b82f6" stroke-width="3.5"/>
+                        <text x="375" y="129" fill="#3b82f6" font-size="15" font-weight="bold">-</text>
+                        <text x="550" y="120" fill="#3b82f6" font-size="9" font-family="JetBrains Mono" font-weight="bold" text-anchor="middle">STAR COMMON GROUND BUS (0V REFERENCE)</text>
+
+                        <!-- Divider Circuit Header -->
+                        <rect x="390" y="160" width="320" height="35" rx="5" fill="#0f172a"/>
+                        <text x="550" y="182" fill="#fbbf24" font-size="11" font-weight="800" text-anchor="middle">5V &rarr; 3.3V LOGIC LEVEL SHIFTER</text>
+
+                        <!-- Breadboard Column Reference -->
+                        <text x="420" y="215" fill="#64748b" font-family="JetBrains Mono" font-size="9" font-weight="bold">A  B  C  D  E</text>
+                        <text x="630" y="215" fill="#64748b" font-family="JetBrains Mono" font-size="9" font-weight="bold">F  G  H  I  J</text>
+
+                        <!-- Row 15: Input from Arduino D10 TX (5V TTL) -->
+                        <rect x="400" y="235" width="300" height="50" rx="6" fill="#1e293b" stroke="#f59e0b" stroke-width="1.2"/>
+                        <circle id="bb-r15-in" cx="420" cy="260" r="6" fill="#f59e0b"/>
+                        <text x="435" y="264" fill="#fbbf24" font-size="10" font-family="JetBrains Mono" font-weight="700">Row 15: 5V TX In &larr; Uno D10</text>
+
+                        <!-- Resistor R1 (1 kΩ) spanning Row 15 to Row 20 -->
+                        <rect x="540" y="275" width="22" height="48" rx="3" fill="#d97706" stroke="#fbbf24"/>
+                        <line x1="540" y1="285" x2="562" y2="285" stroke="#78350f" stroke-width="2.5"/><!-- Brown -->
+                        <line x1="540" y1="295" x2="562" y2="295" stroke="#000000" stroke-width="2.5"/><!-- Black -->
+                        <line x1="540" y1="305" x2="562" y2="305" stroke="#dc2626" stroke-width="2.5"/><!-- Red -->
+                        <text x="575" y="302" fill="#b45309" font-size="9.5" font-family="JetBrains Mono" font-weight="800">1 kΩ (R1)</text>
+
+                        <!-- Row 20: 3.33V Tap Junction -->
+                        <rect x="400" y="335" width="300" height="50" rx="6" fill="#1e293b" stroke="#10b981" stroke-width="1.2"/>
+                        <circle id="bb-r20-tap" cx="420" cy="360" r="6" fill="#10b981"/>
+                        <text x="435" y="364" fill="#34d399" font-size="10" font-family="JetBrains Mono" font-weight="700">Row 20: 3.33V Tap &rarr; NodeMCU D1</text>
+
+                        <!-- Resistor R2 (2 kΩ) spanning Row 20 to Row 25 -->
+                        <rect x="540" y="395" width="22" height="48" rx="3" fill="#d97706" stroke="#fbbf24"/>
+                        <line x1="540" y1="405" x2="562" y2="405" stroke="#dc2626" stroke-width="2.5"/><!-- Red -->
+                        <line x1="540" y1="415" x2="562" y2="415" stroke="#000000" stroke-width="2.5"/><!-- Black -->
+                        <line x1="540" y1="425" x2="562" y2="425" stroke="#dc2626" stroke-width="2.5"/><!-- Red -->
+                        <text x="575" y="422" fill="#b45309" font-size="9.5" font-family="JetBrains Mono" font-weight="800">2 kΩ (R2)</text>
+
+                        <!-- Row 25: Ground Return Leg -->
+                        <rect x="400" y="455" width="300" height="50" rx="6" fill="#1e293b" stroke="#3b82f6" stroke-width="1.2"/>
+                        <circle id="bb-r25-gnd" cx="420" cy="480" r="6" fill="#3b82f6"/>
+                        <text x="435" y="484" fill="#93c5fd" font-size="10" font-family="JetBrains Mono" font-weight="700">Row 25: GND Leg &rarr; Star GND Rail</text>
+
+                        <!-- Direct Wire Channel: Row 30 Jumper for D9 (RX) -->
+                        <rect x="400" y="530" width="300" height="45" rx="6" fill="#1e293b" stroke="#06b6d4" stroke-width="1.2"/>
+                        <circle id="bb-r30-direct" cx="420" cy="552" r="6" fill="#06b6d4"/>
+                        <text x="435" y="556" fill="#67e8f9" font-size="10" font-family="JetBrains Mono" font-weight="700">Row 30: Direct Wire (ESP D2 &rarr; Uno D9)</text>
+
+                        <!-- Calculation Note Box -->
+                        <rect x="390" y="595" width="320" height="70" rx="6" fill="#0f172a" stroke="#334155"/>
+                        <text x="550" y="618" fill="#f8fafc" font-size="9.5" font-weight="bold" text-anchor="middle">DIVIDER FORMULA:</text>
+                        <text x="550" y="636" fill="#fde047" font-size="10" font-family="JetBrains Mono" font-weight="bold" text-anchor="middle">V_out = 5.0V &times; 2kΩ / (1kΩ + 2kΩ) = 3.33V</text>
+                        <text x="550" y="654" fill="#34d399" font-size="9" text-anchor="middle">&check; Perfectly within ESP8266 3.0V &ndash; 3.6V logic window</text>
+                    </g>
+
+                    <!-- ======================================================= -->
+                    <!-- 3. RIGHT COLUMN: NODEMCU ESP8266MOD DEVELOPMENT BOARD   -->
+                    <!-- ======================================================= -->
+                    <g id="nodemcu-board">
+                        <!-- Main PCB Body -->
+                        <rect x="790" y="30" width="350" height="655" rx="14" fill="#0f172a" stroke="#06b6d4" stroke-width="2.5"/>
+                        <rect x="810" y="45" width="310" height="40" rx="6" fill="#1e293b"/>
+                        <text x="965" y="70" fill="#38bdf8" font-size="15" font-weight="800" text-anchor="middle">NodeMCU ESP-12E / ESP8266MOD</text>
+                        <text x="965" y="100" fill="#94a3b8" font-size="10" text-anchor="middle">WiFi 802.11 b/g/n Telemetry &amp; REST IoT Gateway</text>
+
+                        <!-- WiFi Meander Antenna Graphic -->
+                        <rect x="890" y="115" width="150" height="40" rx="4" fill="#1e293b" stroke="#eab308" stroke-width="1.5"/>
+                        <path d="M 905 145 L 905 125 L 920 125 L 920 145 L 935 145 L 935 125 L 950 125 L 950 145 L 965 145 L 965 125 L 980 125 L 980 145 L 995 145 L 995 125 L 1010 125 L 1010 145 L 1025 145" fill="none" stroke="#fde047" stroke-width="2"/>
+                        <text x="965" y="172" fill="#fbbf24" font-size="9" font-family="JetBrains Mono" font-weight="700" text-anchor="middle">2.4 GHz ONBOARD PCB ANTENNA</text>
+
+                        <!-- ESP-12E Metal Shield Can -->
+                        <rect x="840" y="185" width="250" height="150" rx="6" fill="#334155" stroke="#94a3b8" stroke-width="2"/>
+                        <text x="965" y="235" fill="#f8fafc" font-size="14" font-weight="900" text-anchor="middle">ESP8266MOD</text>
+                        <text x="965" y="255" fill="#cbd5e1" font-size="10" font-family="JetBrains Mono" text-anchor="middle">AI-THINKER &bull; FCC ID: 2ADUIESP-12</text>
+                        <text x="965" y="275" fill="#38bdf8" font-size="9.5" font-family="JetBrains Mono" text-anchor="middle">Tensilica L106 32-bit RISC @ 80MHz</text>
+                        <text x="965" y="295" fill="#34d399" font-size="9" font-family="JetBrains Mono" text-anchor="middle">FLASH: 4MB (32Mbit) SPI</text>
+                        <circle cx="860" cy="205" r="4" fill="#38bdf8"/><!-- Status Blue LED -->
+
+                        <!-- AMS1117-3.3 Regulator Chip -->
+                        <rect x="840" y="355" width="65" height="40" rx="3" fill="#1e293b" stroke="#64748b"/>
+                        <text x="872" y="378" fill="#94a3b8" font-size="8" font-family="JetBrains Mono" text-anchor="middle">AMS1117</text>
+                        <text x="872" y="390" fill="#67e8f9" font-size="7.5" font-family="JetBrains Mono" text-anchor="middle">3.3V LDO</text>
+
+                        <!-- Micro-USB Port (Bottom) -->
+                        <rect x="915" y="650" width="100" height="25" rx="4" fill="#0284c7" stroke="#38bdf8"/>
+                        <text x="965" y="667" fill="#ffffff" font-size="9" font-family="JetBrains Mono" font-weight="700" text-anchor="middle">MICRO-USB / CP2102</text>
+
+                        <!-- Active Left Header Pins -->
+                        <g id="nodemcu-pins">
+                            <!-- Vin Pin (5V Star Rail Power In) -->
+                            <rect x="805" y="420" width="140" height="35" rx="5" fill="#1e293b" stroke="#f43f5e"/>
+                            <circle id="node-vin" cx="820" cy="437" r="6" fill="#f43f5e"/>
+                            <text x="835" y="441" fill="#fb7185" font-size="11" font-family="JetBrains Mono" font-weight="700">Vin (5.0V In)</text>
+
+                            <!-- GND Pin (Star GND Common) -->
+                            <rect x="805" y="470" width="140" height="35" rx="5" fill="#1e293b" stroke="#3b82f6"/>
+                            <circle id="node-gnd" cx="820" cy="487" r="6" fill="#3b82f6"/>
+                            <text x="835" y="491" fill="#93c5fd" font-size="11" font-family="JetBrains Mono" font-weight="700">GND (Common)</text>
+
+                            <!-- D1 (GPIO5 / RX) -->
+                            <rect x="805" y="525" width="165" height="40" rx="5" fill="#1e293b" stroke="#10b981"/>
+                            <circle id="node-d1" cx="820" cy="545" r="7" fill="#10b981"/>
+                            <text x="835" y="549" fill="#34d399" font-size="11" font-family="JetBrains Mono" font-weight="700">D1 (RX 3.3V)</text>
+                            <text x="835" y="561" fill="#94a3b8" font-size="8.5" font-family="JetBrains Mono">GPIO5 &larr; Div Tap</text>
+
+                            <!-- D2 (GPIO4 / TX) -->
+                            <rect x="805" y="580" width="165" height="40" rx="5" fill="#1e293b" stroke="#06b6d4"/>
+                            <circle id="node-d2" cx="820" cy="600" r="7" fill="#06b6d4"/>
+                            <text x="835" y="604" fill="#67e8f9" font-size="11" font-family="JetBrains Mono" font-weight="700">D2 (TX 3.3V)</text>
+                            <text x="835" y="616" fill="#94a3b8" font-size="8.5" font-family="JetBrains Mono">GPIO4 &rarr; Uno D9</text>
+                        </g>
+
+                        <!-- Right Header Reference Pins -->
+                        <g fill="#64748b" font-family="JetBrains Mono" font-size="9" text-anchor="end">
+                            <text x="1125" y="437">3V3</text>
+                            <text x="1125" y="465">RST</text>
+                            <text x="1125" y="493">EN</text>
+                            <text x="1125" y="521">D0 (GPIO16)</text>
+                            <text x="1125" y="549">D5 (GPIO14)</text>
+                            <text x="1125" y="577">D6 (GPIO12)</text>
+                            <text x="1125" y="605">D7 (GPIO13)</text>
+                        </g>
+                    </g>
+
+                    <!-- ======================================================= -->
+                    <!-- 4. HIGH-VISIBILITY ANIMATED JUMPER WIRE ROUTING        -->
+                    <!-- ======================================================= -->
+
+                    <!-- [W1: RED] Buck OUT+ (305, 115) -> Top Star 5V Rail (420, 95) -->
+                    <path class="wire" d="M 305 115 L 360 115 L 360 95 L 420 95" stroke="#f43f5e" stroke-width="3.5" fill="none"/>
+
+                    <!-- [W2: RED] Top Star 5V Rail (450, 95) -> Arduino 5V Pin (80, 520) -->
+                    <path class="wire" d="M 450 95 L 340 95 L 340 520 L 80 520" stroke="#f43f5e" stroke-width="3.5" fill="none"/>
+
+                    <!-- [W3: RED] Top Star 5V Rail (680, 95) -> NodeMCU Vin Pin (820, 437) -->
+                    <path class="wire" d="M 680 95 L 760 95 L 760 437 L 820 437" stroke="#f43f5e" stroke-width="3.5" fill="none"/>
+
+                    <!-- [W4: BLUE] Buck OUT- (305, 142) -> Top Star GND Rail (420, 125) -->
+                    <path class="wire" d="M 305 142 L 350 142 L 350 125 L 420 125" stroke="#3b82f6" stroke-width="3.5" fill="none"/>
+
+                    <!-- [W5: BLUE] Top Star GND Rail (470, 125) -> Arduino GND Pin (80, 560) -->
+                    <path class="wire" d="M 470 125 L 330 125 L 330 560 L 80 560" stroke="#3b82f6" stroke-width="3.5" fill="none"/>
+
+                    <!-- [W6: BLUE] Top Star GND Rail (660, 125) -> NodeMCU GND Pin (820, 487) -->
+                    <path class="wire" d="M 660 125 L 770 125 L 770 487 L 820 487" stroke="#3b82f6" stroke-width="3.5" fill="none"/>
+
+                    <!-- [W7: BLUE] Breadboard Row 25 GND (420, 480) -> Top Star GND Rail (490, 125) -->
+                    <path class="wire" d="M 420 480 L 380 480 L 380 125 L 490 125" stroke="#3b82f6" stroke-width="2.5" fill="none"/>
+
+                    <!-- [W8: AMBER] Arduino Pin D10 TX (280, 405) -> Breadboard Row 15 Input (420, 260) -->
+                    <path class="wire" d="M 280 405 L 350 405 L 350 260 L 420 260" stroke="#f59e0b" stroke-width="3" fill="none"/>
+
+                    <!-- [W9: EMERALD] Breadboard Row 20 3.33V Tap (420, 360) -> NodeMCU Pin D1 RX (820, 545) -->
+                    <path class="wire" d="M 420 360 L 400 360 L 400 340 L 750 340 L 750 545 L 820 545" stroke="#10b981" stroke-width="3.5" fill="none"/>
+
+                    <!-- [W10: CYAN] NodeMCU Pin D2 TX (820, 600) -> Breadboard Row 30 (420, 552) -> Arduino Pin D9 RX (280, 350) -->
+                    <path class="wire" d="M 820 600 L 760 600 L 760 552 L 420 552 L 350 552 L 350 350 L 280 350" stroke="#06b6d4" stroke-width="3" fill="none"/>
+                </svg>
+            </div>
+
+            <!-- Wire Legend Bar -->
+            <div class="wire-legend">
+                <div class="legend-item"><div class="legend-color" style="background: #f43f5e;"></div> Star 5.0V Logic Power (Red)</div>
+                <div class="legend-item"><div class="legend-color" style="background: #3b82f6;"></div> Star Common Ground 0V (Blue)</div>
+                <div class="legend-item"><div class="legend-color" style="background: #f59e0b;"></div> Arduino D10 5V TX Output (Amber)</div>
+                <div class="legend-item"><div class="legend-color" style="background: #10b981;"></div> Level-Shifted 3.33V Tap &rarr; NodeMCU D1 RX (Emerald)</div>
+                <div class="legend-item"><div class="legend-color" style="background: #06b6d4;"></div> NodeMCU D2 3.3V TX &rarr; Arduino D9 RX (Cyan)</div>
+            </div>
+        </div>
+
+        <!-- Master Pin Connection Matrix -->
+        <div class="card">
+            <div class="card-title">
+                <div class="icon">📊</div>
+                <span>Pin-by-Pin Star Breadboard Connection Matrix</span>
+            </div>
+            
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Wire ID</th>
+                            <th>Origin Node (From)</th>
+                            <th>Breadboard Routing</th>
+                            <th>Destination Node (To)</th>
+                            <th>Wire Color</th>
+                            <th>Logic / Voltage</th>
+                            <th>Engineering Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- POWER GROUP -->
+                        <tr>
+                            <td><strong style="color: #f43f5e;">PWR-01</strong></td>
+                            <td><span class="pin-tag tag-pwr">LM2596 Buck OUT+</span></td>
+                            <td><span class="pin-tag tag-bb">Top Red Rail (+)</span></td>
+                            <td><span class="pin-tag tag-uno">Arduino 5V Pin</span></td>
+                            <td><strong style="color: #f43f5e;">Red</strong></td>
+                            <td>5.00V DC Regulated</td>
+                            <td>Main logic power supply to Arduino ATmega328P MCU.</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: #f43f5e;">PWR-02</strong></td>
+                            <td><span class="pin-tag tag-bb">Top Red Rail (+)</span></td>
+                            <td>Direct Jumper</td>
+                            <td><span class="pin-tag tag-nodemcu">NodeMCU Pin Vin</span></td>
+                            <td><strong style="color: #f43f5e;">Red</strong></td>
+                            <td>5.00V DC Regulated</td>
+                            <td>Feeds NodeMCU onboard AMS1117-3.3 regulator to power ESP8266 and WiFi radio.</td>
+                        </tr>
+
+                        <!-- GROUND GROUP -->
+                        <tr>
+                            <td><strong style="color: #3b82f6;">GND-01</strong></td>
+                            <td><span class="pin-tag tag-pwr">LM2596 Buck OUT-</span></td>
+                            <td><span class="pin-tag tag-bb">Top Blue Rail (-)</span></td>
+                            <td><span class="pin-tag tag-uno">Arduino GND Pin</span></td>
+                            <td><strong style="color: #3b82f6;">Blue / Slate</strong></td>
+                            <td>0.00V (Star GND)</td>
+                            <td>Establishes the central zero-volt ground reference for all components.</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: #3b82f6;">GND-02</strong></td>
+                            <td><span class="pin-tag tag-bb">Top Blue Rail (-)</span></td>
+                            <td>Direct Jumper</td>
+                            <td><span class="pin-tag tag-nodemcu">NodeMCU Pin GND</span></td>
+                            <td><strong style="color: #3b82f6;">Blue / Black</strong></td>
+                            <td>0.00V (Star GND)</td>
+                            <td>Common ground return preventing ground loops and floating logic levels.</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: #3b82f6;">GND-03</strong></td>
+                            <td><span class="pin-tag tag-bb">Row 25 (2kΩ Ground)</span></td>
+                            <td>Direct Jumper</td>
+                            <td><span class="pin-tag tag-bb">Top Blue Rail (-)</span></td>
+                            <td><strong style="color: #3b82f6;">Blue</strong></td>
+                            <td>0.00V Reference</td>
+                            <td>Ground leg of the 1kΩ / 2kΩ logic level shifting voltage divider.</td>
+                        </tr>
+
+                        <!-- SERIAL SIGNALS GROUP -->
+                        <tr>
+                            <td><strong style="color: #f59e0b;">SIG-01</strong></td>
+                            <td><span class="pin-tag tag-uno">Arduino Pin D10 (TX)</span></td>
+                            <td><span class="pin-tag tag-bb">Row 15 (1kΩ Input)</span></td>
+                            <td>1kΩ Resistor Body</td>
+                            <td><strong style="color: #f59e0b;">Amber / Gold</strong></td>
+                            <td>5.0V TTL Logic</td>
+                            <td>High-speed SoftwareSerial TX line from Arduino. Must NOT be wired directly to ESP.</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: #10b981;">SIG-02</strong></td>
+                            <td><span class="pin-tag tag-bb">Row 20 (R1/R2 Junction)</span></td>
+                            <td>1kΩ / 2kΩ Resistor Divider</td>
+                            <td><span class="pin-tag tag-nodemcu">NodeMCU Pin D1 (RX)</span></td>
+                            <td><strong style="color: #10b981;">Emerald Green</strong></td>
+                            <td>3.33V Stepped Down</td>
+                            <td><strong>Level Shifted:</strong> 5V dropped to 3.33V safe for ESP8266 GPIO5 silicon input.</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: #06b6d4;">SIG-03</strong></td>
+                            <td><span class="pin-tag tag-nodemcu">NodeMCU Pin D2 (TX)</span></td>
+                            <td><span class="pin-tag tag-bb">Row 30 Direct Jumper</span></td>
+                            <td><span class="pin-tag tag-uno">Arduino Pin D9 (RX)</span></td>
+                            <td><strong style="color: #06b6d4;">Cyan</strong></td>
+                            <td>3.3V Digital (Safe)</td>
+                            <td>NodeMCU 3.3V TX directly triggers Arduino 5V TTL input HIGH (&ge; 3.0V threshold).</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="note-box">
+                <h4>⚡ Golden Rules for Error-Free Assembly</h4>
+                <ul>
+                    <li><strong>1. Never Connect Arduino 5V TX Directly to ESP8266 RX:</strong> The ESP8266 silicon pins are strictly 3.3V rated. Always route Arduino Pin D10 through the 1kΩ / 2kΩ voltage divider into NodeMCU Pin D1.</li>
+                    <li><strong>2. Star Ground Bus Is Mandatory:</strong> Both Arduino GND and NodeMCU GND must terminate on the central breadboard blue ground bus. Without this common reference, UART serial bytes will arrive corrupted.</li>
+                    <li><strong>3. Feed Power into Vin, Never 3V3:</strong> The LM2596 output is 5.00V. Feed this 5.00V into NodeMCU pin <code>Vin</code> (which utilizes the onboard AMS1117-3.3 regulator). Connecting 5V directly to the <code>3V3</code> pin will destroy the ESP8266 module instantly!</li>
+                    <li><strong>4. SoftwareSerial Baud Alignment:</strong> Both Arduino Uno sketch and NodeMCU bridge sketch communicate at <strong>9600 baud</strong>. This guarantees 100% stable packet reception on Uno's software bit-banging serial pins without dropped bytes.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Step-by-Step Hardware Assembly Sequence -->
+        <div class="card">
+            <div class="card-title">
+                <div class="icon">🛠️</div>
+                <span>Step-by-Step Hardware Verification Sequence</span>
+            </div>
+            
+            <ol class="step-list">
+                <li>
+                    <strong>Set and Verify 5.00V Buck Power:</strong> Disconnect Arduino and NodeMCU. Apply 12V DC input to LM2596. Use a digital multimeter on OUT+ and OUT- to verify exactly <code>5.00V &plusmn; 0.05V</code> before plugging into breadboard power rails.
+                </li>
+                <li>
+                    <strong>Assemble the 1kΩ / 2kΩ Voltage Divider on Breadboard:</strong> Insert 1kΩ resistor between Row 15 and Row 20. Insert 2kΩ resistor between Row 20 and Row 25. Connect a blue jumper from Row 25 to the top blue Star Ground rail.
+                </li>
+                <li>
+                    <strong>Wire Arduino &amp; NodeMCU Serial Lines:</strong> Connect Arduino Pin D10 to Breadboard Row 15. Connect Breadboard Row 20 (the 3.33V center tap) to NodeMCU Pin D1 (GPIO5 / RX). Connect NodeMCU Pin D2 (GPIO4 / TX) directly to Arduino Pin D9 (RX).
+                </li>
+                <li>
+                    <strong>Connect Star Power Rails:</strong> Run red jumper from Star 5V Rail to Arduino 5V and another to NodeMCU <code>Vin</code>. Run blue jumpers from Star GND Rail to Arduino GND and NodeMCU <code>GND</code>.
+                </li>
+                <li>
+                    <strong>Upload Firmware &amp; Test Live:</strong> Upload <code>wbacfspwi_arduino_controller.ino</code> to Arduino Uno. Upload <code>09_esp8266_wifi_bridge_test.ino</code> to NodeMCU via micro-USB. Open Serial Monitor at 115200 baud to observe telemetry packets transmitted wirelessly over WiFi.
+                </li>
+            </ol>
+        </div>
+
+        <!-- Live Serial & Web Verification Commands -->
+        <div class="card">
+            <div class="card-title">
+                <div class="icon">💻</div>
+                <span>Software Verification &amp; API Endpoint Testing</span>
+            </div>
+            
+            <div class="table-responsive cmd-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Test Stage</th>
+                            <th>Verification Command / URL</th>
+                            <th>Expected Response</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>1. WiFi Connection</strong></td>
+                            <td>Check NodeMCU Serial Monitor (115200 baud) during boot</td>
+                            <td><code>[WIFI] Connected! IP: 192.168.x.x | RSSI: -54 dBm</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>2. Serial Bridge Ingestion</strong></td>
+                            <td>Observe Arduino streaming JSON telemetry over D9/D10 at 9600 baud</td>
+                            <td><code>[ESP-BRIDGE] RX from Uno: {"soil_raw":417,"water_raw":410...}</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>3. REST HTTP Telemetry Push</strong></td>
+                            <td><code>POST http://&lt;server-ip&gt;/api/device/report.php</code></td>
+                            <td><code>HTTP 200 OK: {"status":"ok","alerts_created":[]}</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>4. Remote Override Ingestion</strong></td>
+                            <td><code>GET http://&lt;server-ip&gt;/api/device/pull-schedule.php</code></td>
+                            <td><code>HTTP 200 OK: {"schedules":[...],"overrides":[...]}</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

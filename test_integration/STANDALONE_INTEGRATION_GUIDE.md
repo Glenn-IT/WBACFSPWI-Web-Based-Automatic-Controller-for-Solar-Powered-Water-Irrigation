@@ -58,6 +58,8 @@ For your miniature prototype demonstration, here is the physical layout:
 | **Solar Panel Monitor** | `A3` | Voltage Divider | Solar (+) $\rightarrow 100\text{ k}\Omega \rightarrow$ Pin A3 $\rightarrow 20\text{ k}\Omega \rightarrow$ GND |
 | **Pump Relay Module** | `D7` | Digital Output | Control Pin (IN) $\rightarrow$ D7, VCC $\rightarrow$ 5V, GND $\rightarrow$ GND (Active LOW) |
 | **Sensor Power Gate** | `D8` | Digital Output | Gates VCC to soil sensor to prevent corrosion |
+| **NodeMCU RX Link** | `D9` | Digital Input | Connects to NodeMCU Pin `D2` (TX, 3.3V safe) |
+| **NodeMCU TX Link** | `D10` | Digital Output | Connects to NodeMCU Pin `D1` (RX) via 1kΩ / 2kΩ divider |
 | **Status / Fault LED** | `D13` | Digital Output | Built-in LED for system blink heartbeat & faults |
 
 ---
@@ -65,12 +67,14 @@ For your miniature prototype demonstration, here is the physical layout:
 ## ⚙️ Autonomous Controller Logic (Rice Field Rules)
 
 1. **Irrigation Trigger (Pump ON):**
-   $$\text{Soil Moisture} < 35\% \quad\text{AND}\quad \text{Surface Water} < 80\% \quad\text{AND}\quad V_{\text{batt}} \ge 10.0\text{V}$$
+   $$\text{Surface Water} < 45.0\% \quad\text{AND}\quad V_{\text{batt}} \ge 10.0\text{V}$$
 2. **Irrigation Cutoff (Pump OFF):**
-   $$\text{Soil Moisture} \ge 65\% \quad\text{OR}\quad \text{Surface Water} \ge 80\% \quad\text{OR}\quad V_{\text{batt}} < 10.0\text{V}$$
-3. **Continuous Run Protection:**
-   - Pump is capped at a maximum of **180 seconds continuous run**.
-   - Mandatory **5-minute cooldown** before running again if cap is hit.
+   $$\text{Surface Water} \ge 50.0\% \quad\text{OR}\quad V_{\text{batt}} < 10.0\text{V}$$
+3. **3-Layer Safety Protections:**
+   - **5% Hysteresis Gap:** Turns pump ON only below $45.0\%$, and turns pump OFF only at $\ge 50.0\%$.
+   - **Anti-Splash Minimum Runtime:** Minimum **5 seconds continuous run** before target cutoff is permitted.
+   - **Wave Settling Window:** **10-second stabilization delay** after shutoff to verify calm water height.
+   - **Continuous Run Timeout:** Pump is capped at a maximum of **180 seconds continuous run** with mandatory cooldown.
 4. **Solar Profile:**
    - $V_{\text{solar}} \ge 12.0\text{V} \rightarrow$ Active Solar Harvesting
    - $V_{\text{solar}} < 2.0\text{V} \rightarrow$ Night / Battery Operation Mode
@@ -88,5 +92,8 @@ For your miniature prototype demonstration, here is the physical layout:
   - Open [`arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino`](../arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino) in Arduino IDE.
   - Compile and upload to the Arduino Uno.
   - Open Serial Monitor at **115200 baud** to confirm full telemetry output.
-- [ ] **Step 4: Connect Web Backend / ESP8266**
-  - Connect the ESP node to transmit data to Apache/MySQL via `/api/device/report.php`.
+- [ ] **Step 4: Connect Web Backend via NodeMCU ESP8266 WiFi Bridge (Test 09)**
+  - Open [`arduino/09_esp8266_wifi_bridge_test/09_esp8266_wifi_bridge_test.ino`](../arduino/09_esp8266_wifi_bridge_test/09_esp8266_wifi_bridge_test.ino) in Arduino IDE.
+  - Set your WiFi credentials (`WIFI_SSID` & `WIFI_PASS`) and laptop's XAMPP LAN IP (`SERVER_HOST`).
+  - Flash to NodeMCU (Board: *NodeMCU 1.0 (ESP-12E Module)*).
+  - Confirm wireless HTTP POST telemetry to `/api/device/report.php` without needing any USB cable connected to the computer!

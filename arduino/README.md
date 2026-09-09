@@ -45,6 +45,7 @@ This directory contains the standalone Arduino Uno hardware sketches, component 
 | [`06_solar_charger_battery_test/`](./06_solar_charger_battery_test/06_solar_charger_battery_test.ino) | Charger System Test | Integrated test of solar panel, 3S charger/BMS, battery pack, and buck converter. |
 | [`07_dual_sensor_pump_integration_test/`](./07_dual_sensor_pump_integration_test/07_dual_sensor_pump_integration_test.ino) | Dual Sensor & Pump Test | Integration test for Capacitive Soil + HW-080 Water Level sensors controlling 12V pump. |
 | [`08_dc_adapter_presentation_test/`](./08_dc_adapter_presentation_test/08_dc_adapter_presentation_test.ino) | **12V DC Presentation Test** | Bench/Presentation mode using 12V DC power adapter (no battery needed) with interactive serial controls. |
+| [`09_esp8266_wifi_bridge_test/`](./09_esp8266_wifi_bridge_test/09_esp8266_wifi_bridge_test.ino) | **NodeMCU WiFi Bridge Test** | Wireless telemetry bridge linking Arduino Uno SoftwareSerial to local WiFi & XAMPP backend (no USB cable needed). |
 | [`wbacfspwi_arduino_controller/`](./wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino) | **Full Controller** | Complete automated controller featuring dual-sensor logic, safety cutoffs, relay hysteresis, and serial telemetry. |
 
 ---

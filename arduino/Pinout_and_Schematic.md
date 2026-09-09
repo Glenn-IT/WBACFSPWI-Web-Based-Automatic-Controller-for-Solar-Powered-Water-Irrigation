@@ -52,41 +52,45 @@ To prevent inductive motor spikes and high-current relay switching from causing 
 
 | Wire ID | Origin Node (From) | Breadboard Tie-Point | Destination Node (To) | Wire Color | Signal Type / Voltage | Operational Function & Safety Rule |
 |---|---|---|---|---|---|---|
-| **PWR-01** | 3S Battery (+) [12.6V] | Direct Wire | LM2596 Buck IN+ | **Red** | 11.1V – 12.6V DC | Raw high-capacity battery supply to Buck step-down converter. |
+| **PWR-01** | 12V Motorcycle / 3S Battery (+) [11.1V–14.4V] | Direct Wire | LM2596 Buck IN+ | **Red** | 11.1V – 14.4V DC | Raw battery supply to Buck step-down converter (18/16 AWG with 10A fuse recommended). |
 | **PWR-02** | LM2596 Buck OUT+ | Top Red Rail (`+`) | Arduino 5V Pin | **Red** | 5.00V DC Regulated | **Primary Logic Power:** Powers Arduino ATmega328P MCU. |
 | **PWR-03** | Top Red Rail (`+`) | Direct Jumper | 5V Relay Module VCC | **Red** | 5.00V DC | Powers optocoupler coil driver circuitry. |
 | **PWR-04** | Top Red Rail (`+`) | Direct Jumper | HW-080 Driver VCC | **Red** | 5.00V DC | Powers LM393 surface moisture comparator driver board. |
+| **PWR-05** | Top Red Rail (`+`) | Direct Jumper | NodeMCU Pin `Vin` | **Red** | 5.00V DC | Powers NodeMCU ESP8266 onboard AMS1117 3.3V regulator from Star 5V rail. |
 | **GND-01** | LM2596 Buck OUT- | Top Blue Rail (`-`) | Arduino GND Pin | **Blue / Slate** | 0.00V (Star GND) | **Star Ground Reference:** Central zero-volt reference point. |
-| **GND-02** | 3S Battery (-) Terminal | Top Blue Rail (`-`) | Buck IN- Terminal | **Blue / Black** | 0.00V (Common) | Ties battery negative return directly into central star ground. |
+| **GND-02** | 12V Motorcycle / 3S Battery (-) | Top Blue Rail (`-`) | Buck IN- Terminal | **Blue / Black** | 0.00V (Common) | Ties battery negative return directly into central star ground. |
 | **GND-03** | 30W Solar (-) Terminal | Top Blue Rail (`-`) | Star Common GND | **Blue / Black** | 0.00V (Common) | Ties solar panel return into common ground bus. |
 | **GND-04** | Relay GND & Sensors GND | Top Blue Rail (`-`) | Star Common GND | **Blue / Slate** | 0.00V | Ground returns for relay coil, capacitive sensor, and HW-080. |
-| **ACT-01** | 3S Battery (+) [12V] | Direct Heavy Wire | Relay COM Terminal | **Purple / Red** | 12.6V High Current | Feeds raw un-stepped battery power to relay switch contacts. |
+| **GND-05** | NodeMCU GND Pin | Top Blue Rail (`-`) | Star Common GND | **Blue / Black** | 0.00V | Ties NodeMCU ground into central Star GND reference. |
+| **ACT-01** | 12V Motorcycle / 3S Battery (+) | Direct Heavy Wire | Relay COM Terminal | **Purple / Red** | 11.5V – 14.4V High Current | Feeds un-stepped battery power to relay switch contacts (18/16 AWG wire). |
 | **ACT-02** | Relay NO Terminal | Row 35 (Diode Cathode) | DC Pump (+) Lead | **Blue** | Switched 12V DC | Powers water pump motor when relay is engaged. |
 | **ACT-03** | DC Pump (-) Lead | Row 40 (Diode Anode) | Star GND Rail (`-`) | **Blue / Black** | Motor Return GND | Motor return current flows into Star GND, bypassing Arduino MCU. |
 | **ACT-04** | Row 35 (Cathode) | 1N4007 Diode Body | Row 40 (Anode) | Diode Component | Flyback Clamp | **Inductive Spike Suppression:** Clamps reverse-EMF kickback. |
 | **SIG-01** | Arduino Pin D7 | Direct Jumper | Relay IN Pin | **Amber** | 5V Digital Out | Active LOW trigger with 3-minute continuous runtime safety cap. |
 | **SIG-02** | Arduino Pin D8 | Direct Jumper | Capacitive Sensor VCC | **Pink / Red** | 5V Digital Gate | Powers capacitive sensor only during sampling (anti-corrosion). |
 | **SIG-03** | Capacitive Sensor AOUT | Direct Jumper | Arduino Pin A0 | **Green** | 0V – 3.0V Analog | Root zone soil moisture reading (Air ~417, Water ~153). |
-| **SIG-04** | HW-080 Sensor AO | Direct Jumper | Arduino Pin A1 | **Cyan** | 0V – 5.0V Analog | Surface ponding depth controller (Dry ~1019, Wet ~580). Maintains 85% level (ON < 80%, OFF $\ge$ 85%). |
-| **SIG-05** | Row 10 (R1/R2 Junction) | 100kΩ / 33kΩ Divider | Arduino Pin A2 | **Purple** | 0V – 3.13V Analog | Battery voltage monitor ($V_{\text{batt}} / 4.0303$). Cutoff < 10.0V. |
+| **SIG-04** | HW-080 Sensor AO | Direct Jumper | Arduino Pin A1 | **Cyan** | 0V – 5.0V Analog | Surface ponding depth controller (Dry=1020, Mid=410, Full=355). Maintains 50% target (ON < 45%, OFF $\ge$ 50%, 5s min runtime, 10s settling). |
+| **SIG-05** | Row 10 (R1/R2 Junction) | 100kΩ / 33kΩ Divider | Arduino Pin A2 | **Purple** | 0V – 3.57V Analog | Battery voltage monitor ($V_{\text{batt}} / 4.0303$). Cutoff < 10.0V. Max 3.57V at 14.4V solar bulk charge. |
 | **SIG-06** | Row 25 (R3/R4 Junction) | 100kΩ / 20kΩ Divider | Arduino Pin A3 | **Gold / Yellow** | 0V – 3.67V Analog | Solar panel monitor ($V_{\text{solar}} / 6.000$). Harvesting > 12.0V. |
-| **COMM-01**| USB Port | Direct USB Cable | Computer / Web Bridge | **Blue Cable** | UART (115200 baud)| **Telemetry & Command Bridge Only** (Not primary power). |
+| **COMM-01**| Arduino Pin 10 (TX) | Row 45 (1kΩ/2kΩ Divider)| NodeMCU Pin D1 (RX) | **Orange** | 0V – 3.3V Logic | **Wireless Telemetry Link:** Sends structured JSON to NodeMCU (5V $\rightarrow$ 3.3V shifted). |
+| **COMM-02**| NodeMCU Pin D2 (TX) | Direct Jumper | Arduino Pin 9 (RX) | **White / Green** | 3.3V Logic (Safe) | **Remote Command Link:** Receives schedule/override commands from WiFi. |
+| **COMM-03**| USB Port (Arduino / NodeMCU) | Direct USB Cable | Computer / Laptop | **Blue Cable** | UART (115200 baud)| **Optional Diagnostics & Flashing Only** (No longer required for telemetry). |
 
 ---
 
 ## 3. Voltage Divider Circuits (Arduino 5V ADC Protection)
 
-Arduino Uno analog input pins accept a maximum of **5.0V**. Directly connecting the 3S Battery ($\le 12.6\text{V}$) or 30W Solar Panel ($\le 22.0\text{V}$) will permanently damage the microcontroller. Use resistor dividers plugged into the breadboard:
+Arduino Uno analog input pins accept a maximum of **5.0V**. Directly connecting the Battery ($\le 14.4\text{V}$) or 30W Solar Panel ($\le 22.0\text{V}$) will permanently damage the microcontroller. Use resistor dividers plugged into the breadboard:
 
-### A. 3S Battery Voltage Divider (Pin A2)
+### A. 12V Battery Voltage Divider (Pin A2)
 
 ```
-3S Battery (+) [11.1V - 12.6V] (Breadboard Row 5)
+12V Motorcycle / 3S Battery (+) [10.5V - 14.4V] (Breadboard Row 5)
        │
       ┌┴┐
       │ │  R1 = 100 kΩ (1/4 W)
       └┬┘
-       ├───► Breadboard Row 10 (Junction Tap) ──► Arduino Pin A2 (Max ~3.125V at 12.6V)
+       ├───► Breadboard Row 10 (Junction Tap) ──► Arduino Pin A2 (Max ~3.57V at 14.4V, ~3.12V at 12.6V)
       ┌┴┐
       │ │  R2 = 33 kΩ (1/4 W)
       └┬┘

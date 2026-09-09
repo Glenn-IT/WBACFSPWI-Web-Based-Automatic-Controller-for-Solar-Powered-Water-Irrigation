@@ -12,19 +12,24 @@ Whenever any sensor calibration constant, voltage divider factor, or control thr
 - Applicable files:
   - `arduino/01_soil_root_capacitive_test/01_soil_root_capacitive_test.ino`
   - `arduino/07_dual_sensor_pump_integration_test/07_dual_sensor_pump_integration_test.ino`
+  - `arduino/08_dc_adapter_presentation_test/08_dc_adapter_presentation_test.ino`
   - `arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino`
 
 ### 2. HW-080 Surface Moisture / Ponding Level Sensor (Pin A1)
-- `HW080_RAW_DRY`: Raw 10-bit ADC in dry air (0% standing water)
-- `HW080_RAW_WET`: Raw 10-bit ADC at maximum container depth / full submergence (100% standing water)
+- `HW080_RAW_DRY`: Raw 10-bit ADC in dry air (0% standing water) -> `1020`
+- `HW080_RAW_MID`: Raw 10-bit ADC at middle container height (50% standing water) -> `410`
+- `HW080_RAW_WET`: Raw 10-bit ADC at maximum container depth / full submergence (100% standing water) -> `355`
 - Applicable files:
   - `arduino/02_surface_water_level_test/02_surface_water_level_test.ino`
   - `arduino/07_dual_sensor_pump_integration_test/07_dual_sensor_pump_integration_test.ino`
+  - `arduino/08_dc_adapter_presentation_test/08_dc_adapter_presentation_test.ino`
   - `arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino`
 
-### 3. Voltage Divider Ratios
+### 3. Voltage Divider Ratios & Battery Lockout
 - `VBATT_RATIO` / `BATT_DIVIDER`: (100kΩ + 33kΩ) / 33kΩ = `4.0303` (Pin A2)
 - `VSOLAR_RATIO` / `SOLAR_DIVIDER`: (100kΩ + 20kΩ) / 20kΩ = `6.0000` (Pin A3)
+- `BATT_MIN_LOCKOUT`: `10.00V` (Deep discharge protection cutoff)
+- `BATT_RESUME_VOLTS`: `10.50V` (Hysteresis recovery threshold)
 - Applicable files:
   - `arduino/04_battery_voltage_test/04_battery_voltage_test.ino`
   - `arduino/05_solar_voltage_test/05_solar_voltage_test.ino`
@@ -36,4 +41,10 @@ Whenever any sensor calibration constant, voltage divider factor, or control thr
 - `WATER_REFILL_MIN` (45.0%): Pump ON threshold (5% Hysteresis Gap)
 - `MIN_PUMP_RUN_MS` (5000ms): Anti-splash minimum runtime
 - `SETTLING_DELAY_MS` (10000ms): Wave stabilization settling window
-- Must remain synchronized between Test 07, `Water_Irigation_Final.ino`, and `wbacfspwi_arduino_controller.ino`.
+- Applicable files:
+  - `arduino/07_dual_sensor_pump_integration_test/07_dual_sensor_pump_integration_test.ino`
+  - `arduino/08_dc_adapter_presentation_test/08_dc_adapter_presentation_test.ino`
+  - `arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino`
+  - `arduino/CALIBRATION_REGISTRY.md`
+  - `SYSTEM_MEMORY.md`
+

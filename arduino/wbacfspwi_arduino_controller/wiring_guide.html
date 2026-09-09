@@ -306,7 +306,7 @@
     <header>
         <span class="badge">Master Full Controller Wiring Schematic</span>
         <h1>WBACFSPWI Master Star Breadboard Assembly Guide</h1>
-        <p class="subtitle">Complete High-Visibility Wiring Schematic: 30W Solar Panel + 3S Solar Charger/BMS + 3S Battery + Buck (5V) Main Power | Dark Breadboard | Connected Star Jumpers | HW-080 & Capacitive Dual-Sensor Setup</p>
+        <p class="subtitle">Complete High-Visibility Wiring Schematic: 30W Solar Panel + Solar Charge Controller/BMS + 12V Motorcycle / 3S Battery + Buck (5V) Main Power | Dark Breadboard | Connected Star Jumpers | HW-080 & Capacitive Dual-Sensor Setup</p>
     </header>
 
     <div class="nav-bar">
@@ -317,6 +317,8 @@
         <a href="../04_battery_voltage_test/wiring_guide.html" class="nav-link">Test 04: Battery Monitor</a>
         <a href="../05_solar_voltage_test/wiring_guide.html" class="nav-link">Test 05: Solar Monitor</a>
         <a href="../06_solar_charger_battery_test/wiring_guide.html" class="nav-link">⚡ Test 06: Solar Charger</a>
+        <a href="../08_dc_adapter_presentation_test/wiring_guide.html" class="nav-link">🔬 Test 08: Presentation</a>
+        <a href="../09_esp8266_wifi_bridge_test/wiring_guide.html" class="nav-link">📡 Test 09: ESP8266 WiFi</a>
         <a href="wiring_guide.html" class="nav-link active">🚀 Full Controller</a>
     </div>
 
@@ -373,9 +375,14 @@
                 <span class="chip-color" style="background: #f59e0b;"></span>
                 <span class="chip-text">🚰 5V Relay & Submersible Water Pump</span>
             </label>
+            <label class="filter-chip checked">
+                <input type="checkbox" id="chk-nodemcu" checked>
+                <span class="chip-color" style="background: #06b6d4;"></span>
+                <span class="chip-text">📡 NodeMCU ESP8266MOD WiFi Bridge</span>
+            </label>
         </div>
         <div class="filter-status-bar">
-            <span id="filter-counter-text">Showing 7 of 7 Subsystem Modules</span>
+            <span id="filter-counter-text">Showing 8 of 8 Subsystem Modules</span>
         </div>
     </div>
 
@@ -438,27 +445,33 @@
                         <text x="190" y="234" fill="#ffffff" font-size="9.5" font-family="JetBrains Mono" font-weight="700" text-anchor="middle">USB SERIAL DATA BRIDGE</text>
 
                         <!-- DIGITAL PINS HEADER (TOP-RIGHT of UNO) -->
-                        <rect x="70" y="330" width="240" height="150" rx="6" fill="#1e293b"/>
+                        <rect x="70" y="330" width="240" height="195" rx="6" fill="#1e293b"/>
                         <text x="85" y="350" fill="#94a3b8" font-size="10" font-weight="700">DIGITAL I/O</text>
 
-                        <circle id="uno-d2" cx="310" cy="370" r="6" fill="#f59e0b" class="term-dot"/>
-                        <text x="295" y="374" fill="#fbbf24" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">Pin D2 (HW-080 DO)</text>
+                        <circle id="uno-d2" cx="310" cy="365" r="6" fill="#f59e0b" class="term-dot"/>
+                        <text x="295" y="369" fill="#fbbf24" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">Pin D2 (HW-080 DO)</text>
 
-                        <circle id="uno-d7" cx="310" cy="410" r="6" fill="#f59e0b" class="term-dot"/>
-                        <text x="295" y="414" fill="#fbbf24" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">Pin D7 (Relay Trigger)</text>
+                        <circle id="uno-d7" cx="310" cy="398" r="6" fill="#f59e0b" class="term-dot"/>
+                        <text x="295" y="402" fill="#fbbf24" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">Pin D7 (Relay Trigger)</text>
 
-                        <circle id="uno-d8" cx="310" cy="450" r="6" fill="#ec4899" class="term-dot"/>
-                        <text x="295" y="454" fill="#f472b6" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">Pin D8 (Capacitive Pwr)</text>
+                        <circle id="uno-d8" cx="310" cy="430" r="6" fill="#ec4899" class="term-dot"/>
+                        <text x="295" y="434" fill="#f472b6" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">Pin D8 (Capacitive Pwr)</text>
+
+                        <circle id="uno-d9" cx="310" cy="465" r="6" fill="#06b6d4" class="term-dot"/>
+                        <text x="295" y="469" fill="#67e8f9" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">Pin D9 (RX &larr; ESP D2 TX)</text>
+
+                        <circle id="uno-d10" cx="310" cy="500" r="6" fill="#f59e0b" class="term-dot"/>
+                        <text x="295" y="504" fill="#fbbf24" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">Pin D10 (TX &rarr; Div &rarr; ESP D1)</text>
 
                         <!-- POWER HEADER (BOTTOM-LEFT of UNO) -->
-                        <rect x="70" y="510" width="240" height="140" rx="6" fill="#1e293b"/>
-                        <text x="85" y="530" fill="#94a3b8" font-size="10" font-weight="700">POWER INPUT</text>
+                        <rect x="70" y="535" width="240" height="130" rx="6" fill="#1e293b"/>
+                        <text x="85" y="555" fill="#94a3b8" font-size="10" font-weight="700">POWER INPUT</text>
 
-                        <circle id="uno-5v" cx="310" cy="560" r="7" fill="#f43f5e" class="term-dot"/>
-                        <text x="295" y="564" fill="#fb7185" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">5V (Main Logic In)</text>
+                        <circle id="uno-5v" cx="310" cy="580" r="7" fill="#f43f5e" class="term-dot"/>
+                        <text x="295" y="584" fill="#fb7185" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">5V (Main Logic In)</text>
 
-                        <circle id="uno-gnd" cx="310" cy="610" r="7" fill="#3b82f6" class="term-dot"/>
-                        <text x="295" y="614" fill="#93c5fd" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">GND (Common Return)</text>
+                        <circle id="uno-gnd" cx="310" cy="625" r="7" fill="#3b82f6" class="term-dot"/>
+                        <text x="295" y="629" fill="#93c5fd" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="end">GND (Common Return)</text>
 
                         <!-- ANALOG PINS HEADER (BOTTOM-RIGHT of UNO) -->
                         <rect x="70" y="680" width="240" height="250" rx="6" fill="#1e293b"/>
@@ -599,6 +612,44 @@
                             <text x="485" y="784" fill="#93c5fd" font-size="10" font-family="JetBrains Mono">Row 55: Sensor GND &rarr; Rail</text>
                         </g>
 
+                        <!-- SECTION 5: NODEMCU ESP8266MOD WIFI BRIDGE (Columns F - J, Rows 5 - 30) -->
+                        <g id="bb-nodemcu" data-module="nodemcu">
+                            <rect x="715" y="195" width="235" height="330" rx="8" fill="#0f172a" stroke="#06b6d4" stroke-width="2"/>
+                            <rect x="725" y="205" width="215" height="28" rx="4" fill="#1e293b"/>
+                            <text x="832" y="224" fill="#38bdf8" font-size="11" font-weight="800" text-anchor="middle">5. NODEMCU ESP8266MOD</text>
+                            <text x="832" y="248" fill="#94a3b8" font-size="9" text-anchor="middle">WiFi Serial Telemetry &amp; Command Bridge</text>
+
+                            <!-- NodeMCU Vin (5V In from Star Rail) -->
+                            <circle id="node-vin" cx="735" cy="272" r="6" fill="#f43f5e" class="term-dot"/>
+                            <text x="750" y="276" fill="#fb7185" font-size="10" font-family="JetBrains Mono" font-weight="700">Vin &larr; Star 5V Rail</text>
+
+                            <!-- NodeMCU GND (GND to Star GND Rail) -->
+                            <circle id="node-gnd" cx="735" cy="302" r="6" fill="#3b82f6" class="term-dot"/>
+                            <text x="750" y="306" fill="#93c5fd" font-size="10" font-family="JetBrains Mono" font-weight="700">GND &rarr; Star GND Rail</text>
+
+                            <!-- NodeMCU D2 (GPIO4 - TX out to Arduino D9) -->
+                            <circle id="node-d2" cx="735" cy="336" r="6" fill="#06b6d4" class="term-dot"/>
+                            <text x="750" y="340" fill="#67e8f9" font-size="10" font-family="JetBrains Mono" font-weight="700">D2 (TX 3.3V) &rarr; Uno D9</text>
+
+                            <!-- NodeMCU D1 (GPIO5 - RX in from 3.3V Divider) -->
+                            <circle id="node-d1" cx="735" cy="370" r="6" fill="#f59e0b" class="term-dot"/>
+                            <text x="750" y="374" fill="#fbbf24" font-size="10" font-family="JetBrains Mono" font-weight="700">D1 (RX 3.3V) &larr; Div Tap</text>
+
+                            <!-- Sub-box for 5V-to-3.3V Level Shifter (1k / 2k) -->
+                            <rect x="725" y="400" width="215" height="110" rx="5" fill="#111827" stroke="#f59e0b" stroke-width="1.2"/>
+                            <text x="832" y="418" fill="#fbbf24" font-size="9" font-weight="800" text-anchor="middle">5V &rarr; 3.3V LEVEL SHIFTER</text>
+                            <text x="735" y="438" fill="#94a3b8" font-size="8.5" font-family="JetBrains Mono">Uno D10 &rarr; 1kΩ &rarr; [Tap D1] &rarr; 2kΩ &rarr; GND</text>
+
+                            <circle id="div-in" cx="735" cy="455" r="5" fill="#f59e0b" class="term-dot"/>
+                            <text x="748" y="459" fill="#fbbf24" font-size="9" font-family="JetBrains Mono">1kΩ In &larr; Uno D10</text>
+
+                            <circle id="div-tap" cx="735" cy="478" r="5" fill="#34d399" class="term-dot"/>
+                            <text x="748" y="482" fill="#34d399" font-size="9" font-family="JetBrains Mono">3.3V Tap &rarr; NodeMCU D1</text>
+
+                            <circle id="div-gnd" cx="735" cy="500" r="5" fill="#3b82f6" class="term-dot"/>
+                            <text x="748" y="503" fill="#93c5fd" font-size="9" font-family="JetBrains Mono">2kΩ leg &rarr; Star GND</text>
+                        </g>
+
                         <!-- ================= BOTTOM POWER RAILS ================= -->
                         <rect x="430" y="885" width="520" height="50" rx="4" fill="#0f172a" stroke="#334155"/>
                         <line x1="450" y1="900" x2="930" y2="900" stroke="#ef4444" stroke-width="3"/>
@@ -642,18 +693,18 @@
 
                         <!-- Battery Charging Output Terminals -->
                         <circle id="chg-bat-pos" cx="1390" cy="245" r="6" fill="#a855f7" class="term-dot"/>
-                        <text x="1375" y="249" fill="#c084fc" font-size="10" font-family="JetBrains Mono" font-weight="700" text-anchor="end">BAT+ Out &rarr; 3S Battery (+)</text>
+                        <text x="1375" y="249" fill="#c084fc" font-size="10" font-family="JetBrains Mono" font-weight="700" text-anchor="end">BAT+ Out &rarr; 12V Batt (+)</text>
 
                         <circle id="chg-bat-neg" cx="1390" cy="275" r="6" fill="#3b82f6" class="term-dot"/>
                         <text x="1375" y="279" fill="#93c5fd" font-size="10" font-family="JetBrains Mono" text-anchor="end">BAT- Out &rarr; Star GND</text>
                     </g>
 
-                    <!-- 3C. 3S 18650 BATTERY PACK (UPPER-MIDDLE RIGHT) -->
+                    <!-- 3C. 12V MOTORCYCLE / 3S BATTERY PACK (UPPER-MIDDLE RIGHT) -->
                     <g id="battery-pack" data-module="battery">
                         <rect x="1030" y="315" width="360" height="115" rx="10" fill="#111827" stroke="#a855f7" stroke-width="2"/>
                         <rect x="1050" y="330" width="320" height="28" rx="4" fill="#1f2937"/>
-                        <text x="1210" y="349" fill="#c084fc" font-size="13" font-weight="800" text-anchor="middle">3S 18650 LI-ION BATTERY PACK</text>
-                        <text x="1210" y="369" fill="#9ca3af" font-size="10" text-anchor="middle">11.1V NOMINAL / 12.60V FULL CHARGE (SOLAR CHARGED)</text>
+                        <text x="1210" y="349" fill="#c084fc" font-size="13" font-weight="800" text-anchor="middle">12V MOTORCYCLE / 3S BATTERY</text>
+                        <text x="1210" y="369" fill="#9ca3af" font-size="10" text-anchor="middle">12.0V LEAD-ACID / 11.1V LI-ION (10.5V - 14.4V SOLAR CHARGED)</text>
 
                         <circle id="batt-pos" cx="1030" cy="380" r="7" fill="#f43f5e" class="term-dot"/>
                         <text x="1045" y="384" fill="#fb7185" font-size="11" font-family="JetBrains Mono" font-weight="700">(+) 12V Main / Charge IN+</text>
@@ -743,8 +794,8 @@
                     <!-- A1: Buck OUT+ (330, 130) -> Breadboard Top Star 5V Rail (470, 120) -->
                     <path class="wire" data-module="power" d="M 330 130 L 400 130 L 400 120 L 470 120" stroke="#f43f5e" stroke-width="3.5" fill="none"/>
                     
-                    <!-- A2: Top Star 5V Rail (500, 120) -> Arduino 5V Pin (310, 560) -->
-                    <path class="wire" data-module="power" d="M 500 120 L 380 120 L 380 560 L 310 560" stroke="#f43f5e" stroke-width="3.5" fill="none"/>
+                    <!-- A2: Top Star 5V Rail (500, 120) -> Arduino 5V Pin (310, 580) -->
+                    <path class="wire" data-module="power" d="M 500 120 L 380 120 L 380 580 L 310 580" stroke="#f43f5e" stroke-width="3.5" fill="none"/>
 
                     <!-- A3: Top Star 5V Rail (750, 120) -> Relay VCC (1030, 505) -->
                     <path class="wire" data-module="relay-pump" d="M 750 120 L 750 100 L 1000 100 L 1000 505 L 1030 505" stroke="#f43f5e" stroke-width="3" fill="none"/>
@@ -752,13 +803,16 @@
                     <!-- A4: Top Star 5V Rail (880, 120) -> HW-080 VCC (1030, 925) -->
                     <path class="wire" data-module="hw080" d="M 880 120 L 880 140 L 980 140 L 980 925 L 1030 925" stroke="#f43f5e" stroke-width="3" fill="none"/>
 
+                    <!-- A5: Top Star 5V Rail (735, 120) -> NodeMCU Vin (735, 272) -->
+                    <path class="wire" data-module="nodemcu" d="M 735 120 L 735 272" stroke="#f43f5e" stroke-width="3" fill="none"/>
+
 
                     <!-- [WIRE GROUP B: STAR COMMON GROUND BUS (BLUE)] -->
                     <!-- B1: Buck OUT- (330, 160) -> Breadboard Top Star GND Rail (470, 142) -->
                     <path class="wire" data-module="power" d="M 330 160 L 410 160 L 410 142 L 470 142" stroke="#3b82f6" stroke-width="3.5" fill="none"/>
 
-                    <!-- B2: Top Star GND Rail (520, 142) -> Arduino GND Pin (310, 610) -->
-                    <path class="wire" data-module="power" d="M 520 142 L 360 142 L 360 610 L 310 610" stroke="#3b82f6" stroke-width="3.5" fill="none"/>
+                    <!-- B2: Top Star GND Rail (520, 142) -> Arduino GND Pin (310, 625) -->
+                    <path class="wire" data-module="power" d="M 520 142 L 360 142 L 360 625 L 310 625" stroke="#3b82f6" stroke-width="3.5" fill="none"/>
 
                     <!-- B3: Top Star GND Rail (780, 142) -> Battery (-) Lead (1390, 380) -->
                     <path class="wire" data-module="battery" d="M 780 142 L 780 80 L 1420 80 L 1420 380 L 1390 380" stroke="#3b82f6" stroke-width="3.5" fill="none"/>
@@ -783,6 +837,12 @@
 
                     <!-- B10: On-Breadboard Flyback Diode Anode / Pump (-) Ground -> Star GND Rail -->
                     <path class="wire" data-module="relay-pump" d="M 470 650 L 430 650 L 430 510" stroke="#3b82f6" stroke-width="3.5" fill="none"/>
+
+                    <!-- B11: Top Star GND Rail (720, 142) -> NodeMCU GND (735, 302) -->
+                    <path class="wire" data-module="nodemcu" d="M 720 142 L 720 302 L 735 302" stroke="#3b82f6" stroke-width="3" fill="none"/>
+
+                    <!-- B12: Top Star GND Rail (710, 142) -> Level Shifter 2kΩ Ground (735, 500) -->
+                    <path class="wire" data-module="nodemcu" d="M 710 142 L 710 500 L 735 500" stroke="#3b82f6" stroke-width="2.5" fill="none"/>
 
 
                     <!-- [WIRE GROUP C: SOLAR CHARGING & 12V BATTERY POWER SWITCHING] -->
@@ -826,11 +886,11 @@
 
 
                     <!-- [WIRE GROUP E: SENSORS & ACTUATOR SIGNAL LINES TO ARDUINO] -->
-                    <!-- E1: Arduino D7 (310, 410) -> Relay Module IN (1030, 565) -->
-                    <path class="wire" data-module="relay-pump" d="M 310 410 L 390 410 L 390 565 L 1030 565" stroke="#f59e0b" stroke-width="3" fill="none"/>
+                    <!-- E1: Arduino D7 (310, 398) -> Relay Module IN (1030, 565) -->
+                    <path class="wire" data-module="relay-pump" d="M 310 398 L 390 398 L 390 565 L 1030 565" stroke="#f59e0b" stroke-width="3" fill="none"/>
 
-                    <!-- E2: Arduino D8 (310, 450) -> Capacitive Sensor VCC (1030, 795) -->
-                    <path class="wire" data-module="root-soil" d="M 310 450 L 400 450 L 400 795 L 1030 795" stroke="#ec4899" stroke-width="3" fill="none"/>
+                    <!-- E2: Arduino D8 (310, 430) -> Capacitive Sensor VCC (1030, 795) -->
+                    <path class="wire" data-module="root-soil" d="M 310 430 L 400 430 L 400 795 L 1030 795" stroke="#ec4899" stroke-width="3" fill="none"/>
 
                     <!-- E3: Capacitive Sensor AOUT (1390, 795) -> Arduino Pin A0 (310, 735) -->
                     <path class="wire" data-module="root-soil" d="M 1390 795 L 1420 795 L 1420 735 L 310 735" stroke="#10b981" stroke-width="3" fill="none"/>
@@ -838,14 +898,25 @@
                     <!-- E4: HW-080 Sensor AO (1390, 925) -> Arduino Pin A1 (310, 785) -->
                     <path class="wire" data-module="hw080" d="M 1390 925 L 1430 925 L 1430 785 L 310 785" stroke="#06b6d4" stroke-width="3" fill="none"/>
 
-                    <!-- E5: HW-080 Sensor DO (1270, 925) -> Arduino Pin D2 (310, 370) [Optional Dashed] -->
-                    <path class="wire" data-module="hw080" d="M 1270 925 L 1270 965 L 370 965 L 370 370 L 310 370" stroke="#f59e0b" stroke-width="2" stroke-dasharray="5" fill="none"/>
+                    <!-- E5: HW-080 Sensor DO (1270, 925) -> Arduino Pin D2 (310, 365) [Optional Dashed] -->
+                    <path class="wire" data-module="hw080" d="M 1270 925 L 1270 965 L 370 965 L 370 365 L 310 365" stroke="#f59e0b" stroke-width="2" stroke-dasharray="5" fill="none"/>
 
                     <!-- E6: Breadboard Row 10 (Battery Divider Tap) (470, 290) -> Arduino Pin A2 (310, 835) -->
                     <path class="wire" data-module="battery" d="M 470 290 L 350 290 L 350 835 L 310 835" stroke="#a855f7" stroke-width="3" fill="none"/>
 
                     <!-- E7: Breadboard Row 25 (Solar Divider Tap) (470, 460) -> Arduino Pin A3 (310, 885) -->
                     <path class="wire" data-module="solar" d="M 470 460 L 340 460 L 340 885 L 310 885" stroke="#eab308" stroke-width="3" fill="none"/>
+
+
+                    <!-- [WIRE GROUP F: NODEMCU ESP8266 SERIAL & LEVEL SHIFTER INTERCONNECT] -->
+                    <!-- F1: NodeMCU D2 TX (735, 336) -> Arduino Pin D9 RX (310, 465) (Direct 3.3V->5V Safe) -->
+                    <path class="wire" data-module="nodemcu" d="M 735 336 L 685 336 L 685 465 L 310 465" stroke="#06b6d4" stroke-width="3" fill="none"/>
+
+                    <!-- F2: Arduino Pin D10 TX (310, 500) -> Level Shifter 1kΩ In (735, 455) -->
+                    <path class="wire" data-module="nodemcu" d="M 310 500 L 375 500 L 375 455 L 735 455" stroke="#f59e0b" stroke-width="3" fill="none"/>
+
+                    <!-- F3: Level Shifter 3.3V Tap (735, 478) -> NodeMCU D1 RX (735, 370) -->
+                    <path class="wire" data-module="nodemcu" d="M 735 478 L 700 478 L 700 370 L 735 370" stroke="#34d399" stroke-width="2.5" fill="none"/>
                 </svg>
             </div>
 
@@ -860,6 +931,7 @@
                 <div class="legend-item" data-module="root-soil"><div class="legend-color" style="background: #ec4899;"></div> Capacitive Power Gate D8 (Pink)</div>
                 <div class="legend-item" data-module="root-soil"><div class="legend-color" style="background: #10b981;"></div> Root Soil Signal A0 (Green)</div>
                 <div class="legend-item" data-module="hw080"><div class="legend-color" style="background: #06b6d4;"></div> HW-080 Surface Signal A1 (Cyan)</div>
+                <div class="legend-item" data-module="nodemcu"><div class="legend-color" style="background: #06b6d4; border: 1px solid #f59e0b;"></div> NodeMCU ESP8266 WiFi Bridge (D9 RX / D10 TX)</div>
             </div>
         </div>
 
@@ -909,16 +981,16 @@
                             <td><strong style="color: #a855f7;">CHG-03</strong></td>
                             <td><span class="pin-tag tag-chg">Solar Charger BAT+ Out</span></td>
                             <td>Direct Heavy Wire</td>
-                            <td><span class="pin-tag tag-batt">3S Battery (+) [12.6V]</span></td>
+                            <td><span class="pin-tag tag-batt">12V Motorcycle / 3S Battery (+) [11.1V–14.4V]</span></td>
                             <td><strong style="color: #a855f7;">Purple / Red</strong></td>
-                            <td>12.60V CC/CV Charge</td>
-                            <td>Regulated charging current feeds 3S 18650 battery pack (overcharge protected).</td>
+                            <td>12.60V–14.40V Charge</td>
+                            <td>Regulated charging current feeds 12V Motorcycle / 3S battery pack (overcharge protected).</td>
                         </tr>
                         <tr data-module="battery solar-charger">
                             <td><strong style="color: #3b82f6;">CHG-04</strong></td>
                             <td><span class="pin-tag tag-chg">Solar Charger BAT- Out</span></td>
                             <td><span class="pin-tag tag-bb">Top Blue Rail (-)</span></td>
-                            <td><span class="pin-tag tag-batt">3S Battery (-) Terminal</span></td>
+                            <td><span class="pin-tag tag-batt">12V Motorcycle / 3S Battery (-) Terminal</span></td>
                             <td><strong style="color: #3b82f6;">Blue / Black</strong></td>
                             <td>0.00V (Common)</td>
                             <td>Battery charge ground return to central Star Ground reference.</td>
@@ -927,12 +999,12 @@
                         <!-- POWER GROUP -->
                         <tr data-module="battery power">
                             <td><strong style="color: #f43f5e;">PWR-01</strong></td>
-                            <td><span class="pin-tag tag-batt">3S Battery (+) [12.6V]</span></td>
+                            <td><span class="pin-tag tag-batt">12V Motorcycle / 3S Battery (+) [11.1V–14.4V]</span></td>
                             <td>Direct Wire</td>
                             <td><span class="pin-tag tag-pwr">LM2596 Buck IN+</span></td>
                             <td><strong style="color: #f43f5e;">Red</strong></td>
-                            <td>11.1V – 12.6V DC</td>
-                            <td>Raw high-capacity battery supply to Buck step-down converter.</td>
+                            <td>11.1V – 14.4V DC</td>
+                            <td>Raw high-capacity battery supply to Buck step-down converter (10A inline fuse recommended).</td>
                         </tr>
                         <tr data-module="power">
                             <td><strong style="color: #f43f5e;">PWR-02</strong></td>
@@ -961,6 +1033,15 @@
                             <td>5.00V DC</td>
                             <td>Powers LM393 surface moisture comparator driver board.</td>
                         </tr>
+                        <tr data-module="nodemcu power">
+                            <td><strong style="color: #f43f5e;">PWR-05</strong></td>
+                            <td><span class="pin-tag tag-bb">Top Red Rail (+)</span></td>
+                            <td>Direct Jumper</td>
+                            <td><span class="pin-tag tag-nodemcu">NodeMCU Vin Pin</span></td>
+                            <td><strong style="color: #f43f5e;">Red</strong></td>
+                            <td>5.00V DC Regulated</td>
+                            <td>Supplies regulated 5V into NodeMCU onboard AMS1117 3.3V LDO regulator.</td>
+                        </tr>
 
                         <!-- GROUND GROUP -->
                         <tr data-module="power">
@@ -974,7 +1055,7 @@
                         </tr>
                         <tr data-module="battery">
                             <td><strong style="color: #3b82f6;">GND-02</strong></td>
-                            <td><span class="pin-tag tag-batt">3S Battery (-) Terminal</span></td>
+                            <td><span class="pin-tag tag-batt">12V Motorcycle / 3S Battery (-) Terminal</span></td>
                             <td><span class="pin-tag tag-bb">Top Blue Rail (-)</span></td>
                             <td><span class="pin-tag tag-pwr">Buck IN- Terminal</span></td>
                             <td><strong style="color: #3b82f6;">Blue / Black</strong></td>
@@ -999,16 +1080,25 @@
                             <td>0.00V</td>
                             <td>Ground returns for relay coil, capacitive sensor, and HW-080.</td>
                         </tr>
+                        <tr data-module="nodemcu power">
+                            <td><strong style="color: #3b82f6;">GND-05</strong></td>
+                            <td><span class="pin-tag tag-nodemcu">NodeMCU GND &amp; 2kΩ Div</span></td>
+                            <td><span class="pin-tag tag-bb">Top Blue Rail (-)</span></td>
+                            <td>Star Common GND</td>
+                            <td><strong style="color: #3b82f6;">Blue / Slate</strong></td>
+                            <td>0.00V (Common)</td>
+                            <td>Common 0V reference return for ESP8266 logic and RX voltage divider.</td>
+                        </tr>
 
                         <!-- ACTUATOR & MOTOR GROUP -->
                         <tr data-module="relay-pump battery">
                             <td><strong style="color: #a855f7;">ACT-01</strong></td>
-                            <td><span class="pin-tag tag-batt">3S Battery (+) [12V]</span></td>
+                            <td><span class="pin-tag tag-batt">12V Motorcycle / 3S Battery (+) [11.1V–14.4V]</span></td>
                             <td>Direct Heavy Wire</td>
                             <td><span class="pin-tag tag-relay">Relay COM Terminal</span></td>
                             <td><strong style="color: #a855f7;">Purple / Red</strong></td>
-                            <td>12.6V High Current</td>
-                            <td>Feeds raw un-stepped battery power to relay switch contacts.</td>
+                            <td>11.1V–14.4V High Current</td>
+                            <td>Feeds raw un-stepped battery power to relay switch contacts (16/18 AWG recommended).</td>
                         </tr>
                         <tr data-module="relay-pump">
                             <td><strong style="color: #3b82f6;">ACT-02</strong></td>
@@ -1073,7 +1163,7 @@
                             <td><span class="pin-tag tag-uno">Arduino Pin A1</span></td>
                             <td><strong style="color: #06b6d4;">Cyan</strong></td>
                             <td>0V – 5.0V Analog</td>
-                            <td>Surface ponding depth controller (Dry ~1019, Wet ~580). Maintains 85% level (ON &lt; 80%, OFF &ge; 85%).</td>
+                            <td>Surface ponding depth controller (Dry ~1020, Saturated ~355, Refill ~410). Maintains 50.0% target layer (Target 50.0%, Refill min 45.0%).</td>
                         </tr>
                         <tr data-module="battery">
                             <td><strong style="color: #a855f7;">SIG-05</strong></td>
@@ -1081,8 +1171,8 @@
                             <td>100kΩ / 33kΩ Divider</td>
                             <td><span class="pin-tag tag-uno">Arduino Pin A2</span></td>
                             <td><strong style="color: #a855f7;">Purple</strong></td>
-                            <td>0V – 3.13V Analog</td>
-                            <td>Battery voltage monitor (V<sub>batt</sub> / 4.0303). Cutoff &lt; 10.0V.</td>
+                            <td>0V – 3.57V Analog</td>
+                            <td>Battery voltage monitor (V<sub>batt</sub> / 4.0303). Safe up to 14.4V (3.57V ADC). Cutoff &lt; 10.0V.</td>
                         </tr>
                         <tr data-module="solar">
                             <td><strong style="color: #eab308;">SIG-06</strong></td>
@@ -1093,6 +1183,35 @@
                             <td>0V – 3.67V Analog</td>
                             <td>Solar panel monitor (V<sub>solar</sub> / 6.000). Harvesting &gt; 12.0V.</td>
                         </tr>
+
+                        <!-- SERIAL & WIRELESS COMMUNICATION GROUP -->
+                        <tr data-module="nodemcu">
+                            <td><strong style="color: #06b6d4;">COMM-01</strong></td>
+                            <td><span class="pin-tag tag-nodemcu">NodeMCU Pin D2 (TX)</span></td>
+                            <td>Direct Jumper Wire</td>
+                            <td><span class="pin-tag tag-uno">Arduino Pin D9 (RX)</span></td>
+                            <td><strong style="color: #06b6d4;">Cyan</strong></td>
+                            <td>3.3V Digital (Safe)</td>
+                            <td>NodeMCU 3.3V TX logic connects directly to Arduino 5V TTL RX (exceeds 3.0V HIGH threshold). Streams web commands to Uno.</td>
+                        </tr>
+                        <tr data-module="nodemcu">
+                            <td><strong style="color: #f59e0b;">COMM-02</strong></td>
+                            <td><span class="pin-tag tag-uno">Arduino Pin D10 (TX)</span></td>
+                            <td>1kΩ / 2kΩ Divider</td>
+                            <td><span class="pin-tag tag-nodemcu">NodeMCU Pin D1 (RX)</span></td>
+                            <td><strong style="color: #f59e0b;">Amber / Gold</strong></td>
+                            <td>3.33V Stepped Down</td>
+                            <td><strong>Level Shifted:</strong> 5V TX stepped down to 3.3V via 1kΩ/2kΩ divider to protect ESP8266 3.3V input. Streams telemetry JSON to WiFi.</td>
+                        </tr>
+                        <tr data-module="nodemcu power">
+                            <td><strong style="color: #38bdf8;">COMM-03</strong></td>
+                            <td><span class="pin-tag tag-uno">Arduino / NodeMCU</span></td>
+                            <td>Dual Wireless / USB</td>
+                            <td><span class="pin-tag tag-chg">Web Dashboard &amp; API</span></td>
+                            <td><strong style="color: #38bdf8;">WiFi 802.11 b/g/n</strong></td>
+                            <td>115200 / 9600 Baud</td>
+                            <td>Wireless serial-to-WiFi bridge replaces physical USB tether; full bidirectional telemetry + remote override commands.</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -1100,11 +1219,11 @@
             <div class="note-box">
                 <h4>⚡ Golden Rules for Error-Free Assembly</h4>
                 <ul>
-                    <li><strong>1. Solar Charging & BMS Integration:</strong> Connect 30W Solar Panel outputs to the <code>SOLAR IN+</code> and <code>SOLAR IN-</code> terminals of the 3S Solar Charge Controller / BMS. The <code>BAT+</code> and <code>BAT-</code> outputs feed the 3S 18650 battery pack to provide regulated constant-current / constant-voltage charging up to 12.60V.</li>
-                    <li><strong>2. Calibrate Buck Converter First:</strong> Disconnect Arduino and modules. Turn on 3S Battery power and adjust Buck potentiometer screw until multimeter reads <code>5.00V &plusmn; 0.05V</code> before connecting to breadboard.</li>
+                    <li><strong>1. Solar Charging & BMS Integration:</strong> Connect 30W Solar Panel outputs to the <code>SOLAR IN+</code> and <code>SOLAR IN-</code> terminals of the Solar Charge Controller. The <code>BAT+</code> and <code>BAT-</code> outputs feed the 12V Motorcycle / 3S battery pack to provide regulated charging up to 14.4V bulk (Lead-Acid) or 12.6V (3S Li-ion).</li>
+                    <li><strong>2. Calibrate Buck Converter First:</strong> Disconnect Arduino and modules. Turn on 12V Battery power and adjust Buck potentiometer screw until multimeter reads <code>5.00V &plusmn; 0.05V</code> before connecting to breadboard.</li>
                     <li><strong>3. Check 1N4007 Diode Stripe:</strong> The silver/white band (Cathode) MUST plug into <strong>Row 35</strong> (switched 12V from relay). Connecting in reverse will short-circuit the relay!</li>
                     <li><strong>4. Star Ground Rule:</strong> Ensure all module grounds (Buck OUT-, Battery -, Solar Charger -, Solar Panel -, Arduino GND, Sensor GND, Relay GND) terminate on the blue breadboard rail to eliminate inductive voltage bounce.</li>
-                    <li><strong>5. USB Data Bridge:</strong> Keep USB cable plugged into computer to view live serial telemetry (115200 baud) and web integration.</li>
+                    <li><strong>5. Dual Telemetry &amp; Wireless WiFi Bridge:</strong> NodeMCU ESP8266MOD can replace the physical USB tether. Connect NodeMCU Vin to Star 5V Rail and GND to Star GND Rail. Connect NodeMCU Pin D2 (TX) directly to Arduino Pin D9 (RX). Connect Arduino Pin D10 (TX) through the 1kΩ / 2kΩ level shifter divider to NodeMCU Pin D1 (RX). Arduino telemetry is streamed to both USB Serial (115200) and SoftwareSerial espSerial (9600) for seamless WiFi dashboard streaming and remote control.</li>
                 </ul>
             </div>
         </div>
@@ -1120,7 +1239,8 @@ document.addEventListener('DOMContentLoaded', function() {
         'solar-charger': document.getElementById('chk-solar-charger'),
         'battery': document.getElementById('chk-battery'),
         'power': document.getElementById('chk-power'),
-        'relay-pump': document.getElementById('chk-relay-pump')
+        'relay-pump': document.getElementById('chk-relay-pump'),
+        'nodemcu': document.getElementById('chk-nodemcu')
     };
 
     const filterCounterText = document.getElementById('filter-counter-text');
@@ -1155,7 +1275,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         if (filterCounterText) {
-            filterCounterText.textContent = `Showing ${activeCount} of 7 Subsystem Modules`;
+            filterCounterText.textContent = `Showing ${activeCount} of 8 Subsystem Modules`;
         }
     }
 

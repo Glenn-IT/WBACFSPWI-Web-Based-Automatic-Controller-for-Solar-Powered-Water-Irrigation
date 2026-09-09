@@ -23,6 +23,8 @@
  *   - Periodic Serial Telemetry output (115200 baud).
  */
 
+#include <SoftwareSerial.h>
+
 // ============================================================================
 // 1. PIN DEFINITIONS & HARDWARE CONSTANTS
 // ============================================================================
@@ -33,10 +35,14 @@ const int PIN_VSOLAR         = A3;
 
 const int PIN_RELAY_PUMP     = 7;
 const int PIN_SENSOR_PWR     = 8;
+const int PIN_ESP_RX         = 9;      // Arduino RX <- NodeMCU TX (D2 / GPIO4)
+const int PIN_ESP_TX         = 10;     // Arduino TX -> NodeMCU RX (D1 / GPIO5) via 1k/2k divider
 const int PIN_STATUS_LED     = 13;
 
 const bool RELAY_ACTIVE_LOW  = true;    // Standard 5V relay modules trigger on LOW (Active LOW)
 const bool USE_SENSOR_PWR    = true;   // Enable power gating to prevent corrosion
+
+SoftwareSerial espSerial(PIN_ESP_RX, PIN_ESP_TX);
 
 // ============================================================================
 // 2. CALIBRATION & THRESHOLD VALUES
@@ -60,9 +66,9 @@ const int HW080_RAW_WET      = 355;    // Stage 2: Probe at container maximum de
 const float WATER_TARGET_MAX   = 50.0; // Automatically stop pump when surface water level reaches >= 50.0%
 const float WATER_REFILL_MIN   = 45.0; // Automatically start pump only when surface water level drops < 45.0%
 
-// Safety & Battery Protection Thresholds
-const float BATT_MIN_LOCKOUT = 8.00;   // Low battery lockout cutoff (8.0V)
-const float BATT_RESUME_VOLTS = 8.50;  // Voltage needed to clear lockout and resume operation
+// Safety & Battery Protection Thresholds (3S Li-ion Battery Pack)
+const float BATT_MIN_LOCKOUT = 10.00;  // Low battery lockout cutoff (10.0V deep discharge protection)
+const float BATT_RESUME_VOLTS = 10.50; // Voltage needed to clear lockout and resume operation
 
 // Timing Protections (in milliseconds)
 const unsigned long MIN_PUMP_RUN_MS  = 5000UL;   // 5 seconds minimum runtime (prevents momentary splash cutoffs)
@@ -198,7 +204,19 @@ void printTelemetry() {
     Serial.println(F("[ALERT] Pump Timeout Cooldown in effect!"));
   }
   Serial.println(F("--------------------------------------------------"));
-}
+
+  // Send formatted JSON line over SoftwareSerial to NodeMCU ESP8266 WiFi Bridge
+  espSerial.print(F("{\"soil_moisture\":"));
+  espSerial.print(currentRootMoisture, 1);
+  espSerial.print(F(",\"water_level\":"));
+  espSerial.print(currentSurfaceWater, 1);
+  espSerial.print(F(",\"battery_voltage\":"));
+  espSerial.print(currentBattVolts, 2);
+  espSerial.print(F(",\"solar_output\":"));
+  espSerial.print(currentSolarVolts, 2);
+  espSerial.print(F(",\"pump_state\":\""));
+  espSerial.print(pumpState ? F("on") : F("off"));
+  espSerial.println(F("\"}"));
 
 // ============================================================================
 // 5. SETUP & MAIN LOOP
@@ -221,9 +239,13 @@ void setup() {
     digitalWrite(PIN_SENSOR_PWR, LOW);
   }
 
+  // 2. Initialize Hardware Serial (USB monitor) and SoftwareSerial (NodeMCU WiFi Bridge)
+  espSerial.begin(9600);
+
   Serial.println(F("=================================================="));
   Serial.println(F(" WBACFSPWI: Solar Rice Irrigation Controller     "));
   Serial.println(F(" Standalone Arduino Uno Automation Firmware      "));
+  Serial.println(F(" NodeMCU ESP8266 WiFi Bridge Linked (Pins 9/10)  "));
   Serial.println(F("3-Layer Automatic Surface Water Level Control:"));
   Serial.println(F("  - TARGET MAX (PUMP OFF) : >= 50.0% Surface Water"));
   Serial.println(F("  - REFILL MIN (PUMP ON)  : < 45.0% Surface Water (5% Hysteresis Gap)"));
@@ -329,6 +351,21 @@ void loop() {
   } else {
     // Gentle heartbeat blink when idle
     digitalWrite(PIN_STATUS_LED, (now / 1500) % 2 == 0 ? HIGH : LOW);
+  }
+
+  // -------------------------------------------------------------
+  // D. Process Remote WiFi Commands from NodeMCU ESP8266
+  // -------------------------------------------------------------
+  if (espSerial.available() > 0) {
+    String cmd = espSerial.readStringUntil('\n');
+    cmd.trim();
+    if (cmd == "PUMP_ON") {
+      setPump(true);
+      Serial.println(F(">>> [REMOTE COMMAND via WiFi] Forced Pump ON"));
+    } else if (cmd == "PUMP_OFF") {
+      setPump(false);
+      Serial.println(F(">>> [REMOTE COMMAND via WiFi] Forced Pump OFF"));
+    }
   }
 
   delay(20); // Small loop yield

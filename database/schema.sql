@@ -64,3 +64,14 @@ CREATE TABLE IF NOT EXISTS audit_logs (
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
+
+CREATE TABLE IF NOT EXISTS overrides (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NULL,
+    action ENUM('on','off') NOT NULL,
+    reason VARCHAR(255) NULL,
+    auto_revert_minutes INT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
