@@ -217,6 +217,7 @@ void printTelemetry() {
   espSerial.print(F(",\"pump_state\":\""));
   espSerial.print(pumpState ? F("on") : F("off"));
   espSerial.println(F("\"}"));
+}
 
 // ============================================================================
 // 5. SETUP & MAIN LOOP
