@@ -16,12 +16,11 @@
 #include <ESP8266HTTPClient.h>
 #include <WiFiClient.h>
 #include <SoftwareSerial.h>
-#include <ArduinoJson.h>
 
 // ---------------------------------------------------------------- Network Config
-const char* WIFI_SSID   = "YOUR_WIFI_SSID";
-const char* WIFI_PASS   = "YOUR_WIFI_PASSWORD";
-const char* SERVER_HOST = "http://192.168.1.10/WBACFSPWI-Web-Based-Automatic-Controller-for-Solar-Powered-Water-Irrigation/public";
+const char* WIFI_SSID   = "192.168.1.13";
+const char* WIFI_PASS   = "uHFYzS4H";
+const char* SERVER_HOST = "http://192.168.1.13/WBACFSPWI-Web-Based-Automatic-Controller-for-Solar-Powered-Water-Irrigation/public";
 const char* API_KEY     = "dev-local-device-key"; // Matches DEVICE_API_KEY in config/device.php
 
 // ---------------------------------------------------------------- Pins
