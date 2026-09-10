@@ -75,8 +75,8 @@ const unsigned long MIN_PUMP_RUN_MS  = 5000UL;   // 5 seconds minimum runtime (p
 const unsigned long MAX_PUMP_RUN_MS  = 180000UL; // 3 minutes maximum continuous runtime
 const unsigned long PUMP_COOLDOWN_MS = 60000UL;  // 1 minute mandatory cooldown after timeout
 const unsigned long SETTLING_DELAY_MS= 10000UL;  // 10 seconds water settling / stabilization window
-const unsigned long SAMPLE_INTERVAL  = 3000UL;   // Read sensors & evaluate logic every 3s
-const unsigned long TELEMETRY_PERIOD = 5000UL;   // Print telemetry every 5s
+const unsigned long SAMPLE_INTERVAL  = 1000UL;   // Read sensors & evaluate logic every 1s
+const unsigned long TELEMETRY_PERIOD = 1000UL;   // Print telemetry every 1s
 
 // ============================================================================
 // 3. SYSTEM STATE VARIABLES
@@ -271,7 +271,7 @@ void loop() {
   unsigned long now = millis();
 
   // -------------------------------------------------------------
-  // A. Periodic Sensor Sampling & Automation Logic (Every 3s)
+  // A. Periodic Sensor Sampling & Automation Logic (Every 1s)
   // -------------------------------------------------------------
   if (now - lastSampleTime >= SAMPLE_INTERVAL || lastSampleTime == 0) {
     lastSampleTime = now;
@@ -333,7 +333,7 @@ void loop() {
   }
 
   // -------------------------------------------------------------
-  // B. Telemetry Output (Every 5s)
+  // B. Telemetry Output (Every 1s)
   // -------------------------------------------------------------
   if (now - lastTeleTime >= TELEMETRY_PERIOD || lastTeleTime == 0) {
     lastTeleTime = now;
