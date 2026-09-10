@@ -166,6 +166,17 @@ The standalone Arduino Uno controller (`wbacfspwi_arduino_controller.ino`) and i
 - **Session:** Authenticated session (`Auth::requireLogin()`)
 - **Returns:** Latest reading, 8-day trends, today schedules, active alerts.
 
+### Endpoint 4: Admin Live Telemetry Inspector
+- **URL:** `GET|POST /api/admin/telemetry-live.php`
+- **Session:** Authenticated session (`Auth::requireRole()`)
+- **Page:** [`public/admin/telemetry_test.php`](file:///C:/xampp/htdocs/WBACFSPWI-Web-Based-Automatic-Controller-for-Solar-Powered-Water-Irrigation/public/admin/telemetry_test.php)
+- **Features:** Real-time hardware packet stream (1.5s poll), raw JSON inspector, test packet injection, 0-data purge.
+
+### Endpoint 5: Standalone Public Telemetry Stream
+- **URL:** `GET /api/device/telemetry-public.php`
+- **Page:** [`public/telemetry_monitor.php`](file:///C:/xampp/htdocs/WBACFSPWI-Web-Based-Automatic-Controller-for-Solar-Powered-Water-Irrigation/public/telemetry_monitor.php)
+- **Features:** Direct lightweight mobile/desktop telemetry viewer without login requirements for immediate field testing.
+
 ---
 
 ## 6. How to Verify Full Synchronization

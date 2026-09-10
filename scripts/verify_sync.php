@@ -256,6 +256,25 @@ check("Controller wiring guide SVG reflects 12V MOTORCYCLE / 3S BATTERY",
     strpos($fCtrlWiring, '12V MOTORCYCLE / 3S BATTERY') !== false);
 
 // -------------------------------------------------------------
+// CHECK GROUP 10: LIVE TELEMETRY TEST & MONITORING SYNCHRONIZATION
+// -------------------------------------------------------------
+echo "--- Live Telemetry Test & Monitoring System Synchronization ---\n";
+check("public/admin/telemetry_test.php exists",
+    file_exists($rootDir . '/public/admin/telemetry_test.php'));
+check("Sidebar navigation includes active route `telemetry` (/admin/telemetry_test.php)",
+    strpos($fSidebar, "'telemetry'") !== false && strpos($fSidebar, '/admin/telemetry_test.php') !== false);
+check("public/api/admin/telemetry-live.php exists with inject and clear handlers",
+    file_exists($rootDir . '/public/api/admin/telemetry-live.php') &&
+    strpos(file_get_contents($rootDir . '/public/api/admin/telemetry-live.php'), "'inject'") !== false &&
+    strpos(file_get_contents($rootDir . '/public/api/admin/telemetry-live.php'), "'clear'") !== false);
+check("public/telemetry_monitor.php standalone viewer exists",
+    file_exists($rootDir . '/public/telemetry_monitor.php'));
+check("public/api/device/telemetry-public.php public stream exists",
+    file_exists($rootDir . '/public/api/device/telemetry-public.php'));
+check("scripts/reset_runtime_data.php data purge utility exists",
+    file_exists($rootDir . '/scripts/reset_runtime_data.php'));
+
+// -------------------------------------------------------------
 // SUMMARY
 // -------------------------------------------------------------
 echo "\n=======================================================\n";
