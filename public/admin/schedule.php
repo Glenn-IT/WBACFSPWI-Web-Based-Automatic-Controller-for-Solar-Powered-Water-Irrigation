@@ -85,7 +85,7 @@ include __DIR__ . '/partials/sidebar.php';
 <?php endif; ?>
 
 <div class="row g-3">
-    <div class="col-md-5">
+    <div class="col-12 col-lg-5">
         <div class="card shadow-sm">
             <div class="card-header"><?= $editing ? 'Edit Schedule' : 'Add Schedule' ?></div>
             <div class="card-body">
@@ -113,16 +113,18 @@ include __DIR__ . '/partials/sidebar.php';
                     </div>
                     <div class="mb-3">
                         <label class="form-label d-block">Days of Week</label>
-                        <?php
-                        $selectedDays = $editing ? explode(',', $editing['days_of_week']) : [];
-                        foreach ($dayOptions as $key => $label):
-                        ?>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="checkbox" name="days[]" value="<?= $key ?>"
-                                       id="day_<?= $key ?>" <?= in_array($key, $selectedDays, true) ? 'checked' : '' ?>>
-                                <label class="form-check-label" for="day_<?= $key ?>"><?= $label ?></label>
-                            </div>
-                        <?php endforeach; ?>
+                        <div class="d-flex flex-wrap gap-2 pt-1">
+                            <?php
+                            $selectedDays = $editing ? explode(',', $editing['days_of_week']) : [];
+                            foreach ($dayOptions as $key => $label):
+                            ?>
+                                <div class="form-check form-check-inline m-0">
+                                    <input class="form-check-input" type="checkbox" name="days[]" value="<?= $key ?>"
+                                           id="day_<?= $key ?>" <?= in_array($key, $selectedDays, true) ? 'checked' : '' ?>>
+                                    <label class="form-check-label small" for="day_<?= $key ?>"><?= $label ?></label>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
                     </div>
 
                     <button type="submit" class="btn btn-primary"><?= $editing ? 'Update' : 'Add Schedule' ?></button>
@@ -134,11 +136,11 @@ include __DIR__ . '/partials/sidebar.php';
         </div>
     </div>
 
-    <div class="col-md-7">
+    <div class="col-12 col-lg-7">
         <div class="card shadow-sm">
             <div class="card-header">All Schedules</div>
             <div class="table-responsive">
-                <table class="table table-hover mb-0 align-middle">
+                <table class="table table-hover mb-0 align-middle text-nowrap">
                     <thead>
                         <tr>
                             <th>Label</th>
@@ -164,7 +166,7 @@ include __DIR__ . '/partials/sidebar.php';
                                         <?= $s['is_active'] ? 'Active' : 'Inactive' ?>
                                     </span>
                                 </td>
-                                <td class="text-end">
+                                <td class="text-end text-nowrap">
                                     <a href="<?= BASE_URL ?>/admin/schedule.php?edit=<?= (int) $s['id'] ?>" class="btn btn-sm btn-outline-primary">Edit</a>
                                     <form method="post" action="<?= BASE_URL ?>/admin/schedule.php" class="d-inline">
                                         <?= Csrf::field() ?>

@@ -113,15 +113,15 @@ include __DIR__ . '/partials/sidebar.php';
 <div class="card shadow-sm mb-3">
     <div class="card-body">
         <form method="get" action="<?= BASE_URL ?>/admin/reports.php" class="row g-2 align-items-end">
-            <div class="col-auto">
+            <div class="col-6 col-sm-auto">
                 <label class="form-label small mb-1">From</label>
                 <input type="date" name="from" class="form-control form-control-sm" value="<?= htmlspecialchars($from) ?>">
             </div>
-            <div class="col-auto">
+            <div class="col-6 col-sm-auto">
                 <label class="form-label small mb-1">To</label>
                 <input type="date" name="to" class="form-control form-control-sm" value="<?= htmlspecialchars($to) ?>">
             </div>
-            <div class="col-auto">
+            <div class="col-12 col-md-auto d-flex flex-wrap gap-1 mt-2 mt-md-0">
                 <button type="submit" class="btn btn-sm btn-primary">Apply</button>
                 <a href="<?= BASE_URL ?>/admin/reports.php?from=<?= htmlspecialchars($from) ?>&to=<?= htmlspecialchars($to) ?>&export=csv"
                    class="btn btn-sm btn-outline-secondary">Export Events CSV</a>
@@ -193,15 +193,15 @@ include __DIR__ . '/partials/sidebar.php';
         <?php if (empty($readings)): ?>
             <div class="text-muted text-center py-4">No sensor data for this range.</div>
         <?php else: ?>
-            <div style="max-width: 100%; overflow-x: auto;">
-                <canvas id="trendChart" height="90"></canvas>
+            <div class="chart-container-responsive">
+                <canvas id="trendChart"></canvas>
             </div>
         <?php endif; ?>
     </div>
 </div>
 
 <div class="card shadow-sm">
-    <div class="card-header d-flex justify-content-between align-items-center">
+    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
         <span>Irrigation Logs</span>
         <form method="get" action="<?= BASE_URL ?>/admin/reports.php" class="d-flex align-items-center gap-2">
             <input type="hidden" name="from" value="<?= htmlspecialchars($from) ?>">
@@ -214,7 +214,7 @@ include __DIR__ . '/partials/sidebar.php';
         </form>
     </div>
     <div class="table-responsive">
-        <table class="table table-hover mb-0 align-middle">
+        <table class="table table-hover mb-0 align-middle text-nowrap">
             <thead>
                 <tr>
                     <th>Schedule</th>
@@ -293,6 +293,7 @@ new Chart(ctx, {
     },
     options: {
         responsive: true,
+        maintainAspectRatio: false,
         interaction: { mode: 'index', intersect: false },
         scales: { x: { ticks: { maxTicksLimit: 10 } } },
     },

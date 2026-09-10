@@ -7,12 +7,12 @@ include __DIR__ . '/partials/head.php';
 include __DIR__ . '/partials/sidebar.php';
 ?>
 
-<div class="d-flex justify-content-between align-items-center mb-3">
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-3">
     <div>
         <h4 class="mb-1">📡 Live Telemetry Monitor & Integration Test</h4>
         <p class="text-muted small mb-0">Direct real-time hardware packet inspector between Arduino Uno, NodeMCU ESP8266, and MySQL database.</p>
     </div>
-    <div class="d-flex gap-2">
+    <div class="d-flex flex-wrap gap-2 w-100 w-md-auto">
         <button class="btn btn-sm btn-outline-primary" id="btn-inject-packet">
             ⚡ Inject Test Packet
         </button>
@@ -27,15 +27,15 @@ include __DIR__ . '/partials/sidebar.php';
 
 <!-- Real-Time Hardware Link Status Bar -->
 <div class="card bg-dark border-secondary shadow-sm mb-4">
-    <div class="card-body py-3 d-flex flex-wrap justify-content-between align-items-center gap-3">
+    <div class="card-body py-3 d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3">
         <div class="d-flex align-items-center gap-3">
-            <div id="status-indicator-dot" style="width: 16px; height: 16px; border-radius: 50%; background: #6c757d;"></div>
+            <div id="status-indicator-dot" style="width: 16px; height: 16px; border-radius: 50%; background: #6c757d; flex-shrink: 0;"></div>
             <div>
                 <span class="badge" id="status-badge" style="font-size: 0.95rem; background: #343a40;">CHECKING DATABASE...</span>
-                <span class="text-light ms-2 small" id="status-message">Initializing live telemetry poll...</span>
+                <span class="text-light ms-2 small d-block d-sm-inline" id="status-message">Initializing live telemetry poll...</span>
             </div>
         </div>
-        <div class="d-flex align-items-center gap-4 text-secondary small">
+        <div class="d-flex flex-wrap align-items-center gap-3 gap-md-4 text-secondary small">
             <div>Total Database Records: <strong class="text-info fs-5" id="val-total-records">0</strong></div>
             <div>Last Packet Arrival: <strong class="text-light" id="val-last-arrival">--</strong></div>
             <div>Active Battery Profile: <strong class="text-warning">12V Motorcycle Lead-Acid (10.5V - 14.4V)</strong></div>
@@ -46,8 +46,8 @@ include __DIR__ . '/partials/sidebar.php';
 <!-- Live Metric Cards (Latest Packet) -->
 <div class="row g-3 mb-4">
     <!-- Root Soil Moisture -->
-    <div class="col-md-3">
-        <div class="card stat-card shadow-sm border-0" style="border-left: 4px solid #10b981 !important;">
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card stat-card shadow-sm border-0 h-100" style="border-left: 4px solid #10b981 !important;">
             <div class="card-body">
                 <div class="text-muted small fw-bold text-uppercase">🌱 Root Soil Moisture</div>
                 <div class="fs-2 fw-bold text-success" id="card-soil">--%</div>
@@ -57,8 +57,8 @@ include __DIR__ . '/partials/sidebar.php';
     </div>
 
     <!-- Surface Ponding Water Level -->
-    <div class="col-md-3">
-        <div class="card stat-card shadow-sm border-0" style="border-left: 4px solid #06b6d4 !important;">
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card stat-card shadow-sm border-0 h-100" style="border-left: 4px solid #06b6d4 !important;">
             <div class="card-body">
                 <div class="text-muted small fw-bold text-uppercase">🌊 Surface Water Level</div>
                 <div class="fs-2 fw-bold text-info" id="card-water">--%</div>
@@ -68,8 +68,8 @@ include __DIR__ . '/partials/sidebar.php';
     </div>
 
     <!-- 12V Battery Voltage -->
-    <div class="col-md-3">
-        <div class="card stat-card shadow-sm border-0" style="border-left: 4px solid #8b5cf6 !important;">
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card stat-card shadow-sm border-0 h-100" style="border-left: 4px solid #8b5cf6 !important;">
             <div class="card-body">
                 <div class="text-muted small fw-bold text-uppercase">🔋 12V Battery Voltage</div>
                 <div class="fs-2 fw-bold" style="color: #a855f7;" id="card-battery">-- V</div>
@@ -79,8 +79,8 @@ include __DIR__ . '/partials/sidebar.php';
     </div>
 
     <!-- Solar Voltage & Pump State -->
-    <div class="col-md-3">
-        <div class="card stat-card shadow-sm border-0" style="border-left: 4px solid #f59e0b !important;">
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card stat-card shadow-sm border-0 h-100" style="border-left: 4px solid #f59e0b !important;">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
@@ -122,7 +122,7 @@ include __DIR__ . '/partials/sidebar.php';
     <!-- Right Column: Database Feed Table (Last 25 Rows) -->
     <div class="col-lg-8">
         <div class="card shadow-sm h-100">
-            <div class="card-header bg-dark text-light d-flex justify-content-between align-items-center">
+            <div class="card-header bg-dark text-light d-flex justify-content-between align-items-center flex-wrap gap-2">
                 <span class="fw-bold small text-uppercase">🗄️ Database Record Stream (Last 25 Received)</span>
                 <div class="form-check form-switch mb-0">
                     <input class="form-check-input" type="checkbox" id="chk-auto-refresh" checked>
@@ -130,7 +130,7 @@ include __DIR__ . '/partials/sidebar.php';
                 </div>
             </div>
             <div class="card-body p-0 table-responsive" style="max-height: 480px; overflow-y: auto;">
-                <table class="table table-dark table-hover table-striped mb-0 text-center align-middle" style="font-size: 0.88rem;">
+                <table class="table table-dark table-hover table-striped mb-0 text-center align-middle text-nowrap" style="font-size: 0.88rem;">
                     <thead class="table-secondary text-dark sticky-top">
                         <tr>
                             <th>#ID</th>

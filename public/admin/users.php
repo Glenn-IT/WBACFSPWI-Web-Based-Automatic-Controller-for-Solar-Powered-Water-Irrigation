@@ -113,7 +113,7 @@ include __DIR__ . '/partials/sidebar.php';
 <?php endif; ?>
 
 <div class="row g-3">
-    <div class="col-md-4">
+    <div class="col-12 col-lg-4">
         <div class="card shadow-sm">
             <div class="card-header">Add User</div>
             <div class="card-body">
@@ -149,11 +149,11 @@ include __DIR__ . '/partials/sidebar.php';
         </div>
     </div>
 
-    <div class="col-md-8">
+    <div class="col-12 col-lg-8">
         <div class="card shadow-sm">
             <div class="card-header">All Users</div>
             <div class="table-responsive">
-                <table class="table table-hover mb-0 align-middle">
+                <table class="table table-hover mb-0 align-middle text-nowrap">
                     <thead>
                         <tr>
                             <th>Name</th>
@@ -194,7 +194,7 @@ include __DIR__ . '/partials/sidebar.php';
                                     </span>
                                 </td>
                                 <td class="small text-muted"><?= htmlspecialchars($u['last_login_at'] ?? 'Never') ?></td>
-                                <td class="text-end">
+                                <td class="text-end text-nowrap">
                                     <?php if ((int) $u['id'] !== (int) $user['id']): ?>
                                         <form method="post" action="<?= BASE_URL ?>/admin/users.php" class="d-inline">
                                             <?= Csrf::field() ?>

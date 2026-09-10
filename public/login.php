@@ -59,14 +59,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Login - Web Based Automatic Controller for Solar Powered Water Irrigation</title>
     <link rel="icon" href="<?= BASE_URL ?>/assets/img/logo.png" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/app.css">
 </head>
 <body class="bg-light">
-<div class="d-flex align-items-center justify-content-center vh-100">
-    <div class="card shadow-sm" style="width: 360px;">
+<div class="d-flex align-items-center justify-content-center min-vh-100 py-4 px-3">
+    <div class="card shadow-sm w-100" style="max-width: 380px;">
         <div class="card-body p-4">
             <div class="text-center mb-3">
                 <img src="<?= BASE_URL ?>/assets/img/logo.png" alt="Logo" class="login-logo mb-2">

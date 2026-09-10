@@ -10,8 +10,8 @@ include __DIR__ . '/partials/sidebar.php';
 <h4 class="mb-4">Dashboard</h4>
 
 <div class="row g-3 mb-4">
-    <div class="col-md-4">
-        <div class="card stat-card shadow-sm">
+    <div class="col-12 col-sm-6 col-lg-4">
+        <div class="card stat-card shadow-sm h-100">
             <div class="card-body">
                 <div class="text-muted small">Soil Moisture</div>
                 <div class="fs-3 fw-bold" id="stat-soil-moisture">--%</div>
@@ -19,16 +19,16 @@ include __DIR__ . '/partials/sidebar.php';
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card stat-card shadow-sm">
+    <div class="col-12 col-sm-6 col-lg-4">
+        <div class="card stat-card shadow-sm h-100">
             <div class="card-body">
                 <div class="text-muted small">Water Level</div>
                 <div class="fs-3 fw-bold" id="stat-water-level">--%</div>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card stat-card shadow-sm">
+    <div class="col-12 col-sm-6 col-lg-4">
+        <div class="card stat-card shadow-sm h-100">
             <div class="card-body">
                 <div class="text-muted small">Battery Voltage</div>
                 <div class="fs-3 fw-bold" style="color: #a855f7;" id="stat-battery">-- V</div>
@@ -36,18 +36,18 @@ include __DIR__ . '/partials/sidebar.php';
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card stat-card shadow-sm">
+    <div class="col-12 col-sm-6 col-lg-4">
+        <div class="card stat-card shadow-sm h-100">
             <div class="card-body">
                 <div class="text-muted small">Solar Output</div>
                 <div class="fs-3 fw-bold" id="stat-solar">-- W</div>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card stat-card shadow-sm border-0" style="border-left: 4px solid #3b82f6 !important;">
+    <div class="col-12 col-sm-6 col-lg-4">
+        <div class="card stat-card shadow-sm border-0 h-100" style="border-left: 4px solid #3b82f6 !important;">
             <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start mb-2">
+                <div class="d-flex justify-content-between align-items-start flex-wrap gap-1 mb-2">
                     <div>
                         <div class="text-muted small">Pump Relay State</div>
                         <div class="fs-3 fw-bold">
@@ -63,7 +63,7 @@ include __DIR__ . '/partials/sidebar.php';
                 <!-- Manual Pump Override Switch Buttons -->
                 <div class="mt-2 pt-2 border-top border-light-subtle">
                     <div class="text-muted small mb-1 fw-semibold">Manual Control Switch:</div>
-                    <div class="btn-group w-100" role="group" aria-label="Pump Controls">
+                    <div class="btn-group w-100 btn-group-pump" role="group" aria-label="Pump Controls">
                         <button type="button" class="btn btn-sm btn-outline-success" id="btn-pump-on" title="Force Pump ON">
                             ⚡ Force ON
                         </button>
@@ -94,7 +94,9 @@ include __DIR__ . '/partials/sidebar.php';
         <div class="card shadow-sm">
             <div class="card-header">Sensor Trends</div>
             <div class="card-body">
-                <canvas id="trendChart" height="80"></canvas>
+                <div class="chart-container-responsive">
+                    <canvas id="trendChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
@@ -158,6 +160,7 @@ function renderTrendChart(trend) {
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             interaction: { mode: 'index', intersect: false },
             scales: { y: { min: 0, max: 100 }, x: { ticks: { maxTicksLimit: 8 } } },
         },

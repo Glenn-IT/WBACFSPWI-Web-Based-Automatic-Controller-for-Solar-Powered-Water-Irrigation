@@ -101,13 +101,15 @@ if (($step === 'answer' || $step === 'reset') && !empty($_SESSION['pwreset_user_
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Forgot Password - WBACFSPWI Admin</title>
+    <link rel="icon" href="<?= BASE_URL ?>/assets/img/logo.png" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/app.css">
 </head>
 <body class="bg-light">
-<div class="d-flex align-items-center justify-content-center vh-100">
-    <div class="card shadow-sm" style="width: 400px;">
+<div class="d-flex align-items-center justify-content-center min-vh-100 py-4 px-3">
+    <div class="card shadow-sm w-100" style="max-width: 420px;">
         <div class="card-body p-4">
             <h5 class="card-title mb-3 text-center">Forgot Password</h5>
 

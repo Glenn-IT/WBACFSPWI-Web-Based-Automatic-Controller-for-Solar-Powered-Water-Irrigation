@@ -54,13 +54,32 @@ body {
     top: 12px;
     left: 12px;
     z-index: 1050;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    line-height: 42px;
+    text-align: center;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    background-color: #1e2a35;
+    border: 1px solid #37474f;
+    color: #fff;
+    font-size: 1.25rem;
+}
+
+.mobile-nav-toggle:hover,
+.mobile-nav-toggle:focus {
+    background-color: #2b3b47;
+    color: #fff;
+    outline: none;
 }
 
 .sidebar-backdrop {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(2px);
     z-index: 1030;
 }
 
@@ -68,9 +87,43 @@ body {
     display: block;
 }
 
+/* Flex child safety rule: prevents tables/charts from expanding the body beyond 100vw */
+main.flex-grow-1 {
+    min-width: 0;
+    width: 100%;
+}
+
+.table-responsive {
+    width: 100%;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Responsive Pump Control Button Group */
+.btn-group-pump {
+    display: flex;
+    width: 100%;
+}
+
+.btn-group-pump .btn {
+    flex: 1 1 0;
+    font-size: 0.8rem;
+    padding: 0.35rem 0.3rem;
+    white-space: nowrap;
+}
+
+/* Responsive Chart Container */
+.chart-container-responsive {
+    position: relative;
+    width: 100%;
+    min-height: 240px;
+    height: 280px;
+}
+
 @media (max-width: 767.98px) {
     .mobile-nav-toggle {
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .sidebar {
@@ -80,20 +133,42 @@ body {
         bottom: 0;
         z-index: 1040;
         transform: translateX(-100%);
-        transition: transform 0.2s ease-in-out;
+        transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.4);
     }
 
     .sidebar.sidebar-open {
         transform: translateX(0);
     }
 
-    main {
-        padding-top: 4rem !important;
+    main.flex-grow-1 {
+        padding: 1rem !important;
+        padding-top: 4.25rem !important;
         width: 100%;
     }
 
-    .table-responsive {
-        max-width: 100vw;
+    .stat-card .fs-3 {
+        font-size: 1.5rem !important;
+    }
+
+    .btn-group-pump .btn {
+        font-size: 0.72rem;
+        padding: 0.35rem 0.2rem;
+    }
+}
+
+@media (max-width: 420px) {
+    .btn-group-pump {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .btn-group-pump .btn {
+        width: 100%;
+        border-radius: 6px !important;
+        font-size: 0.8rem;
+        padding: 0.4rem 0.5rem;
     }
 }

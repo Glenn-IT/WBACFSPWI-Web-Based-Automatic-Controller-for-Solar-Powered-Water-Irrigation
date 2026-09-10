@@ -97,7 +97,7 @@ include __DIR__ . '/partials/sidebar.php';
     <div class="card-body">
         <form method="get" action="<?= BASE_URL ?>/admin/logs.php" class="row g-2 align-items-end">
             <input type="hidden" name="tab" value="alerts">
-            <div class="col-auto">
+            <div class="col-6 col-md-auto">
                 <label class="form-label small mb-1">Type</label>
                 <select name="type" class="form-select form-select-sm">
                     <option value="">All</option>
@@ -106,7 +106,7 @@ include __DIR__ . '/partials/sidebar.php';
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="col-auto">
+            <div class="col-6 col-md-auto">
                 <label class="form-label small mb-1">Status</label>
                 <select name="is_read" class="form-select form-select-sm">
                     <option value="">All</option>
@@ -114,7 +114,7 @@ include __DIR__ . '/partials/sidebar.php';
                     <option value="1" <?= $alertFilters['is_read'] === '1' ? 'selected' : '' ?>>Read</option>
                 </select>
             </div>
-            <div class="col-auto">
+            <div class="col-12 col-md-auto mt-2 mt-md-0 d-flex gap-1">
                 <button type="submit" class="btn btn-sm btn-primary">Filter</button>
                 <a href="<?= BASE_URL ?>/admin/logs.php?tab=alerts" class="btn btn-sm btn-outline-secondary">Reset</a>
             </div>
@@ -124,7 +124,7 @@ include __DIR__ . '/partials/sidebar.php';
 
 <div class="card shadow-sm">
     <div class="table-responsive">
-        <table class="table table-hover mb-0 align-middle">
+        <table class="table table-hover mb-0 align-middle text-nowrap">
             <thead>
                 <tr>
                     <th>Type</th>
@@ -144,7 +144,7 @@ include __DIR__ . '/partials/sidebar.php';
                         <td><?= htmlspecialchars($a['message']) ?></td>
                         <td><?= (int) $a['is_read'] === 1 ? '<span class="text-muted">Read</span>' : '<span class="text-primary">Unread</span>' ?></td>
                         <td><?= htmlspecialchars($a['created_at']) ?></td>
-                        <td class="text-end">
+                        <td class="text-end text-nowrap">
                             <?php if ((int) $a['is_read'] === 0): ?>
                                 <form method="post" action="<?= BASE_URL ?>/admin/logs.php?<?= htmlspecialchars(http_build_query(['tab' => 'alerts'])) ?>" class="d-inline">
                                     <?= Csrf::field() ?>
@@ -190,22 +190,22 @@ include __DIR__ . '/partials/sidebar.php';
     <div class="card-body">
         <form method="get" action="<?= BASE_URL ?>/admin/logs.php" class="row g-2 align-items-end">
             <input type="hidden" name="tab" value="logs">
-            <div class="col-md-3">
+            <div class="col-12 col-sm-6 col-lg-3">
                 <label class="form-label small">Action contains</label>
                 <input type="text" name="action_q" class="form-control form-control-sm"
                        value="<?= htmlspecialchars($logFilters['action'] ?? '') ?>" placeholder="e.g. schedule_update">
             </div>
-            <div class="col-md-3">
+            <div class="col-12 col-sm-6 col-lg-3">
                 <label class="form-label small">From date</label>
                 <input type="date" name="date_from" class="form-control form-control-sm"
                        value="<?= htmlspecialchars($logFilters['date_from'] ?? '') ?>">
             </div>
-            <div class="col-md-3">
+            <div class="col-12 col-sm-6 col-lg-3">
                 <label class="form-label small">To date</label>
                 <input type="date" name="date_to" class="form-control form-control-sm"
                        value="<?= htmlspecialchars($logFilters['date_to'] ?? '') ?>">
             </div>
-            <div class="col-md-3">
+            <div class="col-12 col-sm-6 col-lg-3 d-flex gap-1">
                 <button type="submit" class="btn btn-sm btn-primary">Filter</button>
                 <a href="<?= BASE_URL ?>/admin/logs.php?tab=logs" class="btn btn-sm btn-outline-secondary">Reset</a>
             </div>
@@ -215,7 +215,7 @@ include __DIR__ . '/partials/sidebar.php';
 
 <div class="card shadow-sm">
     <div class="table-responsive">
-        <table class="table table-hover mb-0 align-middle">
+        <table class="table table-hover mb-0 align-middle text-nowrap">
             <thead>
                 <tr>
                     <th>Date/Time</th>
@@ -242,7 +242,7 @@ include __DIR__ . '/partials/sidebar.php';
         </table>
     </div>
     <?php if ($logTotalPages > 1): ?>
-        <div class="card-footer d-flex justify-content-between align-items-center">
+        <div class="card-footer d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2">
             <span class="text-muted small"><?= $logResult['total'] ?> total entries</span>
             <nav>
                 <ul class="pagination pagination-sm mb-0">

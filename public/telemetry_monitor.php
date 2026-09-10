@@ -45,7 +45,7 @@ require_once __DIR__ . '/../config/bootstrap.php';
 <body>
 <div class="container-fluid" style="max-width: 1300px;">
     <!-- Top Header -->
-    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom border-secondary">
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4 pb-3 border-bottom border-secondary">
         <div>
             <span class="badge bg-primary px-3 py-2 text-uppercase mb-2">Standalone Live Hardware Telemetry</span>
             <h2 class="h3 fw-bold mb-1">WBACFSPWI Rice Irrigation Controller Telemetry</h2>
@@ -59,15 +59,15 @@ require_once __DIR__ . '/../config/bootstrap.php';
     </div>
 
     <!-- Live Status Banner -->
-    <div class="monitor-card p-3 mb-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
+    <div class="monitor-card p-3 mb-4 d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3">
         <div class="d-flex align-items-center gap-3">
-            <span class="live-dot" id="live-dot" style="background: #ef4444;"></span>
+            <span class="live-dot" id="live-dot" style="background: #ef4444; flex-shrink: 0;"></span>
             <div>
                 <span class="badge" id="live-badge" style="font-size: 0.95rem; background: #374151;">CONNECTING...</span>
-                <span class="text-light ms-2 small" id="live-msg">Polling endpoint...</span>
+                <span class="text-light ms-2 small d-block d-sm-inline" id="live-msg">Polling endpoint...</span>
             </div>
         </div>
-        <div class="d-flex gap-4 text-secondary small">
+        <div class="d-flex flex-wrap gap-2 gap-sm-4 text-secondary small">
             <div>Packets in Database: <strong class="text-info fs-5 mono-val" id="cnt-packets">0</strong></div>
             <div>Latest Packet Age: <strong class="text-light mono-val" id="age-packet">--</strong></div>
             <div>Battery Chem: <strong class="text-warning">12V Motorcycle Lead-Acid</strong></div>
@@ -76,33 +76,33 @@ require_once __DIR__ . '/../config/bootstrap.php';
 
     <!-- Live Metrics Grid -->
     <div class="row g-3 mb-4">
-        <div class="col-md-3">
-            <div class="metric-card" style="border-left: 4px solid #10b981;">
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="metric-card h-100" style="border-left: 4px solid #10b981;">
                 <div class="text-secondary small fw-bold text-uppercase">🌱 Root Soil Moisture</div>
-                <div class="fs-1 fw-bold text-success mono-val my-1" id="m-soil">--%</div>
+                <div class="fs-2 fs-sm-1 fw-bold text-success mono-val my-1" id="m-soil">--%</div>
                 <div class="text-secondary small">Air: ~0% | Submerged: ~100%</div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="metric-card" style="border-left: 4px solid #06b6d4;">
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="metric-card h-100" style="border-left: 4px solid #06b6d4;">
                 <div class="text-secondary small fw-bold text-uppercase">🌊 Surface Water Level</div>
-                <div class="fs-1 fw-bold text-info mono-val my-1" id="m-water">--%</div>
+                <div class="fs-2 fs-sm-1 fw-bold text-info mono-val my-1" id="m-water">--%</div>
                 <div class="text-secondary small">Refill: &lt;45% | Target Max: &ge;50%</div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="metric-card" style="border-left: 4px solid #8b5cf6;">
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="metric-card h-100" style="border-left: 4px solid #8b5cf6;">
                 <div class="text-secondary small fw-bold text-uppercase">🔋 12V Battery Voltage</div>
-                <div class="fs-1 fw-bold mono-val my-1" style="color: #c084fc;" id="m-battery">-- V</div>
+                <div class="fs-2 fs-sm-1 fw-bold mono-val my-1" style="color: #c084fc;" id="m-battery">-- V</div>
                 <div class="text-secondary small" id="m-battery-pct">Charge: --% (10.5V - 14.4V)</div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="metric-card" style="border-left: 4px solid #f59e0b;">
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="metric-card h-100" style="border-left: 4px solid #f59e0b;">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
                         <div class="text-secondary small fw-bold text-uppercase">☀️ Solar Panel Output</div>
-                        <div class="fs-1 fw-bold text-warning mono-val my-1" id="m-solar">-- V</div>
+                        <div class="fs-2 fs-sm-1 fw-bold text-warning mono-val my-1" id="m-solar">-- V</div>
                     </div>
                     <div class="text-end">
                         <div class="text-secondary small fw-bold text-uppercase">Pump State</div>
@@ -122,17 +122,17 @@ require_once __DIR__ . '/../config/bootstrap.php';
                     <strong class="text-uppercase small">Hardware JSON Packet</strong>
                     <span class="badge bg-info mono-val" id="pkt-id">#--</span>
                 </div>
-                <pre class="text-success small mono-val mb-0" id="json-raw" style="background:#090d16; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; min-height: 220px;">Waiting for telemetry packet...</pre>
+                <pre class="text-success small mono-val mb-0" id="json-raw" style="background:#090d16; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; min-height: 220px; white-space: pre-wrap; word-break: break-all;">Waiting for telemetry packet...</pre>
             </div>
         </div>
         <div class="col-lg-8">
             <div class="monitor-card h-100 p-3">
-                <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom border-secondary">
+                <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom border-secondary flex-wrap gap-2">
                     <strong class="text-uppercase small">Recent Telemetry Records (Last 20)</strong>
                     <span class="badge bg-dark border border-secondary text-secondary">Auto-Refresh 1s</span>
                 </div>
                 <div class="table-responsive" style="max-height: 380px; overflow-y: auto;">
-                    <table class="table table-dark table-striped table-hover text-center align-middle mb-0 small">
+                    <table class="table table-dark table-striped table-hover text-center align-middle mb-0 small text-nowrap">
                         <thead class="table-secondary text-dark sticky-top">
                             <tr>
                                 <th>#ID</th>
