@@ -66,4 +66,10 @@ if ($batteryVoltage !== null && $batteryVoltage > ALERT_HIGH_BATTERY_VOLTS && !A
     $newAlerts[] = 'overcharge';
 }
 
-echo json_encode(['status' => 'ok', 'alerts_created' => $newAlerts]);
+$activeCommand = Override::getActiveCommand();
+
+echo json_encode([
+    'status' => 'ok',
+    'alerts_created' => $newAlerts,
+    'command' => $activeCommand,
+]);

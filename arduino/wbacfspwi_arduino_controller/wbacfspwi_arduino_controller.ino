@@ -85,6 +85,8 @@ bool  pumpState          = false;
 bool  isSettling         = false;
 bool  lowBatteryLockout  = false;
 bool  timeoutLockout     = false;
+bool  manualOverride     = false;
+bool  manualOverrideState= false;
 
 unsigned long pumpStartTime     = 0;
 unsigned long pumpStopTime      = 0;
@@ -299,9 +301,13 @@ void loop() {
       Serial.println(F("[SAFETY] Cooldown finished. Resuming normal operations."));
     }
 
-    // 3. Automated Decision Logic with 10s Settling Safety Net
+    // 3. Automated Decision Logic with 10s Settling Safety Net & Manual Override
     if (lowBatteryLockout || timeoutLockout) {
       setPump(false);
+      isSettling = false;
+    } else if (manualOverride) {
+      // Manual Override takes precedence over automated sensor decisions
+      setPump(manualOverrideState);
       isSettling = false;
     } else if (isSettling) {
       if (now - settlingStartTime >= SETTLING_DELAY_MS) {
@@ -361,11 +367,20 @@ void loop() {
     String cmd = espSerial.readStringUntil('\n');
     cmd.trim();
     if (cmd == "PUMP_ON") {
+      manualOverride = true;
+      manualOverrideState = true;
       setPump(true);
-      Serial.println(F(">>> [REMOTE COMMAND via WiFi] Forced Pump ON"));
+      Serial.println(F(">>> [REMOTE COMMAND via WiFi] Manual Override: PUMP ON"));
     } else if (cmd == "PUMP_OFF") {
+      manualOverride = true;
+      manualOverrideState = false;
       setPump(false);
-      Serial.println(F(">>> [REMOTE COMMAND via WiFi] Forced Pump OFF"));
+      Serial.println(F(">>> [REMOTE COMMAND via WiFi] Manual Override: PUMP OFF"));
+    } else if (cmd == "PUMP_AUTO") {
+      if (manualOverride) {
+        manualOverride = false;
+        Serial.println(F(">>> [REMOTE COMMAND via WiFi] Manual Override Cleared -> AUTO Mode Resumed"));
+      }
     }
   }
 

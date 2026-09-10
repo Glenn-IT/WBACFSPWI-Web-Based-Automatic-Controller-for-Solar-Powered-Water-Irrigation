@@ -132,6 +132,18 @@ bool postTelemetryToBackend(const String& jsonPayload) {
     if (httpCode == 200) {
       success = true;
       blinkLed(1, 80); // Quick blink on successful transmit
+
+      // Check for remote control commands from web dashboard
+      if (response.indexOf("\"command\":\"PUMP_ON\"") >= 0) {
+        arduinoSerial.println("PUMP_ON");
+        Serial.println(F("[REMOTE COMMAND] Dispatched PUMP_ON to Arduino Uno"));
+      } else if (response.indexOf("\"command\":\"PUMP_OFF\"") >= 0) {
+        arduinoSerial.println("PUMP_OFF");
+        Serial.println(F("[REMOTE COMMAND] Dispatched PUMP_OFF to Arduino Uno"));
+      } else if (response.indexOf("\"command\":\"PUMP_AUTO\"") >= 0) {
+        arduinoSerial.println("PUMP_AUTO");
+        Serial.println(F("[REMOTE COMMAND] Dispatched PUMP_AUTO to Arduino Uno"));
+      }
     }
   } else {
     Serial.print(F("  -> POST failed, error: "));

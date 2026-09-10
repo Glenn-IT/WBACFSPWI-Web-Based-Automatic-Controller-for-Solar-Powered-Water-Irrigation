@@ -277,6 +277,55 @@ check("arduino/HARDWARE_STARTUP_GUIDE.md integration startup guide exists",
     file_exists($rootDir . '/arduino/HARDWARE_STARTUP_GUIDE.md'));
 
 // -------------------------------------------------------------
+// CHECK GROUP 11: MANUAL PUMP OVERRIDE & BIDIRECTIONAL CONTROL SYNCHRONIZATION
+// -------------------------------------------------------------
+echo "--- Manual Pump Override & Bidirectional Control Synchronization ---\n";
+check("src/models/Override.php model exists",
+    file_exists($rootDir . '/src/models/Override.php'));
+$fOverride = file_exists($rootDir . '/src/models/Override.php') ? file_get_contents($rootDir . '/src/models/Override.php') : '';
+check("Override model defines getActiveCommand(), create(), and clearAll()",
+    strpos($fOverride, 'getActiveCommand') !== false &&
+    strpos($fOverride, 'create') !== false &&
+    strpos($fOverride, 'clearAll') !== false);
+
+check("public/api/admin/pump-control.php control endpoint exists",
+    file_exists($rootDir . '/public/api/admin/pump-control.php'));
+$fPumpCtrl = file_exists($rootDir . '/public/api/admin/pump-control.php') ? file_get_contents($rootDir . '/public/api/admin/pump-control.php') : '';
+check("pump-control.php handles on, off, and auto actions",
+    strpos($fPumpCtrl, "'on'") !== false &&
+    strpos($fPumpCtrl, "'off'") !== false &&
+    strpos($fPumpCtrl, "'auto'") !== false);
+
+$fReport = file_get_contents($rootDir . '/public/api/device/report.php');
+check("public/api/device/report.php returns active command in response payload",
+    strpos($fReport, "'command'") !== false && strpos($fReport, 'Override::getActiveCommand()') !== false);
+
+check("Production ESP8266 node forwards PUMP_ON, PUMP_OFF, PUMP_AUTO to Arduino",
+    strpos($fEspNode, 'arduinoSerial.println("PUMP_ON")') !== false &&
+    strpos($fEspNode, 'arduinoSerial.println("PUMP_OFF")') !== false &&
+    strpos($fEspNode, 'arduinoSerial.println("PUMP_AUTO")') !== false);
+
+$f09 = file_get_contents($rootDir . '/arduino/09_esp8266_wifi_bridge_test/09_esp8266_wifi_bridge_test.ino');
+check("Test 09 WiFi Bridge forwards PUMP_ON, PUMP_OFF, PUMP_AUTO to Arduino",
+    strpos($f09, 'arduinoSerial.println("PUMP_ON")') !== false &&
+    strpos($f09, 'arduinoSerial.println("PUMP_OFF")') !== false &&
+    strpos($f09, 'arduinoSerial.println("PUMP_AUTO")') !== false);
+
+check("Main Controller handles manualOverride with PUMP_ON, PUMP_OFF, PUMP_AUTO",
+    strpos($fMain, 'manualOverride') !== false &&
+    strpos($fMain, 'PUMP_ON') !== false &&
+    strpos($fMain, 'PUMP_OFF') !== false &&
+    strpos($fMain, 'PUMP_AUTO') !== false);
+
+$fDashboard = file_get_contents($rootDir . '/public/admin/dashboard.php');
+check("Dashboard UI contains 3-way manual pump switch buttons (btn-pump-on, btn-pump-off, btn-pump-auto)",
+    strpos($fDashboard, 'btn-pump-on') !== false &&
+    strpos($fDashboard, 'btn-pump-off') !== false &&
+    strpos($fDashboard, 'btn-pump-auto') !== false);
+check("Dashboard UI contains setPumpOverride() JavaScript handler",
+    strpos($fDashboard, 'setPumpOverride') !== false);
+
+// -------------------------------------------------------------
 // SUMMARY
 // -------------------------------------------------------------
 echo "\n=======================================================\n";

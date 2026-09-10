@@ -177,6 +177,14 @@ The standalone Arduino Uno controller (`wbacfspwi_arduino_controller.ino`) and i
 - **Page:** [`public/telemetry_monitor.php`](file:///C:/xampp/htdocs/WBACFSPWI-Web-Based-Automatic-Controller-for-Solar-Powered-Water-Irrigation/public/telemetry_monitor.php)
 - **Features:** Direct lightweight mobile/desktop telemetry viewer without login requirements for immediate field testing.
 
+### Endpoint 6: Remote Pump Manual Override API
+- **URL:** `POST /api/admin/pump-control.php`
+- **Session:** Authenticated session (`Auth::requireRole(['super_admin', 'admin'])`)
+- **Action values:** `on` (Force ON), `off` (Force OFF), `auto` (Resume Auto)
+- **Model:** [`src/models/Override.php`](file:///C:/xampp/htdocs/WBACFSPWI-Web-Based-Automatic-Controller-for-Solar-Powered-Water-Irrigation/src/models/Override.php)
+- **Device Delivery:** Embedded in HTTP 200 response of `/api/device/report.php` as `"command": "PUMP_ON" | "PUMP_OFF" | "PUMP_AUTO"`. NodeMCU receives response and writes command to Arduino Uno SoftwareSerial (D1/D2 <-> 9/10).
+- **Arduino Safety Override:** Manual state overrides automatic water level thresholds, while preserving low-battery lockout (<10.0V) and thermal/runtime safety limits.
+
 ---
 
 ## 6. How to Verify Full Synchronization
@@ -187,4 +195,4 @@ Run the automated verification suite from the project root at any time:
 php scripts/verify_sync.php
 ```
 
-If all 39+ inter-file tests pass, the system is 100% synchronized. If any check fails, the test script pinpoint the exact file, constant, and line that is out of sync.
+If all 83+ inter-file tests pass, the system is 100% synchronized. If any check fails, the test script pinpoints the exact file, constant, and line that is out of sync.

@@ -23,6 +23,7 @@ $allSchedules = array_values(array_filter(
 
 echo json_encode([
     'is_sample' => $isSample,
+    'active_command' => Override::getActiveCommand(),
     'reading' => [
         'soil_moisture' => $reading['soil_moisture'],
         'water_level' => $reading['water_level'],

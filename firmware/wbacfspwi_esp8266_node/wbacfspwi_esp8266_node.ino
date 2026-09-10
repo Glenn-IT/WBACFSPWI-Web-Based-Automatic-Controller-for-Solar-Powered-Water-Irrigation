@@ -74,6 +74,19 @@ void forwardReport(const String& payload) {
   int code = http.POST(payload);
   if (code == 200) {
     digitalWrite(PIN_LED, LOW); delay(50); digitalWrite(PIN_LED, HIGH);
+
+    // Check for remote control commands from web dashboard
+    String response = http.getString();
+    if (response.indexOf("\"command\":\"PUMP_ON\"") >= 0) {
+      arduinoSerial.println("PUMP_ON");
+      Serial.println(F("[REMOTE COMMAND] Dispatched PUMP_ON to Arduino Uno"));
+    } else if (response.indexOf("\"command\":\"PUMP_OFF\"") >= 0) {
+      arduinoSerial.println("PUMP_OFF");
+      Serial.println(F("[REMOTE COMMAND] Dispatched PUMP_OFF to Arduino Uno"));
+    } else if (response.indexOf("\"command\":\"PUMP_AUTO\"") >= 0) {
+      arduinoSerial.println("PUMP_AUTO");
+      Serial.println(F("[REMOTE COMMAND] Dispatched PUMP_AUTO to Arduino Uno"));
+    }
   } else {
     Serial.printf("[HTTP] Report error code: %d\n", code);
   }
