@@ -273,6 +273,8 @@ check("public/api/device/telemetry-public.php public stream exists",
     file_exists($rootDir . '/public/api/device/telemetry-public.php'));
 check("scripts/reset_runtime_data.php data purge utility exists",
     file_exists($rootDir . '/scripts/reset_runtime_data.php'));
+check("arduino/HARDWARE_STARTUP_GUIDE.md integration startup guide exists",
+    file_exists($rootDir . '/arduino/HARDWARE_STARTUP_GUIDE.md'));
 
 // -------------------------------------------------------------
 // SUMMARY

@@ -36,6 +36,7 @@ This directory contains the standalone Arduino Uno hardware sketches, component 
 
 | Folder / File | Purpose | Description |
 |---|---|---|
+| [`HARDWARE_STARTUP_GUIDE.md`](./HARDWARE_STARTUP_GUIDE.md) | **Integration Startup Guide** | Step-by-step power-up sequence, wiring checklist, flashing reference, and live telemetry testing for Arduino Uno + NodeMCU. |
 | [`Pinout_and_Schematic.md`](./Pinout_and_Schematic.md) | Wiring Reference | Complete pin assignments, voltage divider math, wiring table, and electrical safety guidelines. |
 | [`01_soil_root_capacitive_test/`](./01_soil_root_capacitive_test/01_soil_root_capacitive_test.ino) | Root Sensor Test | Calibrates Capacitive Moisture Sensor v1.2 in dry air vs. water to determine ADC thresholds. |
 | [`02_surface_water_level_test/`](./02_surface_water_level_test/02_surface_water_level_test.ino) | Surface Sensor Test | Calibrates HW-080 Moisture Sensor module (probe + LM393 board) for detecting standing water in rice field. |
