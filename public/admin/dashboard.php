@@ -30,8 +30,9 @@ include __DIR__ . '/partials/sidebar.php';
     <div class="col-md-4">
         <div class="card stat-card shadow-sm">
             <div class="card-body">
-                <div class="text-muted small">Battery Level</div>
-                <div class="fs-3 fw-bold" id="stat-battery">--%</div>
+                <div class="text-muted small">Battery Voltage</div>
+                <div class="fs-3 fw-bold" style="color: #a855f7;" id="stat-battery">-- V</div>
+                <div class="small text-muted" id="stat-battery-sub">Est. Charge: --%</div>
             </div>
         </div>
     </div>
@@ -119,10 +120,10 @@ function renderTrendChart(trend) {
                     spanGaps: true,
                 },
                 {
-                    label: 'Battery Level (%)',
-                    data: trend.battery_percent,
-                    borderColor: '#ef6c00',
-                    backgroundColor: 'rgba(239,108,0,0.1)',
+                    label: 'Battery Voltage (V)',
+                    data: trend.battery_voltage || trend.battery_percent,
+                    borderColor: '#a855f7',
+                    backgroundColor: 'rgba(168,85,247,0.1)',
                     tension: 0.3,
                     spanGaps: true,
                 },
@@ -150,7 +151,19 @@ function refreshDashboard() {
             const r = data.reading;
             document.getElementById('stat-soil-moisture').textContent = r && r.soil_moisture !== null ? r.soil_moisture + '%' : '--%';
             document.getElementById('stat-water-level').textContent = r && r.water_level !== null ? r.water_level + '%' : '--%';
-            document.getElementById('stat-battery').textContent = r && r.battery_percent !== null ? r.battery_percent + '%' : '--%';
+            
+            if (r && r.battery_voltage !== null) {
+                document.getElementById('stat-battery').textContent = Number(r.battery_voltage).toFixed(2) + ' V';
+                if (document.getElementById('stat-battery-sub')) {
+                    document.getElementById('stat-battery-sub').textContent = r.battery_percent !== null ? 'Est. Charge: ' + r.battery_percent + '%' : '';
+                }
+            } else {
+                document.getElementById('stat-battery').textContent = '-- V';
+                if (document.getElementById('stat-battery-sub')) {
+                    document.getElementById('stat-battery-sub').textContent = '';
+                }
+            }
+
             document.getElementById('stat-solar').textContent = r && r.solar_output !== null ? r.solar_output + ' W' : '-- W';
 
             const pumpBadge = document.getElementById('stat-pump-state');

@@ -228,9 +228,9 @@ $fDevCfgPath = $rootDir . '/config/device.php';
 $fDevCfg = file_exists($fDevCfgPath) ? file_get_contents($fDevCfgPath) : '';
 check("config/device.php defines '12v_motorcycle' profile as default",
     strpos($fDevCfg, "'12v_motorcycle'") !== false);
-check("config/device.php defines 10.5V min and 14.4V max for motorcycle battery",
+check("config/device.php defines 10.5V min and 12.7V resting max for motorcycle battery",
     strpos($fDevCfg, "define('BATTERY_MIN_VOLTS', 10.5)") !== false &&
-    strpos($fDevCfg, "define('BATTERY_MAX_VOLTS', 14.4)") !== false);
+    strpos($fDevCfg, "define('BATTERY_MAX_VOLTS', 12.7)") !== false);
 check("config/device.php preserves '3s_liion' profile option for 3S 18650 packs",
     strpos($fDevCfg, "'3s_liion'") !== false && strpos($fDevCfg, "define('BATTERY_MAX_VOLTS', 12.6)") !== false);
 

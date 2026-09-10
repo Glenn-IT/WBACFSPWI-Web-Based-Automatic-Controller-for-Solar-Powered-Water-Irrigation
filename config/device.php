@@ -35,5 +35,5 @@ if ($batteryProfile === '6v_sla') {
     define('ALERT_LOW_BATTERY_VOLTS', 10.8);   // Low voltage warning to prevent lead-acid sulfation
     define('ALERT_HIGH_BATTERY_VOLTS', 14.8);  // Overvoltage warning above 14.4V bulk solar charge
     define('BATTERY_MIN_VOLTS', 10.5);         // Discharged battery floor (0% charge)
-    define('BATTERY_MAX_VOLTS', 14.4);         // Full solar absorption charge ceiling (100% charge)
+    define('BATTERY_MAX_VOLTS', 12.7);         // Full resting charge ceiling (100% capacity at 12.7V)
 }

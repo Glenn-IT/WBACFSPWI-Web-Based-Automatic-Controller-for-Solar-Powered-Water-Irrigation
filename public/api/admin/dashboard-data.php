@@ -26,6 +26,7 @@ echo json_encode([
     'reading' => [
         'soil_moisture' => $reading['soil_moisture'],
         'water_level' => $reading['water_level'],
+        'battery_voltage' => $reading['battery_voltage'] !== null ? round((float) $reading['battery_voltage'], 2) : null,
         'battery_percent' => SensorReading::batteryPercent($reading['battery_voltage'] !== null ? (float) $reading['battery_voltage'] : null),
         'solar_output' => $reading['solar_output'],
         'pump_state' => $reading['pump_state'],
@@ -35,6 +36,7 @@ echo json_encode([
         'labels' => array_map(fn($r) => substr($r['recorded_at'], 0, 10), $history),
         'soil_moisture' => array_map(fn($r) => $r['soil_moisture'], $history),
         'water_level' => array_map(fn($r) => $r['water_level'], $history),
+        'battery_voltage' => array_map(fn($r) => $r['battery_voltage'] !== null ? round((float) $r['battery_voltage'], 2) : null, $history),
         'battery_percent' => array_map(fn($r) => SensorReading::batteryPercent($r['battery_voltage'] !== null ? (float) $r['battery_voltage'] : null), $history),
     ],
     'today_schedules' => array_map(fn($s) => [
