@@ -7,7 +7,7 @@ This file serves as the single source of truth for physical sensor calibration v
 | Sensor / Measurement | Pin | Raw Dry / Minimum | Raw Wet / Maximum | Scaling Factor | Active Sketches |
 | :--- | :---: | :---: | :---: | :---: | :--- |
 | **Capacitive Soil (Root Zone)** | `A0` | `417` (Air / 0%) | `153` (Water / 100%) | Multi-sample Avg (16x) | `01_soil_root_capacitive_test`<br>`07_dual_sensor_pump_integration_test`<br>`08_dc_adapter_presentation_test`<br>`10_gsm_sms_irrigation_alert_test`<br>`wbacfspwi_arduino_controller` |
-| **HW-080 (Surface Ponding Level)** | `A1` | `1020` (Air / 0%)<br>`410` (Mid / 50%) | `355` (Full / 100%) | 3-Point Physical Ruler Calibration | `02_surface_water_level_test`<br>`07_dual_sensor_pump_integration_test`<br>`08_dc_adapter_presentation_test`<br>`10_gsm_sms_irrigation_alert_test`<br>`wbacfspwi_arduino_controller` |
+| **HW-080 (Surface Ponding Level)** | `A1` | `1020` (Air / 0%)<br>`663` (Mid / 50%) | `568` (Full / 100%) | 3-Point Physical Ruler Calibration | `02_surface_water_level_test`<br>`07_dual_sensor_pump_integration_test`<br>`08_dc_adapter_presentation_test`<br>`10_gsm_sms_irrigation_alert_test`<br>`wbacfspwi_arduino_controller` |
 | **Battery Voltage Divider** | `A2` | `0.0V` | `12.6V` (Max 3S) / `14.4V` (Motorcycle) | `4.0303` (100kΩ/33kΩ) | `04_battery_voltage_test`<br>`06_solar_charger_battery_test`<br>`wbacfspwi_arduino_controller` |
 | **Solar Panel Voltage Divider** | `A3` | `0.0V` | `25.0V` (Max Input) | `6.0000` (100kΩ/20kΩ) | `05_solar_voltage_test`<br>`06_solar_charger_battery_test`<br>`wbacfspwi_arduino_controller` |
 
@@ -43,7 +43,7 @@ This file serves as the single source of truth for physical sensor calibration v
 | Date | Sensor | Dry Raw ADC | Wet / Full Raw ADC | Notes |
 | :--- | :--- | :---: | :---: | :--- |
 | Initial | Capacitive Soil (A0) | `417` | `153` | Air (0%) vs Full water submersion (100%) |
-| 2026-08-31 | HW-080 Surface (A1) | `1020` (Air)<br>`410` (Middle 50%) | `355` (Full 100%) | 3-Point physical ruler calibration: 1020=0% (dry air), 410=50.0% (exact middle/7-8cm), 355=100.0% (top header / max flood). |
+| 2026-09-13 | HW-080 Surface (A1) | `1020` (Air)<br>`663` (Middle 50%) | `568` (Full 100%) | 3-Point physical ruler calibration: 1020=0% (dry air), 663=50.0% (exact middle/7-8cm), 568=100.0% (top header / max flood). |
 | 2026-09-09 | 12V Battery Divider (A2) | `0.0V` | `14.4V` | Verified compatible with 12V Motorcycle Lead-Acid (up to 14.4V bulk solar charge = 3.57V on ADC). |
 
 ---

@@ -55,16 +55,16 @@ check("Calibration Registry records Capacitive Root (417/153)",
 
 echo "\n2. Testing HW-080 Surface Water Level (A1) 3-Point Calibration:\n";
 $f02 = file_get_contents("$rootDir/arduino/02_surface_water_level_test/02_surface_water_level_test.ino");
-check("Test 02 defines HW080 Dry=1020, Mid=410, Wet=355", 
-    strpos($f02, '1020') !== false && strpos($f02, '410') !== false && strpos($f02, '355') !== false);
-check("Test 07 defines HW080 Dry=1020, Mid=410, Wet=355", 
-    strpos($f07, '1020') !== false && strpos($f07, '410') !== false && strpos($f07, '355') !== false);
-check("Test 08 defines HW080 Dry=1020, Mid=410, Wet=355", 
-    strpos($f08, '1020') !== false && strpos($f08, '410') !== false && strpos($f08, '355') !== false);
-check("Main Controller defines HW080 Dry=1020, Mid=410, Wet=355", 
-    strpos($fMain, '1020') !== false && strpos($fMain, '410') !== false && strpos($fMain, '355') !== false);
-check("Calibration Registry records HW-080 (1020/410/355)", 
-    strpos($fCal, '1020') !== false && strpos($fCal, '410') !== false && strpos($fCal, '355') !== false);
+check("Test 02 defines HW080 Dry=1020, Mid=663, Wet=568", 
+    strpos($f02, '1020') !== false && strpos($f02, '663') !== false && strpos($f02, '568') !== false);
+check("Test 07 defines HW080 Dry=1020, Mid=663, Wet=568", 
+    strpos($f07, '1020') !== false && strpos($f07, '663') !== false && strpos($f07, '568') !== false);
+check("Test 08 defines HW080 Dry=1020, Mid=663, Wet=568", 
+    strpos($f08, '1020') !== false && strpos($f08, '663') !== false && strpos($f08, '568') !== false);
+check("Main Controller defines HW080 Dry=1020, Mid=663, Wet=568", 
+    strpos($fMain, '1020') !== false && strpos($fMain, '663') !== false && strpos($fMain, '568') !== false);
+check("Calibration Registry records HW-080 (1020/663/568)", 
+    strpos($fCal, '1020') !== false && strpos($fCal, '663') !== false && strpos($fCal, '568') !== false);
 
 echo "\n3. Testing Resistor Voltage Divider Ratios:\n";
 $f04 = file_get_contents("$rootDir/arduino/04_battery_voltage_test/04_battery_voltage_test.ino");

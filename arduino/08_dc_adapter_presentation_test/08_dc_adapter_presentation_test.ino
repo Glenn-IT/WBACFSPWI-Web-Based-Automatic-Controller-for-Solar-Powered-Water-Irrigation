@@ -50,8 +50,8 @@ const int SOIL_WATER_RAW     = 153;  // Sensor submerged in water (100% moisture
 
 // HW-080 Surface Water Level Sensor (3-Point Ruler Calibration)
 const int HW080_RAW_DRY      = 1020; // 0.0% surface water (dry probe)
-const int HW080_RAW_MID      = 410;  // 50.0% water depth (mid-probe mark)
-const int HW080_RAW_WET      = 355;  // 100.0% water depth (fully immersed)
+const int HW080_RAW_MID      = 663;  // 50.0% water depth (mid-probe mark)
+const int HW080_RAW_WET      = 568;  // 100.0% water depth (fully immersed)
 
 // Irrigation Decision Thresholds (Synchronized 50%/45% Hysteresis)
 const float WATER_TARGET_MAX        = 50.0;  // Automatic Mode: Stop pump at >= 50.0% water level

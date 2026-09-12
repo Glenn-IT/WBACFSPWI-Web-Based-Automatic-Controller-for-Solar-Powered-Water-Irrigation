@@ -69,7 +69,7 @@ To prevent inductive motor spikes and high-current relay switching from causing 
 | **SIG-01** | Arduino Pin D7 | Direct Jumper | Relay IN Pin | **Amber** | 5V Digital Out | Active LOW trigger with 3-minute continuous runtime safety cap. |
 | **SIG-02** | Arduino Pin D8 | Direct Jumper | Capacitive Sensor VCC | **Pink / Red** | 5V Digital Gate | Powers capacitive sensor only during sampling (anti-corrosion). |
 | **SIG-03** | Capacitive Sensor AOUT | Direct Jumper | Arduino Pin A0 | **Green** | 0V – 3.0V Analog | Root zone soil moisture reading (Air ~417, Water ~153). |
-| **SIG-04** | HW-080 Sensor AO | Direct Jumper | Arduino Pin A1 | **Cyan** | 0V – 5.0V Analog | Surface ponding depth controller (Dry=1020, Mid=410, Full=355). Maintains 50% target (ON < 45%, OFF $\ge$ 50%, 5s min runtime, 10s settling). |
+| **SIG-04** | HW-080 Sensor AO | Direct Jumper | Arduino Pin A1 | **Cyan** | 0V – 5.0V Analog | Surface ponding depth controller (Dry=1020, Mid=663, Full=568). Maintains 50% target (ON < 45%, OFF $\ge$ 50%, 5s min runtime, 10s settling). |
 | **SIG-05** | Row 10 (R1/R2 Junction) | 100kΩ / 33kΩ Divider | Arduino Pin A2 | **Purple** | 0V – 3.57V Analog | Battery voltage monitor ($V_{\text{batt}} / 4.0303$). Cutoff < 10.0V. Max 3.57V at 14.4V solar bulk charge. |
 | **SIG-06** | Row 25 (R3/R4 Junction) | 100kΩ / 20kΩ Divider | Arduino Pin A3 | **Gold / Yellow** | 0V – 3.67V Analog | Solar panel monitor ($V_{\text{solar}} / 6.000$). Harvesting > 12.0V. |
 | **COMM-01**| Arduino Pin 10 (TX) | Row 45 (1kΩ/2kΩ Divider)| NodeMCU Pin D1 (RX) | **Orange** | 0V – 3.3V Logic | **Wireless Telemetry Link:** Sends structured JSON to NodeMCU (5V $\rightarrow$ 3.3V shifted). |

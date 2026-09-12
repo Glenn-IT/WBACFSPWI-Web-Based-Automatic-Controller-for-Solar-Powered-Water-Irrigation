@@ -42,8 +42,8 @@
 
   // Calibrated HW-080 constants (Calibrated to Physical Ruler & Water Height):
   const int HW080_RAW_DRY      = 1020;  // 0.0% surface standing water (dry surface)
-  const int HW080_RAW_MID      = 410;   // 50.0% water at middle of sensor (7-8cm mark)
-  const int HW080_RAW_WET      = 355;   // 100.0% full container depth (top header / max flood)
+  const int HW080_RAW_MID      = 663;   // 50.0% water at middle of sensor (7-8cm mark)
+  const int HW080_RAW_WET      = 568;   // 100.0% full container depth (top header / max flood)
 
   // ============================================================================
   // 3. IRRIGATION CONTROL THRESHOLDS (3-LAYER SAFETY: HYSTERESIS + MIN RUN + SETTLING)
@@ -143,22 +143,20 @@
     Serial.println(F("  - REFILL MIN (PUMP ON)  : < 45.0% Surface Water (5% Hysteresis Gap)"));
     Serial.println(F("  - MINIMUM RUNTIME       : 5 Seconds (Anti-Splash Protection)"));
     Serial.println(F("  - SETTLING WINDOW       : 10 Seconds Wave Stabilization"));
-    Serial.println(F("  - Calibrated            : HW080 Dry=1020, Mid=410, Full=355"));
+    Serial.println(F("  - Calibrated            : HW080 Dry=1020, Mid=663, Full=568"));
     Serial.println(F("=================================================================="));
     
-    // 30-Second Sensor Calibration & Stabilization Window
-    Serial.println(F("[STARTUP] 30-Second Sensor Calibration & Stabilization Window..."));
-    for (int sec = 30; sec > 0; sec--) {
+    // 10-Second Sensor Calibration & Stabilization Window
+    Serial.println(F("[STARTUP] 10-Second Sensor Calibration & Stabilization Window..."));
+    for (int sec = 10; sec > 0; sec--) {
       Serial.print(F("  -> Stabilizing sensors... "));
       Serial.print(sec);
       Serial.println(F("s remaining"));
       readRootSoilMoisture();
       readSurfaceWaterLevel();
-      digitalWrite(PIN_STATUS_LED, (sec % 2 == 0) ? HIGH : LOW);
       delay(1000);
     }
-    digitalWrite(PIN_STATUS_LED, LOW);
-    Serial.println(F("[STARTUP] 30-second calibration window complete! Starting autonomous maintenance...\n"));
+    Serial.println(F("[STARTUP] Calibration window complete! Starting autonomous maintenance...\n"));
   }
 
   void loop() {
@@ -180,15 +178,12 @@
       unsigned long elapsedSettling = now - settlingStartTime;
       if (elapsedSettling >= SETTLING_DELAY_MS) {
         isSettling = false;
-        // Re-evaluate with settled surface water:
-        // 50.0% is Target Max, < 45.0% is Refill Trigger.
-        // If settled level is >= 45.0%, water is sufficient -> Pump stays shut off.
-        // If settled level is < 45.0%, water dropped below refill trigger -> Resuming pump.
-        if (surfaceWater < WATER_REFILL_MIN) {
-          Serial.println(F(">>> [REFILL] 10s Settling complete! Level settled < 45.0% -> Resuming pump"));
-          setPump(true, "Post-settling reading dropped below 45.0% refill trigger");
+        // Re-evaluate with settled surface water
+        if (surfaceWater >= WATER_TARGET_MAX) {
+          Serial.println(F(">>> [STABLE] 10s Settling complete! Level verified >= 50.0% -> Pump stays OFF"));
         } else {
-          Serial.println(F(">>> [STABLE] 10s Settling complete! Level settled >= 45.0% -> Pump stays OFF"));
+          Serial.println(F(">>> [REFILL] 10s Settling complete! Level settled < 50.0% -> Resuming pump"));
+          setPump(true, "Post-settling reading below 50.0%");
         }
       }
     } else if (pumpState) {

@@ -17,12 +17,13 @@ Whenever any sensor calibration constant, voltage divider factor, or control thr
 
 ### 2. HW-080 Surface Moisture / Ponding Level Sensor (Pin A1)
 - `HW080_RAW_DRY`: Raw 10-bit ADC in dry air (0% standing water) -> `1020`
-- `HW080_RAW_MID`: Raw 10-bit ADC at middle container height (50% standing water) -> `410`
-- `HW080_RAW_WET`: Raw 10-bit ADC at maximum container depth / full submergence (100% standing water) -> `355`
+- `HW080_RAW_MID`: Raw 10-bit ADC at middle container height (50% standing water) -> `663`
+- `HW080_RAW_WET`: Raw 10-bit ADC at maximum container depth / full submergence (100% standing water) -> `568`
 - Applicable files:
   - `arduino/02_surface_water_level_test/02_surface_water_level_test.ino`
   - `arduino/07_dual_sensor_pump_integration_test/07_dual_sensor_pump_integration_test.ino`
   - `arduino/08_dc_adapter_presentation_test/08_dc_adapter_presentation_test.ino`
+  - `arduino/10_gsm_sms_irrigation_alert_test/10_gsm_sms_irrigation_alert_test.ino`
   - `arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino`
 
 ### 3. Voltage Divider Ratios & Battery Lockout

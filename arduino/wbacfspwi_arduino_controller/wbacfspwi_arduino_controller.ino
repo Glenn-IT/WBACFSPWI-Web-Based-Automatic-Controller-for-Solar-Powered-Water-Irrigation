@@ -75,8 +75,8 @@ const int SOIL_WATER_RAW     = 153;    // 100% moisture in water
 
 // HW-080 Moisture Sensor (Physical Ruler 3-Point Calibration for Surface Ponding Depth)
 const int HW080_RAW_DRY      = 1020;   // Stage 0: Probe in dry air (0.0% surface water)
-const int HW080_RAW_MID      = 410;    // Stage 1: Water at middle of sensor 7-8cm mark (50.0% depth)
-const int HW080_RAW_WET      = 355;    // Stage 2: Probe at container maximum depth (100% full ponding)
+const int HW080_RAW_MID      = 663;    // Stage 1: Water at middle of sensor 7-8cm mark (50.0% depth)
+const int HW080_RAW_WET      = 568;    // Stage 2: Probe at container maximum depth (100% full ponding)
 
 // Irrigation Decision Thresholds (Surface Water Level Control with 5% Hysteresis)
 const float WATER_TARGET_MAX   = 50.0; // Automatically stop pump when surface water level reaches >= 50.0%
@@ -356,11 +356,11 @@ float readSurfaceWater() {
   if (raw >= HW080_RAW_DRY) {
     return 0.0;
   } else if (raw >= HW080_RAW_MID) {
-    // Stage 1: Dry air (1020) down to Middle height (410) -> 0.0% to 50.0%
+    // Stage 1: Dry air (1020) down to Middle height (663) -> 0.0% to 50.0%
     float pct = 50.0 * (float)(HW080_RAW_DRY - raw) / (float)(HW080_RAW_DRY - HW080_RAW_MID);
     return constrain(pct, 0.0, 50.0);
   } else {
-    // Stage 2: Middle height (410) down to Full top (355) -> 50.0% to 100.0%
+    // Stage 2: Middle height (663) down to Full top (568) -> 50.0% to 100.0%
     float pct = 50.0 + 50.0 * (float)(HW080_RAW_MID - raw) / (float)(HW080_RAW_MID - HW080_RAW_WET);
     return constrain(pct, 0.0, 100.0);
   }

@@ -43,5 +43,5 @@ This integrated test links **both physical sensors** and the **relay water pump*
   - Fully Submerged: `153` ADC $\rightarrow$ **`100.0%` Moisture**
 - **HW-080 Surface Water Level (A1) - 3-Point Piecewise Curve:**
   - Dry Probe in Air: `1020` ADC $\rightarrow$ **`0.0%` Surface Water**
-  - Middle Mark (7-8cm): `410` ADC $\rightarrow$ **`50.0%` Target Level**
-  - Full Submersion: `355` ADC $\rightarrow$ **`100.0%` Maximum Flood Depth**
+  - Middle Mark (7-8cm): `663` ADC $\rightarrow$ **`50.0%` Target Level**
+  - Full Submersion: `568` ADC $\rightarrow$ **`100.0%` Maximum Flood Depth**
