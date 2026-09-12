@@ -318,12 +318,12 @@ check("Main Controller handles manualOverride with PUMP_ON, PUMP_OFF, PUMP_AUTO"
     strpos($fMain, 'PUMP_AUTO') !== false);
 
 $fDashboard = file_get_contents($rootDir . '/public/admin/dashboard.php');
-check("Dashboard UI contains 3-way manual pump switch buttons (btn-pump-on, btn-pump-off, btn-pump-auto)",
-    strpos($fDashboard, 'btn-pump-on') !== false &&
-    strpos($fDashboard, 'btn-pump-off') !== false &&
-    strpos($fDashboard, 'btn-pump-auto') !== false);
-check("Dashboard UI contains setPumpOverride() JavaScript handler",
-    strpos($fDashboard, 'setPumpOverride') !== false);
+check("Dashboard UI displays autonomous pump relay state & control mode widgets",
+    strpos($fDashboard, 'stat-pump-state') !== false &&
+    strpos($fDashboard, 'stat-pump-mode') !== false);
+check("Dashboard UI operates autonomously without manual pump buttons",
+    strpos($fDashboard, 'btn-pump-on') === false &&
+    strpos($fDashboard, 'pump-status-sub') !== false);
 
 // -------------------------------------------------------------
 // TEST 10 GSM SMS ALERT MODULE SYNCHRONIZATION

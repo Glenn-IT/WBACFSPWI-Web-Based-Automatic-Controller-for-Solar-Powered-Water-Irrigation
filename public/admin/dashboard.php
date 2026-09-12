@@ -51,7 +51,7 @@ include __DIR__ . '/partials/sidebar.php';
                     <div>
                         <div class="text-muted small">Pump Relay State</div>
                         <div class="fs-3 fw-bold">
-                            <span class="badge bg-secondary" id="stat-pump-state">Unknown</span>
+                            <span class="badge bg-secondary" id="stat-pump-state">STANDBY</span>
                         </div>
                     </div>
                     <div class="text-end">
@@ -59,24 +59,8 @@ include __DIR__ . '/partials/sidebar.php';
                         <span class="badge bg-dark border border-secondary text-info" id="stat-pump-mode">AUTOMATIC</span>
                     </div>
                 </div>
-
-                <!-- Manual Pump Override Switch Buttons -->
-                <div class="mt-2 pt-2 border-top border-light-subtle">
-                    <div class="text-muted small mb-1 fw-semibold">Manual Control Switch:</div>
-                    <div class="btn-group w-100 btn-group-pump" role="group" aria-label="Pump Controls">
-                        <button type="button" class="btn btn-sm btn-outline-success" id="btn-pump-on" title="Force Pump ON">
-                            ⚡ Force ON
-                        </button>
-                        <button type="button" class="btn btn-sm btn-outline-danger" id="btn-pump-off" title="Force Pump OFF">
-                            🛑 Force OFF
-                        </button>
-                        <button type="button" class="btn btn-sm btn-outline-primary active" id="btn-pump-auto" title="Resume Automatic Sensor Logic">
-                            🔄 Auto Mode
-                        </button>
-                    </div>
-                    <div class="small text-muted mt-1" id="pump-control-msg" style="font-size: 0.78rem;">
-                        Operating autonomously based on surface water level.
-                    </div>
+                <div class="small text-muted mt-2 pt-2 border-top border-light-subtle" id="pump-status-sub">
+                    Autonomous: ON &lt; 45%, OFF &ge; 50%
                 </div>
             </div>
         </div>
@@ -216,38 +200,21 @@ function refreshDashboard() {
                 pumpBadge.className = 'badge bg-secondary';
             }
 
-            // Update Control Mode Indicator and Active Button States
+            // Update Control Mode Indicator
             const modeBadge = document.getElementById('stat-pump-mode');
-            const msgEl = document.getElementById('pump-control-msg');
-            const btnOn = document.getElementById('btn-pump-on');
-            const btnOff = document.getElementById('btn-pump-off');
-            const btnAuto = document.getElementById('btn-pump-auto');
-
-            btnOn.classList.remove('active', 'btn-success');
-            btnOn.classList.add('btn-outline-success');
-            btnOff.classList.remove('active', 'btn-danger');
-            btnOff.classList.add('btn-outline-danger');
-            btnAuto.classList.remove('active', 'btn-primary');
-            btnAuto.classList.add('btn-outline-primary');
-
+            const subEl = document.getElementById('pump-status-sub');
             if (data.active_command === 'PUMP_ON') {
                 modeBadge.textContent = 'MANUAL ON';
                 modeBadge.className = 'badge bg-success';
-                msgEl.textContent = 'Manual Override active: Pump forced ON.';
-                btnOn.classList.add('active', 'btn-success');
-                btnOn.classList.remove('btn-outline-success');
+                if (subEl) subEl.textContent = 'Active Override: Pump forced ON';
             } else if (data.active_command === 'PUMP_OFF') {
                 modeBadge.textContent = 'MANUAL OFF';
                 modeBadge.className = 'badge bg-danger';
-                msgEl.textContent = 'Manual Override active: Pump forced OFF.';
-                btnOff.classList.add('active', 'btn-danger');
-                btnOff.classList.remove('btn-outline-danger');
+                if (subEl) subEl.textContent = 'Active Override: Pump forced OFF';
             } else {
                 modeBadge.textContent = 'AUTOMATIC';
                 modeBadge.className = 'badge bg-dark border border-secondary text-info';
-                msgEl.textContent = 'Operating autonomously based on surface water level.';
-                btnAuto.classList.add('active', 'btn-primary');
-                btnAuto.classList.remove('btn-outline-primary');
+                if (subEl) subEl.textContent = 'Autonomous: ON < 45%, OFF ≥ 50%';
             }
 
             document.getElementById('stat-last-updated').textContent = r ? 'Last updated: ' + r.recorded_at : 'No sensor data received yet — waiting for Arduino / ESP8266 to connect.';
@@ -278,37 +245,6 @@ function refreshDashboard() {
         })
         .catch(() => {});
 }
-
-function setPumpOverride(action) {
-    const msgEl = document.getElementById('pump-control-msg');
-    msgEl.textContent = 'Dispatching command via WiFi bridge...';
-
-    const formData = new URLSearchParams();
-    formData.append('action', action);
-
-    fetch('<?= BASE_URL ?>/api/admin/pump-control.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: formData
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            msgEl.textContent = data.message;
-            refreshDashboard();
-        } else {
-            alert(data.error || 'Failed to update pump state.');
-        }
-    })
-    .catch(err => {
-        console.error(err);
-        msgEl.textContent = 'Error communicating with server.';
-    });
-}
-
-document.getElementById('btn-pump-on').addEventListener('click', () => setPumpOverride('on'));
-document.getElementById('btn-pump-off').addEventListener('click', () => setPumpOverride('off'));
-document.getElementById('btn-pump-auto').addEventListener('click', () => setPumpOverride('auto'));
 
 refreshDashboard();
 setInterval(refreshDashboard, 3000);
