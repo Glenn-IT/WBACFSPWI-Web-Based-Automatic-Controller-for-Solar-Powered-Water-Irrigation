@@ -27,11 +27,11 @@
 // 1. NETWORK & API CONFIGURATION
 // ============================================================================
 // Enter your WiFi Network Credentials here:
-const char* WIFI_SSID = "YOUR_WIFI_SSID";
-const char* WIFI_PASS = "YOUR_WIFI_PASSWORD";
+const char* WIFI_SSID = "Kabit ni Francis";
+const char* WIFI_PASS = "qwerty123";
 
 // LAN IP address of the machine running XAMPP, pointing to public/ directory
-const char* SERVER_HOST = "http://192.168.1.10/WBACFSPWI-Web-Based-Automatic-Controller-for-Solar-Powered-Water-Irrigation/public";
+const char* SERVER_HOST = "http://10.232.94.14/WBACFSPWI-Web-Based-Automatic-Controller-for-Solar-Powered-Water-Irrigation/public";
 
 // Device API key matching DEVICE_API_KEY in config/device.php
 const char* DEVICE_API_KEY = "dev-local-device-key";
