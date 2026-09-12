@@ -111,7 +111,7 @@ The standalone Arduino Uno controller (`wbacfspwi_arduino_controller.ino`) and i
 3. **Layer 3: Wave Settling Window (`SETTLING_DELAY_MS = 10000ms`)**
    - When the pump stops after hitting $\ge 50.0\%$, the system enters a **10-second settling window**.
    - Sensors pause irrigation decisions while physical wave action dissipates.
-   - If water settles $\ge 50.0\%$, state is marked STABLE. If water level settles $< 50.0\%$, pump refills to true target.
+   - If water settles $\ge 45.0\%$, pump stays shut off (STABLE / BUFFER ZONE). Pump only refills if settled level drops below the refill trigger ($< 45.0\%$).
 
 4. **Safety Interlocks:**
    - **Continuous Run Cap:** `MAX_PUMP_RUN_MS = 180000ms` (3 minutes maximum runtime).

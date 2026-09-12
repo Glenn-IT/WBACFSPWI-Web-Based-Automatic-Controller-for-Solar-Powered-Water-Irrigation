@@ -146,17 +146,19 @@
     Serial.println(F("  - Calibrated            : HW080 Dry=1020, Mid=410, Full=355"));
     Serial.println(F("=================================================================="));
     
-    // 10-Second Sensor Calibration & Stabilization Window
-    Serial.println(F("[STARTUP] 10-Second Sensor Calibration & Stabilization Window..."));
-    for (int sec = 10; sec > 0; sec--) {
+    // 30-Second Sensor Calibration & Stabilization Window
+    Serial.println(F("[STARTUP] 30-Second Sensor Calibration & Stabilization Window..."));
+    for (int sec = 30; sec > 0; sec--) {
       Serial.print(F("  -> Stabilizing sensors... "));
       Serial.print(sec);
       Serial.println(F("s remaining"));
       readRootSoilMoisture();
       readSurfaceWaterLevel();
+      digitalWrite(PIN_STATUS_LED, (sec % 2 == 0) ? HIGH : LOW);
       delay(1000);
     }
-    Serial.println(F("[STARTUP] Calibration window complete! Starting autonomous maintenance...\n"));
+    digitalWrite(PIN_STATUS_LED, LOW);
+    Serial.println(F("[STARTUP] 30-second calibration window complete! Starting autonomous maintenance...\n"));
   }
 
   void loop() {
@@ -178,12 +180,15 @@
       unsigned long elapsedSettling = now - settlingStartTime;
       if (elapsedSettling >= SETTLING_DELAY_MS) {
         isSettling = false;
-        // Re-evaluate with settled surface water
-        if (surfaceWater >= WATER_TARGET_MAX) {
-          Serial.println(F(">>> [STABLE] 10s Settling complete! Level verified >= 50.0% -> Pump stays OFF"));
+        // Re-evaluate with settled surface water:
+        // 50.0% is Target Max, < 45.0% is Refill Trigger.
+        // If settled level is >= 45.0%, water is sufficient -> Pump stays shut off.
+        // If settled level is < 45.0%, water dropped below refill trigger -> Resuming pump.
+        if (surfaceWater < WATER_REFILL_MIN) {
+          Serial.println(F(">>> [REFILL] 10s Settling complete! Level settled < 45.0% -> Resuming pump"));
+          setPump(true, "Post-settling reading dropped below 45.0% refill trigger");
         } else {
-          Serial.println(F(">>> [REFILL] 10s Settling complete! Level settled < 50.0% -> Resuming pump"));
-          setPump(true, "Post-settling reading below 50.0%");
+          Serial.println(F(">>> [STABLE] 10s Settling complete! Level settled >= 45.0% -> Pump stays OFF"));
         }
       }
     } else if (pumpState) {

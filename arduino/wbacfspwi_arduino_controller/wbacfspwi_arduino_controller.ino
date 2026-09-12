@@ -547,11 +547,11 @@ void loop() {
     } else if (isSettling) {
       if (now - settlingStartTime >= SETTLING_DELAY_MS) {
         isSettling = false;
-        if (currentSurfaceWater >= WATER_TARGET_MAX) {
-          Serial.println(F(">>> [STABLE] 10s Settling verified >= 50.0% -> Pump stays OFF"));
-        } else {
-          Serial.println(F(">>> [REFILL] 10s Settling settled < 50.0% -> Resuming pump"));
+        if (currentSurfaceWater < WATER_REFILL_MIN) {
+          Serial.println(F(">>> [REFILL] 10s Settling complete! Level settled < 45.0% -> Resuming pump"));
           setPump(true);
+        } else {
+          Serial.println(F(">>> [STABLE] 10s Settling complete! Level settled >= 45.0% -> Pump stays OFF"));
         }
       }
     } else if (pumpState) {
