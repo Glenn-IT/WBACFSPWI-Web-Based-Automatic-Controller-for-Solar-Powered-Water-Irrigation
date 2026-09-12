@@ -75,6 +75,8 @@ To prevent inductive motor spikes and high-current relay switching from causing 
 | **COMM-01**| Arduino Pin 10 (TX) | Row 45 (1kΩ/2kΩ Divider)| NodeMCU Pin D1 (RX) | **Orange** | 0V – 3.3V Logic | **Wireless Telemetry Link:** Sends structured JSON to NodeMCU (5V $\rightarrow$ 3.3V shifted). |
 | **COMM-02**| NodeMCU Pin D2 (TX) | Direct Jumper | Arduino Pin 9 (RX) | **White / Green** | 3.3V Logic (Safe) | **Remote Command Link:** Receives schedule/override commands from WiFi. |
 | **COMM-03**| USB Port (Arduino / NodeMCU) | Direct USB Cable | Computer / Laptop | **Blue Cable** | UART (115200 baud)| **Optional Diagnostics & Flashing Only** (No longer required for telemetry). |
+| **COMM-04**| GSM Module TXD | Direct Jumper | Arduino Pin D2 (RX) | **Green** | 0V – 2.8V Logic | **GSM Cellular Link:** Receives AT command responses and SMS dispatch status. |
+| **COMM-05**| Arduino Pin D3 (TX) | 1kΩ/2kΩ Divider | GSM Module RXD | **Orange** | 0V – 3.3V Logic | **GSM AT Transmit:** Sends AT+CMGS SMS commands (5V $\rightarrow$ 3.3V shifted). |
 
 ---
 

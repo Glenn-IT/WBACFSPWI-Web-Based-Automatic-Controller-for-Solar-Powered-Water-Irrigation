@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test 10: GSM Module (SIM800L) SMS Irrigation Alert Wiring Guide — WBACFSPWI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-hover: #334155;
+            --border-color: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-cyan: #06b6d4;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-purple: #8b5cf6;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+        .container { max-width: 1240px; margin: 0 auto; }
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.35rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-green);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            margin-bottom: 0.75rem;
+        }
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        p.subtitle { color: var(--text-secondary); font-size: 1.05rem; }
+        
+        .nav-bar {
+            display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; margin-bottom: 2rem;
+        }
+        .nav-link {
+            font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); background: var(--bg-card);
+            padding: 0.5rem 1rem; border-radius: 0.5rem; text-decoration: none; border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #ffffff; background: var(--accent-green); border-color: var(--accent-green);
+        }
+
+        .grid-layout { display: grid; grid-template-columns: 1fr; gap: 2rem; }
+        .card {
+            background-color: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: 1rem; padding: 1.75rem; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+        .card-title {
+            font-size: 1.25rem; font-weight: 700; margin-bottom: 1.25rem; display: flex;
+            align-items: center; gap: 0.75rem; color: var(--text-primary);
+        }
+        .card-title .icon {
+            width: 32px; height: 32px; border-radius: 0.5rem; background: rgba(16, 185, 129, 0.2);
+            color: var(--accent-green); display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+        }
+        .svg-container {
+            width: 100%; overflow-x: auto; background: #090d16; border-radius: 0.75rem;
+            padding: 1.5rem 1rem; border: 1px solid #1e293b;
+        }
+        svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+        .wire {
+            stroke-dasharray: 8; animation: dash 30s linear infinite;
+            transition: stroke-width 0.2s ease, stroke 0.2s ease; cursor: pointer;
+        }
+        .wire:hover { stroke-width: 4.5px !important; filter: drop-shadow(0 0 6px currentColor); }
+        @keyframes dash { to { stroke-dashoffset: -1000; } }
+
+        .wire-legend {
+            display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1.25rem; padding-top: 1.25rem;
+            border-top: 1px solid var(--border-color); font-size: 0.85rem; color: var(--text-secondary);
+        }
+        .legend-item { display: flex; align-items: center; gap: 0.5rem; }
+        .legend-color { width: 14px; height: 14px; border-radius: 3px; }
+
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.95rem; }
+        th {
+            background-color: #0f172a; color: var(--text-secondary); font-weight: 600;
+            padding: 0.85rem 1rem; border-bottom: 2px solid var(--border-color);
+            text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em;
+        }
+        td { padding: 1rem; border-bottom: 1px solid var(--border-color); color: var(--text-primary); }
+        tr:hover td { background-color: rgba(255, 255, 255, 0.02); }
+        
+        .pin-tag {
+            font-family: 'JetBrains Mono', monospace; padding: 0.2rem 0.5rem; border-radius: 0.35rem;
+            font-size: 0.85rem; font-weight: 600;
+        }
+        .tag-uno { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
+        .tag-gsm { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+        .tag-pwr { background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.4); }
+        .tag-bb  { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+
+        .callout {
+            border-left: 4px solid var(--accent-amber); background: rgba(245, 158, 11, 0.1);
+            padding: 1rem 1.25rem; border-radius: 0 0.5rem 0.5rem 0; margin-bottom: 1.5rem;
+        }
+        .callout-title { font-weight: 700; color: var(--accent-amber); margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem; }
+        .callout p { font-size: 0.9rem; color: var(--text-secondary); margin: 0; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <span class="badge">Hardware Test Suite 10</span>
+        <h1>GSM Module (SIM800L / SIM900) SMS Alert Wiring Guide</h1>
+        <p class="subtitle">Automated SMS Dispatches: Irrigation Started (&lt;45%), Stopped (&ge;50%), and Restarted Cycles</p>
+    </header>
+
+    <!-- Navigation Hub -->
+    <div class="nav-bar">
+        <a href="../index.html" class="nav-link">← Master Hardware Hub</a>
+        <a href="../wbacfspwi_arduino_controller/wiring_guide.html" class="nav-link">Full Controller</a>
+        <a href="../02_surface_water_level_test/wiring_guide.html" class="nav-link">Test 02: HW-080 Sensor</a>
+        <a href="../03_relay_pump_test/wiring_guide.html" class="nav-link">Test 03: Relay & Pump</a>
+        <a href="../07_dual_sensor_pump_integration_test/wiring_guide.html" class="nav-link">Test 07: Dual Sensor</a>
+        <a href="../09_esp8266_wifi_bridge_test/wiring_guide.html" class="nav-link">Test 09: WiFi Bridge</a>
+        <a href="wiring_guide.html" class="nav-link active">Test 10: GSM SMS Alert</a>
+    </div>
+
+    <div class="callout">
+        <div class="callout-title">⚠️ Critical SIM800L Power Warning</div>
+        <p>The SIM800L requires <strong>3.7V to 4.4V (nominal 4.0V)</strong> and draws up to <strong>2.0 Amperes peak burst current</strong> during cellular RF transmission. <strong>DO NOT</strong> attempt to power it from the Arduino 5V or 3.3V pin. Power it from the LM2596 Buck Converter or a 3.7V Li-ion battery, with a <strong>1000&mu;F capacitor</strong> across VCC and GND, and tie all GNDs together!</p>
+    </div>
+
+    <div class="grid-layout">
+        <!-- Interactive Breadboard Schematic Card -->
+        <div class="card">
+            <div class="card-title">
+                <div class="icon">⚡</div>
+                Interactive Breadboard & Star Wiring Schematic (Click wires to highlight)
+            </div>
+
+            <div class="svg-container">
+                <svg viewBox="0 0 1100 680" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Background Grid Pattern -->
+                    <defs>
+                        <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                            <circle cx="2" cy="2" r="1" fill="#1e293b"/>
+                        </pattern>
+                        <linearGradient id="grad-uno" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#1e40af"/>
+                            <stop offset="100%" stop-color="#1e3a8a"/>
+                        </linearGradient>
+                        <linearGradient id="grad-gsm" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#991b1b"/>
+                            <stop offset="100%" stop-color="#7f1d1d"/>
+                        </linearGradient>
+                        <linearGradient id="grad-relay" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#065f46"/>
+                            <stop offset="100%" stop-color="#064e3b"/>
+                        </linearGradient>
+                        <linearGradient id="grad-hw080" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#0e7490"/>
+                            <stop offset="100%" stop-color="#155e75"/>
+                        </linearGradient>
+                        <linearGradient id="grad-buck" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#1e293b"/>
+                            <stop offset="100%" stop-color="#0f172a"/>
+                        </linearGradient>
+                    </defs>
+                    <rect width="100%" height="100%" fill="#0a0e17"/>
+                    <rect width="100%" height="100%" fill="url(#grid)"/>
+
+                    <!-- SOLDERLESS BREADBOARD (Central) -->
+                    <g id="breadboard" transform="translate(320, 160)">
+                        <rect x="0" y="0" width="460" height="340" rx="10" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="2"/>
+                        <!-- Top Power Rails -->
+                        <line x1="20" y1="25" x2="440" y2="25" stroke="#ef4444" stroke-width="2"/>
+                        <line x1="20" y1="45" x2="440" y2="45" stroke="#3b82f6" stroke-width="2"/>
+                        <text x="25" y="20" font-family="'JetBrains Mono'" font-size="10" font-weight="700" fill="#ef4444">+ STAR POWER RAIL (4.0V-5.0V)</text>
+                        <text x="25" y="60" font-family="'JetBrains Mono'" font-size="10" font-weight="700" fill="#3b82f6">- STAR COMMON GND RAIL (0V)</text>
+
+                        <!-- Breadboard Terminal Strip Rows -->
+                        <g opacity="0.6">
+                            <circle cx="100" cy="120" r="4" fill="#334155"/>
+                            <circle cx="100" cy="140" r="4" fill="#334155"/>
+                            <circle cx="100" cy="160" r="4" fill="#334155"/>
+                            <circle cx="100" cy="180" r="4" fill="#334155"/>
+                            <circle cx="100" cy="200" r="4" fill="#334155"/>
+
+                            <circle cx="220" cy="120" r="4" fill="#334155"/>
+                            <circle cx="220" cy="140" r="4" fill="#334155"/>
+                            <circle cx="220" cy="160" r="4" fill="#334155"/>
+                            <circle cx="220" cy="180" r="4" fill="#334155"/>
+                            <circle cx="220" cy="200" r="4" fill="#334155"/>
+                        </g>
+
+                        <!-- Level Shifter Resistors on Breadboard -->
+                        <rect x="190" y="130" width="10" height="30" rx="3" fill="#e2e8f0" stroke="#64748b" stroke-width="1.5"/>
+                        <text x="145" y="150" font-family="'JetBrains Mono'" font-size="10" font-weight="700" fill="#334155">R1: 1kΩ</text>
+                        <rect x="190" y="175" width="10" height="30" rx="3" fill="#e2e8f0" stroke="#64748b" stroke-width="1.5"/>
+                        <text x="145" y="195" font-family="'JetBrains Mono'" font-size="10" font-weight="700" fill="#334155">R2: 2kΩ</text>
+
+                        <!-- Buffer Capacitor (1000uF) -->
+                        <circle cx="340" cy="150" r="18" fill="#1e293b" stroke="#64748b" stroke-width="2"/>
+                        <text x="340" y="154" font-family="'JetBrains Mono'" font-size="9" font-weight="700" fill="#f8fafc" text-anchor="middle">1000μF</text>
+                        <text x="340" y="185" font-family="'JetBrains Mono'" font-size="9" font-weight="600" fill="#475569" text-anchor="middle">Buffer Cap</text>
+
+                        <!-- Bottom Power Rails -->
+                        <line x1="20" y1="295" x2="440" y2="295" stroke="#ef4444" stroke-width="2"/>
+                        <line x1="20" y1="315" x2="440" y2="315" stroke="#3b82f6" stroke-width="2"/>
+                        <text x="25" y="290" font-family="'JetBrains Mono'" font-size="10" font-weight="700" fill="#ef4444">+ 5.0V AUX RAIL</text>
+                        <text x="25" y="330" font-family="'JetBrains Mono'" font-size="10" font-weight="700" fill="#3b82f6">- GND RAIL</text>
+                    </g>
+
+                    <!-- ARDUINO UNO R3 (Left Side) -->
+                    <g id="arduino" transform="translate(40, 150)">
+                        <rect x="0" y="0" width="220" height="360" rx="8" fill="url(#grad-uno)" stroke="#3b82f6" stroke-width="2"/>
+                        <text x="110" y="35" font-family="'Plus Jakarta Sans'" font-size="15" font-weight="800" fill="#ffffff" text-anchor="middle">ARDUINO UNO R3</text>
+                        <text x="110" y="55" font-family="'JetBrains Mono'" font-size="10" fill="#93c5fd" text-anchor="middle">ATmega328P MCU</text>
+
+                        <!-- USB Port -->
+                        <rect x="15" y="-12" width="45" height="24" fill="#94a3b8" rx="2"/>
+                        <text x="37" y="4" font-family="'JetBrains Mono'" font-size="8" fill="#0f172a" text-anchor="middle">USB</text>
+
+                        <!-- Pin Headers Right Side (Digital) -->
+                        <g transform="translate(195, 80)">
+                            <!-- Pin 13 -->
+                            <circle cx="10" cy="20" r="5" fill="#f59e0b"/>
+                            <text x="-5" y="24" font-family="'JetBrains Mono'" font-size="10" fill="#ffffff" text-anchor="end">D13 (LED)</text>
+                            <!-- Pin 7 (Relay) -->
+                            <circle cx="10" cy="80" r="5" fill="#f59e0b"/>
+                            <text x="-5" y="84" font-family="'JetBrains Mono'" font-size="10" fill="#ffffff" text-anchor="end">D7 (Relay)</text>
+                            <!-- Pin 3 (GSM TX) -->
+                            <circle cx="10" cy="140" r="5" fill="#f97316"/>
+                            <text x="-5" y="144" font-family="'JetBrains Mono'" font-size="10" fill="#ffffff" text-anchor="end">D3 (GSM TX)</text>
+                            <!-- Pin 2 (GSM RX) -->
+                            <circle cx="10" cy="170" r="5" fill="#10b981"/>
+                            <text x="-5" y="174" font-family="'JetBrains Mono'" font-size="10" fill="#ffffff" text-anchor="end">D2 (GSM RX)</text>
+                            <!-- GND Pin -->
+                            <circle cx="10" cy="220" r="5" fill="#3b82f6"/>
+                            <text x="-5" y="224" font-family="'JetBrains Mono'" font-size="10" fill="#ffffff" text-anchor="end">GND</text>
+                            <!-- 5V Pin -->
+                            <circle cx="10" cy="250" r="5" fill="#ef4444"/>
+                            <text x="-5" y="254" font-family="'JetBrains Mono'" font-size="10" fill="#ffffff" text-anchor="end">5V</text>
+                        </g>
+
+                        <!-- Pin Headers Bottom Left (Analog) -->
+                        <g transform="translate(25, 280)">
+                            <!-- A1 (Surface Water) -->
+                            <circle cx="10" cy="20" r="5" fill="#06b6d4"/>
+                            <text x="25" y="24" font-family="'JetBrains Mono'" font-size="10" fill="#ffffff">A1 (HW-080)</text>
+                            <!-- A0 (Capacitive) -->
+                            <circle cx="10" cy="50" r="5" fill="#10b981"/>
+                            <text x="25" y="54" font-family="'JetBrains Mono'" font-size="10" fill="#ffffff">A0 (Root Soil)</text>
+                        </g>
+                    </g>
+
+                    <!-- GSM MODULE: SIM800L (Right Side Top) -->
+                    <g id="sim800l" transform="translate(840, 80)">
+                        <rect x="0" y="0" width="220" height="230" rx="8" fill="url(#grad-gsm)" stroke="#ef4444" stroke-width="2"/>
+                        <text x="110" y="30" font-family="'Plus Jakarta Sans'" font-size="15" font-weight="800" fill="#ffffff" text-anchor="middle">SIM800L GSM/GPRS</text>
+                        <text x="110" y="48" font-family="'JetBrains Mono'" font-size="10" fill="#fca5a5" text-anchor="middle">Cellular SMS Module</text>
+
+                        <!-- SIM Card Slot Outline -->
+                        <rect x="40" y="65" width="140" height="75" rx="4" fill="#450a0a" stroke="#b91c1c" stroke-width="1.5"/>
+                        <text x="110" y="108" font-family="'JetBrains Mono'" font-size="11" font-weight="700" fill="#f87171" text-anchor="middle">MICRO-SIM CARD</text>
+
+                        <!-- Status Ring LED -->
+                        <circle cx="185" cy="30" r="6" fill="#22c55e" stroke="#15803d" stroke-width="1.5"/>
+                        <text x="175" y="22" font-family="'JetBrains Mono'" font-size="8" fill="#86efac" text-anchor="end">NET LED</text>
+
+                        <!-- Pin Outlets Left Side -->
+                        <g transform="translate(15, 155)">
+                            <!-- VCC (4.0V) -->
+                            <circle cx="0" cy="10" r="5" fill="#ef4444"/>
+                            <text x="15" y="14" font-family="'JetBrains Mono'" font-size="10" font-weight="700" fill="#ffffff">VCC (3.7V-4.4V)</text>
+                            <!-- GND -->
+                            <circle cx="0" cy="30" r="5" fill="#3b82f6"/>
+                            <text x="15" y="34" font-family="'JetBrains Mono'" font-size="10" font-weight="700" fill="#ffffff">GND</text>
+                            <!-- SIM RXD -->
+                            <circle cx="0" cy="50" r="5" fill="#f97316"/>
+                            <text x="15" y="54" font-family="'JetBrains Mono'" font-size="10" font-weight="700" fill="#ffffff">RXD (3.3V Logic)</text>
+                            <!-- SIM TXD -->
+                            <circle cx="0" cy="70" r="5" fill="#10b981"/>
+                            <text x="15" y="74" font-family="'JetBrains Mono'" font-size="10" font-weight="700" fill="#ffffff">TXD (2.8V Out)</text>
+                        </g>
+                    </g>
+
+                    <!-- 5V RELAY MODULE & 12V WATER PUMP (Right Side Bottom) -->
+                    <g id="relay" transform="translate(840, 360)">
+                        <rect x="0" y="0" width="220" height="150" rx="8" fill="url(#grad-relay)" stroke="#10b981" stroke-width="2"/>
+                        <text x="110" y="25" font-family="'Plus Jakarta Sans'" font-size="14" font-weight="800" fill="#ffffff" text-anchor="middle">5V RELAY MODULE</text>
+                        <text x="110" y="42" font-family="'JetBrains Mono'" font-size="10" fill="#6ee7b7" text-anchor="middle">Controls 12V DC Pump</text>
+
+                        <!-- Inputs Left -->
+                        <circle cx="15" cy="70" r="5" fill="#ef4444"/>
+                        <text x="30" y="74" font-family="'JetBrains Mono'" font-size="10" fill="#ffffff">VCC (5V)</text>
+                        <circle cx="15" cy="95" r="5" fill="#3b82f6"/>
+                        <text x="30" y="99" font-family="'JetBrains Mono'" font-size="10" fill="#ffffff">GND</text>
+                        <circle cx="15" cy="120" r="5" fill="#f59e0b"/>
+                        <text x="30" y="124" font-family="'JetBrains Mono'" font-size="10" fill="#ffffff">IN (Active LOW)</text>
+
+                        <!-- Screw Terminal Right -->
+                        <rect x="165" y="60" width="45" height="70" fill="#047857" rx="3"/>
+                        <text x="187" y="85" font-family="'JetBrains Mono'" font-size="9" fill="#ffffff" text-anchor="middle">COM</text>
+                        <text x="187" y="115" font-family="'JetBrains Mono'" font-size="9" fill="#ffffff" text-anchor="middle">NO</text>
+                    </g>
+
+                    <!-- HW-080 SURFACE WATER LEVEL SENSOR (Bottom Center) -->
+                    <g id="hw080" transform="translate(520, 530)">
+                        <rect x="0" y="0" width="220" height="110" rx="8" fill="url(#grad-hw080)" stroke="#06b6d4" stroke-width="2"/>
+                        <text x="110" y="25" font-family="'Plus Jakarta Sans'" font-size="13" font-weight="800" fill="#ffffff" text-anchor="middle">HW-080 WATER LEVEL</text>
+                        <text x="110" y="42" font-family="'JetBrains Mono'" font-size="9" fill="#67e8f9" text-anchor="middle">Surface Ponding (LM393)</text>
+
+                        <circle cx="20" cy="70" r="5" fill="#ef4444"/>
+                        <text x="35" y="74" font-family="'JetBrains Mono'" font-size="10" fill="#ffffff">VCC (5V)</text>
+                        <circle cx="90" cy="70" r="5" fill="#3b82f6"/>
+                        <text x="105" y="74" font-family="'JetBrains Mono'" font-size="10" fill="#ffffff">GND</text>
+                        <circle cx="160" cy="70" r="5" fill="#06b6d4"/>
+                        <text x="175" y="74" font-family="'JetBrains Mono'" font-size="10" fill="#ffffff">AO</text>
+                    </g>
+
+                    <!-- LM2596 BUCK CONVERTER (Top Center) -->
+                    <g id="buck" transform="translate(420, 20)">
+                        <rect x="0" y="0" width="260" height="90" rx="8" fill="url(#grad-buck)" stroke="#475569" stroke-width="2"/>
+                        <text x="130" y="25" font-family="'Plus Jakarta Sans'" font-size="13" font-weight="800" fill="#ffffff" text-anchor="middle">LM2596 BUCK CONVERTER</text>
+                        <text x="130" y="42" font-family="'JetBrains Mono'" font-size="9" fill="#94a3b8" text-anchor="middle">Tuned: 4.00V DC (High Current 2A+)</text>
+
+                        <!-- Input Terminal -->
+                        <text x="15" y="70" font-family="'JetBrains Mono'" font-size="9" fill="#f87171">IN: 12V</text>
+                        <!-- Output Terminal -->
+                        <text x="195" y="70" font-family="'JetBrains Mono'" font-size="9" fill="#4ade80">OUT: 4.0V</text>
+                    </g>
+
+                    <!-- WIRING CONNECTIONS (ANIMATED VIBRANT JUMPERS) -->
+                    <!-- Wire 1: Buck OUT+ (4.0V) -> Breadboard Top Red Rail (+) -->
+                    <path class="wire" d="M 640 68 Q 660 120 550 185" fill="none" stroke="#ef4444" stroke-width="3" title="4.0V Clean Power"/>
+
+                    <!-- Wire 2: Buck OUT- (GND) -> Breadboard Top Blue Rail (-) -->
+                    <path class="wire" d="M 620 68 Q 600 130 550 205" fill="none" stroke="#3b82f6" stroke-width="3" title="Common Ground Return"/>
+
+                    <!-- Wire 3: Breadboard Top Red Rail -> SIM800L VCC -->
+                    <path class="wire" d="M 670 185 Q 750 140 855 165" fill="none" stroke="#ef4444" stroke-width="3.5" title="SIM800L VCC Power"/>
+
+                    <!-- Wire 4: Breadboard Top Blue Rail -> SIM800L GND -->
+                    <path class="wire" d="M 670 205 Q 760 210 855 185" fill="none" stroke="#3b82f6" stroke-width="3" title="SIM800L Common GND"/>
+
+                    <!-- Wire 5: SIM800L TXD -> Arduino Pin D2 (Direct Safe 2.8V Out) -->
+                    <path class="wire" d="M 855 225 Q 600 420 245 320" fill="none" stroke="#10b981" stroke-width="2.5" title="GSM TXD to Arduino D2 RX"/>
+
+                    <!-- Wire 6: Arduino Pin D3 (5V TX) -> Level Shifter R1 Top -->
+                    <path class="wire" d="M 245 290 Q 380 260 510 290" fill="none" stroke="#f97316" stroke-width="2.5" title="Arduino D3 TX to R1"/>
+
+                    <!-- Wire 7: Level Shifter Junction (3.3V) -> SIM800L RXD -->
+                    <path class="wire" d="M 520 310 Q 680 260 855 205" fill="none" stroke="#f59e0b" stroke-width="2.5" title="3.3V Shifted Signal to SIM800L RXD"/>
+
+                    <!-- Wire 8: Arduino D7 -> Relay IN -->
+                    <path class="wire" d="M 245 230 Q 540 100 855 480" fill="none" stroke="#eab308" stroke-width="2.5" title="D7 Relay Trigger (Active LOW)"/>
+
+                    <!-- Wire 9: HW-080 AO -> Arduino Pin A1 -->
+                    <path class="wire" d="M 695 600 Q 400 650 75 300" fill="none" stroke="#06b6d4" stroke-width="2.5" title="HW-080 Analog Signal to Pin A1"/>
+
+                    <!-- Wire 10: Star GND -> Arduino GND -->
+                    <path class="wire" d="M 370 205 Q 310 220 245 370" fill="none" stroke="#3b82f6" stroke-width="3" title="Star GND to Arduino GND"/>
+                </svg>
+            </div>
+
+            <!-- Wire Legend -->
+            <div class="wire-legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #ef4444;"></div>
+                    <span><strong>Red:</strong> Regulated 4.0V-5.0V Star Power Rail</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #3b82f6;"></div>
+                    <span><strong>Blue:</strong> Central Star Common Ground (0V)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #10b981;"></div>
+                    <span><strong>Green:</strong> GSM TXD &rarr; Arduino Pin D2 (RX)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #f97316;"></div>
+                    <span><strong>Orange:</strong> Arduino Pin D3 (TX) &rarr; 1k&Omega;/2k&Omega; Voltage Divider &rarr; GSM RXD</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #06b6d4;"></div>
+                    <span><strong>Cyan:</strong> HW-080 Water Level Sensor AO &rarr; Arduino Pin A1</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #eab308;"></div>
+                    <span><strong>Yellow:</strong> Arduino Pin D7 &rarr; Relay IN (Active LOW Pump Trigger)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Master Connection Table -->
+        <div class="card">
+            <div class="card-title">
+                <div class="icon">📋</div>
+                Complete Interconnect Matrix & Pin Mapping
+            </div>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Signal ID</th>
+                            <th>Origin Node</th>
+                            <th>Breadboard Route / Component</th>
+                            <th>Destination Node</th>
+                            <th>Voltage / Logic Level</th>
+                            <th>Function & Safety Directive</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="pin-tag tag-pwr">PWR-GSM</span></td>
+                            <td>LM2596 Buck OUT+</td>
+                            <td>Star Red Rail (+) with 1000&mu;F Cap</td>
+                            <td><span class="pin-tag tag-gsm">SIM800L VCC</span></td>
+                            <td>4.00V DC (2.0A Peak)</td>
+                            <td>Dedicated high-current supply to survive RF transmit bursts without brownout.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="pin-tag tag-pwr">GND-ALL</span></td>
+                            <td>Star Blue Rail (-)</td>
+                            <td>Common Ground Bus</td>
+                            <td><span class="pin-tag tag-uno">Arduino / GSM GND</span></td>
+                            <td>0.00V Reference</td>
+                            <td><strong>CRITICAL:</strong> All module grounds must be tied together.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="pin-tag tag-bb">COMM-01</span></td>
+                            <td><span class="pin-tag tag-gsm">SIM800L TXD</span></td>
+                            <td>Direct Jumper Wire</td>
+                            <td><span class="pin-tag tag-uno">Arduino Pin D2 (RX)</span></td>
+                            <td>2.8V CMOS Logic</td>
+                            <td>Arduino detects 2.8V as HIGH reliably; direct connection is safe.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="pin-tag tag-bb">COMM-02</span></td>
+                            <td><span class="pin-tag tag-uno">Arduino Pin D3 (TX)</span></td>
+                            <td>1k&Omega; / 2k&Omega; Voltage Divider</td>
+                            <td><span class="pin-tag tag-gsm">SIM800L RXD</span></td>
+                            <td>5.0V &rarr; 3.3V Shift</td>
+                            <td>Protects SIM800L 3.3V UART receiver from 5V overvoltage damage.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="pin-tag tag-bb">SIG-WATER</span></td>
+                            <td>HW-080 Module AO</td>
+                            <td>Direct Jumper Wire</td>
+                            <td><span class="pin-tag tag-uno">Arduino Pin A1</span></td>
+                            <td>0.0V – 5.0V Analog</td>
+                            <td>Monitors standing water. 45% refill start trigger, 50% target stop trigger.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="pin-tag tag-bb">ACT-PUMP</span></td>
+                            <td><span class="pin-tag tag-uno">Arduino Pin D7</span></td>
+                            <td>Direct Jumper Wire</td>
+                            <td>5V Relay Module IN</td>
+                            <td>5V Digital (Active LOW)</td>
+                            <td>Switches 12V DC Water Pump with 5s anti-splash & 180s continuous run cap.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Step-by-Step Bench Testing Guide -->
+        <div class="card">
+            <div class="card-title">
+                <div class="icon">🚀</div>
+                Step-by-Step Hardware Verification Sequence
+            </div>
+            
+            <ol style="padding-left: 1.5rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 0.85rem;">
+                <li>
+                    <strong style="color: var(--text-primary);">Insert Micro-SIM Card:</strong> Insert an activated SIM card with regular SMS load or promo. Ensure SIM PIN is disabled.
+                </li>
+                <li>
+                    <strong style="color: var(--text-primary);">Power Up & Observe NET LED:</strong> Apply power to the LM2596 buck converter and Arduino.
+                    The SIM800L NET LED will blink rapidly (1/sec) while searching for cellular signal, and slow down to <strong>1 blink every 3 seconds</strong> once registered to the cell tower.
+                </li>
+                <li>
+                    <strong style="color: var(--text-primary);">Open Arduino IDE Serial Monitor:</strong> Set baud rate to <strong>115200 baud</strong>.
+                    Type <code style="color: var(--accent-green); background: rgba(16, 185, 129, 0.1); padding: 0.2rem 0.4rem; border-radius: 4px;">s</code> to send an instant verification SMS to your phone.
+                </li>
+                <li>
+                    <strong style="color: var(--text-primary);">Live Water Level Simulation:</strong>
+                    Type <code style="color: var(--accent-cyan); background: rgba(6, 182, 212, 0.1); padding: 0.2rem 0.4rem; border-radius: 4px;">1</code> to simulate Trigger 1 (Irrigation Started &lt;45%).
+                    Type <code style="color: var(--accent-amber); background: rgba(245, 158, 11, 0.1); padding: 0.2rem 0.4rem; border-radius: 4px;">2</code> to simulate Trigger 2 (Irrigation Stopped &ge;50%).
+                    Type <code style="color: var(--accent-purple); background: rgba(139, 92, 246, 0.1); padding: 0.2rem 0.4rem; border-radius: 4px;">3</code> to simulate Trigger 3 (Irrigation Restarted &lt;45% again).
+                </li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

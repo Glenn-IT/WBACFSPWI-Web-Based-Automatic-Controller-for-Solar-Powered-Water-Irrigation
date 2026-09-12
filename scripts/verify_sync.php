@@ -326,6 +326,32 @@ check("Dashboard UI contains setPumpOverride() JavaScript handler",
     strpos($fDashboard, 'setPumpOverride') !== false);
 
 // -------------------------------------------------------------
+// TEST 10 GSM SMS ALERT MODULE SYNCHRONIZATION
+// -------------------------------------------------------------
+echo "--- Test 10 GSM SMS Alert Module Synchronization ---\n";
+$t10Path = $rootDir . '/arduino/10_gsm_sms_irrigation_alert_test/10_gsm_sms_irrigation_alert_test.ino';
+check("Test 10 GSM sketch exists", file_exists($t10Path));
+if (file_exists($t10Path)) {
+    $f10 = file_get_contents($t10Path);
+    check("Test 10 defines GSM SoftwareSerial on Pins 2(RX) & 3(TX)",
+        strpos($f10, 'PIN_GSM_RX') !== false && strpos($f10, '2') !== false &&
+        strpos($f10, 'PIN_GSM_TX') !== false && strpos($f10, '3') !== false);
+    check("Test 10 enforces calibrated 50.0% target & 45.0% refill thresholds",
+        strpos($f10, '50.0') !== false && strpos($f10, '45.0') !== false);
+    check("Test 10 contains automated SMS triggers for Started, Stopped, and Restarted",
+        strpos($f10, 'Irrigation STARTED') !== false &&
+        strpos($f10, 'Irrigation STOPPED') !== false &&
+        strpos($f10, 'Irrigation RESTARTED') !== false);
+    check("Test 10 README.md documentation exists",
+        file_exists($rootDir . '/arduino/10_gsm_sms_irrigation_alert_test/README.md'));
+    check("Test 10 wiring_guide.html exists with interactive SVG breadboard",
+        file_exists($rootDir . '/arduino/10_gsm_sms_irrigation_alert_test/wiring_guide.html') &&
+        strpos(file_get_contents($rootDir . '/arduino/10_gsm_sms_irrigation_alert_test/wiring_guide.html'), '<svg') !== false);
+    check("Arduino Hardware index.html links to Test 10",
+        strpos(file_get_contents($rootDir . '/arduino/index.html'), '10_gsm_sms_irrigation_alert_test') !== false);
+}
+
+// -------------------------------------------------------------
 // SUMMARY
 // -------------------------------------------------------------
 echo "\n=======================================================\n";
