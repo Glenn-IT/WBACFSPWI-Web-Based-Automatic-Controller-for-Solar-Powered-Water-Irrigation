@@ -281,6 +281,16 @@
             <a href="06_solar_charger_battery_test/wiring_guide.html" class="btn btn-amber">View Star Diagram →</a>
         </div>
 
+        <!-- Test 07 -->
+        <div class="card">
+            <div>
+                <span class="card-tag" style="background: rgba(16, 185, 129, 0.25); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.5);">TEST 07 (DUAL SENSOR)</span>
+                <h3>Dual Sensor & Relay Pump Integration</h3>
+                <p>Closed-loop autonomous irrigation logic: Capacitive root sensor (A0) + HW-080 surface water sensor (A1) controlling 5V relay (D7) with calibrated 50% target / 45% refill hysteresis and anti-splash settling window.</p>
+            </div>
+            <a href="07_dual_sensor_pump_integration_test/wiring_guide.html" class="btn btn-green">View Star Diagram →</a>
+        </div>
+
         <!-- Test 08 -->
         <div class="card">
             <div>
@@ -351,32 +361,68 @@
                     <tr>
                         <td><span class="pin-tag tag-uno">Pin A0</span></td>
                         <td>Sensor Signal Lead</td>
-                        <td>Root zone capacitive soil moisture</td>
-                        <td>0V – 3.0V (Irrigate &lt; 35%, Stop &ge; 65%)</td>
+                        <td>Root zone capacitive soil moisture (VCC gated via D8)</td>
+                        <td>0V – 3.0V (Calibrated: Air=417, Submerged=153)</td>
                     </tr>
                     <tr>
                         <td><span class="pin-tag tag-uno">Pin A1</span></td>
                         <td>Sensor Signal Lead</td>
-                        <td>HW-080 Moisture Sensor (rice field ponding depth: dry ~950, wet ~300)</td>
-                        <td>Invert mapping: Inhibit pump if &ge; 75% ponding</td>
+                        <td>HW-080 Surface Water Sensor (standing water / ponding depth)</td>
+                        <td>0V – 5.0V (3-Point: Dry=1020, Mid=410, Wet=355 | Target: 50%, Refill: 45%)</td>
                     </tr>
                     <tr>
                         <td><span class="pin-tag tag-uno">Pin A2</span></td>
                         <td>Row 10 (Divider Tap)</td>
-                        <td>3S 18650 Battery voltage monitor ($V_{\text{batt}} / 4.0303$)</td>
-                        <td>Lockout cutoff &lt; 10.0V</td>
+                        <td>12V Motorcycle / 3S Battery voltage monitor (V<sub>batt</sub> / 4.0303)</td>
+                        <td>Cutoff &lt; 10.0V (Resume &ge; 10.50V, Max 14.4V bulk)</td>
                     </tr>
                     <tr>
                         <td><span class="pin-tag tag-uno">Pin A3</span></td>
                         <td>Row 25 (Divider Tap)</td>
-                        <td>30W Solar panel voltage monitor ($V_{\text{solar}} / 6.000$)</td>
-                        <td>Daytime harvest &gt; 12.0V</td>
+                        <td>30W Solar panel voltage monitor (V<sub>solar</sub> / 6.000)</td>
+                        <td>Daytime harvest &gt; 12.0V (Max 22.0V Voc)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="pin-tag tag-uno">Pin D2</span></td>
+                        <td>Direct Jumper</td>
+                        <td>SoftwareSerial RX &larr; SIM800L GSM Module TXD</td>
+                        <td>0V – 2.8V TTL Logic (Safe for ATmega328P input)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="pin-tag tag-uno">Pin D3</span></td>
+                        <td>1kΩ / 2kΩ Divider</td>
+                        <td>SoftwareSerial TX &rarr; SIM800L GSM Module RXD</td>
+                        <td>5V &rarr; 3.3V Logic Level Shifted (Protects SIM800L)</td>
                     </tr>
                     <tr>
                         <td><span class="pin-tag tag-uno">Pin D7</span></td>
                         <td>Direct Jumper</td>
-                        <td>5V Relay module trigger (Active LOW)</td>
-                        <td>3-minute continuous runtime limit</td>
+                        <td>5V Relay module trigger (Active LOW, controls 12V DC Pump)</td>
+                        <td>3-minute continuous runtime limit (180s cap)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="pin-tag tag-uno">Pin D8</span></td>
+                        <td>Direct Jumper</td>
+                        <td>Capacitive soil moisture sensor VCC power gate</td>
+                        <td>5V Digital Gate (Anti-corrosion: HIGH on sample, LOW idle)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="pin-tag tag-uno">Pin D9</span></td>
+                        <td>Direct Jumper</td>
+                        <td>SoftwareSerial RX &larr; NodeMCU ESP8266 Pin D2 (TX)</td>
+                        <td>3.3V TTL Logic (Safe for ATmega328P input)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="pin-tag tag-uno">Pin D10</span></td>
+                        <td>1kΩ / 2kΩ Divider</td>
+                        <td>SoftwareSerial TX &rarr; NodeMCU ESP8266 Pin D1 (RX)</td>
+                        <td>5V &rarr; 3.3V Logic Level Shifted (Protects ESP8266)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="pin-tag tag-uno">Pin D13</span></td>
+                        <td>Built-in LED</td>
+                        <td>System heartbeat &amp; pump state indicator</td>
+                        <td>Blinks during 10s boot stabilization; solid ON when pumping</td>
                     </tr>
                 </tbody>
             </table>

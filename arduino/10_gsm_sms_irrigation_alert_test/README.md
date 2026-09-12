@@ -51,20 +51,35 @@ This test suite verifies bidirectional GSM cellular integration for the miniatur
 
 ## 2. Hardware Overview & Power Requirements (CRITICAL)
 
-### The SIM800L Cellular Transceiver
-- **Operating Voltage:** $3.7\text{V} - 4.4\text{V}$ DC (Nominal: $4.0\text{V}$).
-- **Peak Current:** Up to **$2.0\text{A}$ burst current** during RF network transmission!
-- **Logic Level:** $2.8\text{V} - 3.3\text{V}$ UART TTL.
+### The SIM800L & SIM900A (S2-1040U-Z1K0B) Cellular Transceivers
+- **SIM800L:** Quad-Band (850/900/1800/1900MHz), 3.7V–4.4V DC direct input, 2.8V–3.3V UART.
+- **SIM900A (S2-1040U-Z1K0B):** Dual-Band EGSM (900MHz / 1800MHz) designed for Asian cellular networks (e.g. Philippines Smart/Globe/TNT/TM). The metal RF shield is factory stamped `SIM900A` with part number `S2-1040U-Z1K0B`.
+- **Peak Current:** Up to **2.0A burst current** during cellular RF network registration and SMS dispatches.
+- **Logic Level:** Supports 5V TTL (`5VR` / `5VT` pins) on mini development boards, and 2.8V–3.3V UART on raw pins.
 
 > [!CAUTION]
-> **DO NOT connect SIM800L VCC directly to the Arduino Uno 5V or 3.3V pins!**
-> The Arduino onboard voltage regulator can only supply ~400mA, which will cause an instant voltage brown-out, resetting both the Arduino and the SIM800L continually.
->
-> **Recommended Power Source:**
-> - **Option 1 (Best):** Powered from the **LM2596 DC-DC Buck Converter** tuned to $4.0\text{V} - 4.2\text{V}$ (or a dedicated secondary buck converter).
-> - **Option 2:** Powered directly from a single **3.7V 18650 Li-ion Cell** (3.7V–4.2V nominal).
-> - **Option 3:** Powered from the Star 5V rail through a **1N4007 silicon diode in series** (drops 5.0V by ~0.7V down to ~4.3V).
-> - **Decoupling Capacitor:** Solder or wire a **$1000\mu\text{F}$ (or $470\mu\text{F}$) Low-ESR Electrolytic Capacitor** directly across the SIM800L `VCC` and `GND` pins to absorb the 2A cellular transmit pulses.
+> **DO NOT power SIM800L or SIM900A from the Arduino Uno 5V or 3.3V header pins!**  
+> The Arduino Uno onboard 5V regulator can only deliver ~400mA. Attempting to power a GSM module from the Arduino header will cause immediate brownouts, resets, and dropped cell tower connections during transmission bursts.
+
+### Powering the SIM900A (S2-1040U-Z1K0B) Mini Development Board:
+- **Option A (Board with 5V / VCC5 Input - Most Common):**  
+  If your SIM900A mini board features a `5V` or `VCC5` pin (with an onboard MIC29302 or AMS1117 high-current regulator):
+  - Power it from the **LM2596 Buck Converter tuned to 5.00V DC** (capable of delivering 2A+).
+  - Place a **$1000\mu\text{F}$ low-ESR buffer capacitor** across `5V` and `GND`.
+- **Option B (Direct Chip VBAT / VCC4 Input):**  
+  If your board powers the raw SIM900A chip via `VCC4` / `VBAT` ($3.7\text{V} - 4.4\text{V}$):
+  - Tune the **LM2596 Buck Converter to 4.00V DC** (or use a 3.7V Li-ion battery).
+  - Connect a **$1000\mu\text{F}$ capacitor** across `VCC4` and `GND`.
+- **PWRKEY Power-On Behavior:**  
+  Some SIM900A boards automatically turn on when power is connected. If the `PWR` or `STATUS` LED does not illuminate, momentarily short the **`PWRKEY` pin to `GND` for 1.5 seconds** (or press the onboard `POWER` tactile button) to boot the modem.
+
+### UART Pinout Mapping for SIM900A (S2-1040U-Z1K0B):
+| SIM900A Mini Pin | Arduino Uno Pin | Function / Logic Level | Notes |
+| :--- | :--- | :--- | :--- |
+| **`5VT`** (or `TXD`) | **Pin D2 (RX)** | 5V TTL Transmit from GSM &rarr; Uno RX | Direct jumper wire (Safe). |
+| **`5VR`** (or `RXD`) | **Pin D3 (TX)** | 5V TTL Receive into GSM &larr; Uno TX | Direct jumper wire if board has onboard level shifter; use 1k/2k divider if raw 3.3V `3VR` pin. |
+| **`GND`** | **Star GND / Arduino GND** | Common Ground (0V Reference) | **Mandatory:** All grounds must be tied together. |
+| **`5V` / `VCC5`** | **Star 5.0V (from LM2596)** | Main 2A+ Power Input | Powered from LM2596 tuned to 5.0V with 1000&mu;F cap. |
 
 ---
 

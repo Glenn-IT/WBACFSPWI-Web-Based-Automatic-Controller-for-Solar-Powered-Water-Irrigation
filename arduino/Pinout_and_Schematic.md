@@ -126,6 +126,28 @@ Star GND Rail (-) (Breadboard Row 30)
 
 ---
 
+### C. 5V $\rightarrow$ 3.3V Logic Level Shifters (NodeMCU Pin D1 & GSM SIM800L RXD)
+
+Both the NodeMCU ESP8266 (`D1` RX) and SIM800L GSM Module (`RXD`) operate on **3.3V maximum logic levels**. Connecting Arduino 5V TX pins directly will damage these peripheral chips. Use identical $1\text{k}\Omega / 2\text{k}\Omega$ resistor voltage dividers:
+
+```
+Arduino TX Pin (D10 for NodeMCU / D3 for GSM) [5.0V Logic]
+       │
+      ┌┴┐
+      │ │  R_top = 1 kΩ
+      └┬┘
+       ├───► Peripheral RX Pin (NodeMCU D1 / GSM RXD) [3.33V Logic Safe]
+      ┌┴┐
+      │ │  R_bottom = 2 kΩ
+      └┬┘
+       │
+Star GND Rail (-) (0V Common Reference)
+```
+
+- **Level Shift Factor**: $\frac{2\text{k}\Omega}{1\text{k}\Omega + 2\text{k}\Omega} \times 5.0\text{V} = \frac{2}{3} \times 5.0\text{V} \approx 3.33\text{V}$
+
+---
+
 ## 4. DC Pump Power & Flyback Diode Wiring
 
 ```

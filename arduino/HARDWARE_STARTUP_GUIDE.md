@@ -58,12 +58,15 @@ Before turning on power, verify these physical connections on your solderless br
 | **Solar Divider** | Row 25 Tap (R3/R4) | Arduino Pin `A3` | R3 = $100\text{k}\Omega$ (to Solar +), R4 = $20\text{k}\Omega$ (to GND). |
 | **Relay Signal** | Arduino Pin `D7` | Relay Module `IN` | Active LOW trigger. |
 | **Flyback Diode** | Across DC Pump | Across Pump Leads | **Silver Stripe (Cathode)** to switched +12V; **Anode** to Ground. |
+| **GSM Link (RX $\leftarrow$ TX)** | GSM Module TXD | Arduino Pin `D2` | Direct jumper wire (2.8V TTL is safely read by Arduino Uno). |
+| **GSM Link (TX $\rightarrow$ RX)** | Arduino Pin `D3` | GSM Module RXD | **Voltage Divider Required:** Arduino D3 $\rightarrow 1\text{k}\Omega \rightarrow$ RXD $\rightarrow 2\text{k}\Omega \rightarrow$ GND (protects 3.3V logic). |
+| **GSM Power Supply** | Dedicated 4.0V / Battery | SIM800L `VCC` & `GND` | **Critical:** 3.7V–4.4V (4.0V nominal), 2A burst current. Place 1000µF cap across VCC/GND; connect common GND to Star GND. |
 
 ---
 
 ## 3. Firmware Flashing Reference
 
-Make sure both microcontrollers are flashed with their dedicated code:
+Make sure all microcontrollers and peripheral modules are flashed with their dedicated code:
 
 ### Board 1: NodeMCU ESP8266 (The WiFi Bridge)
 - **Sketch File:** [`firmware/wbacfspwi_esp8266_node/wbacfspwi_esp8266_node.ino`](file:///C:/xampp/htdocs/WBACFSPWI-Web-Based-Automatic-Controller-for-Solar-Powered-Water-Irrigation/firmware/wbacfspwi_esp8266_node/wbacfspwi_esp8266_node.ino)  
@@ -82,6 +85,16 @@ Make sure both microcontrollers are flashed with their dedicated code:
 - **Sketch File:** [`arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino`](file:///C:/xampp/htdocs/WBACFSPWI-Web-Based-Automatic-Controller-for-Solar-Powered-Water-Irrigation/arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino)
 - **Arduino IDE Board:** `Arduino Uno`
 - **Upload:** Plug Arduino Uno into PC via USB $\rightarrow$ Click **Upload**.
+
+### Board 3: SIM800L / SIM900 GSM Module (Cellular SMS Alerts)
+- **Sketch File:** [`arduino/10_gsm_sms_irrigation_alert_test/10_gsm_sms_irrigation_alert_test.ino`](file:///C:/xampp/htdocs/WBACFSPWI-Web-Based-Automatic-Controller-for-Solar-Powered-Water-Irrigation/arduino/10_gsm_sms_irrigation_alert_test/10_gsm_sms_irrigation_alert_test.ino)
+- **Arduino IDE Board:** `Arduino Uno`
+- **Configuration in Sketch:**
+  ```cpp
+  char ADMIN_PHONE[20] = "+639123456789"; // Set your mobile phone number here
+  ```
+- **Features:** Dispatches automated SMS alerts directly to Admin phone when irrigation is STARTED (<45%), STOPPED (>=50%), or RESTARTED. Requires active mini-SIM card with SMS credit.
+- **Dedicated Wiring Guide:** [`arduino/10_gsm_sms_irrigation_alert_test/wiring_guide.html`](file:///C:/xampp/htdocs/WBACFSPWI-Web-Based-Automatic-Controller-for-Solar-Powered-Water-Irrigation/arduino/10_gsm_sms_irrigation_alert_test/wiring_guide.html)
 
 ---
 

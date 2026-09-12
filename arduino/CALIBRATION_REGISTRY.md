@@ -6,8 +6,8 @@ This file serves as the single source of truth for physical sensor calibration v
 
 | Sensor / Measurement | Pin | Raw Dry / Minimum | Raw Wet / Maximum | Scaling Factor | Active Sketches |
 | :--- | :---: | :---: | :---: | :---: | :--- |
-| **Capacitive Soil (Root Zone)** | `A0` | `417` (Air / 0%) | `153` (Water / 100%) | Multi-sample Avg (16x) | `01_soil_root_capacitive_test`<br>`07_dual_sensor_pump_integration_test`<br>`wbacfspwi_arduino_controller` |
-| **HW-080 (Surface Ponding Level)** | `A1` | `1020` (Air / 0%)<br>`410` (Mid / 50%) | `355` (Full / 100%) | 3-Point Physical Ruler Calibration | `02_surface_water_level_test`<br>`07_dual_sensor_pump_integration_test`<br>`wbacfspwi_arduino_controller` |
+| **Capacitive Soil (Root Zone)** | `A0` | `417` (Air / 0%) | `153` (Water / 100%) | Multi-sample Avg (16x) | `01_soil_root_capacitive_test`<br>`07_dual_sensor_pump_integration_test`<br>`08_dc_adapter_presentation_test`<br>`10_gsm_sms_irrigation_alert_test`<br>`wbacfspwi_arduino_controller` |
+| **HW-080 (Surface Ponding Level)** | `A1` | `1020` (Air / 0%)<br>`410` (Mid / 50%) | `355` (Full / 100%) | 3-Point Physical Ruler Calibration | `02_surface_water_level_test`<br>`07_dual_sensor_pump_integration_test`<br>`08_dc_adapter_presentation_test`<br>`10_gsm_sms_irrigation_alert_test`<br>`wbacfspwi_arduino_controller` |
 | **Battery Voltage Divider** | `A2` | `0.0V` | `12.6V` (Max 3S) / `14.4V` (Motorcycle) | `4.0303` (100kΩ/33kΩ) | `04_battery_voltage_test`<br>`06_solar_charger_battery_test`<br>`wbacfspwi_arduino_controller` |
 | **Solar Panel Voltage Divider** | `A3` | `0.0V` | `25.0V` (Max Input) | `6.0000` (100kΩ/20kΩ) | `05_solar_voltage_test`<br>`06_solar_charger_battery_test`<br>`wbacfspwi_arduino_controller` |
 

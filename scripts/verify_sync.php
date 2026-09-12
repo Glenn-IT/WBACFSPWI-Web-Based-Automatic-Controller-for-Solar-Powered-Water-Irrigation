@@ -349,7 +349,66 @@ if (file_exists($t10Path)) {
         strpos(file_get_contents($rootDir . '/arduino/10_gsm_sms_irrigation_alert_test/wiring_guide.html'), '<svg') !== false);
     check("Arduino Hardware index.html links to Test 10",
         strpos(file_get_contents($rootDir . '/arduino/index.html'), '10_gsm_sms_irrigation_alert_test') !== false);
+    check("Master Controller wiring guide links to Test 10 GSM",
+        strpos($fCtrlWiring, '10_gsm_sms_irrigation_alert_test') !== false);
+    check("Master Controller wiring guide table includes COMM-04 and COMM-05 GSM rows",
+        strpos($fCtrlWiring, 'COMM-04') !== false && strpos($fCtrlWiring, 'COMM-05') !== false);
+    check("Master Controller wiring guide filter panel includes chk-gsm",
+        strpos($fCtrlWiring, 'chk-gsm') !== false);
 }
+
+// -------------------------------------------------------------
+// TEST 07 DUAL SENSOR INTEGRATION WIRING GUIDE SYNCHRONIZATION
+// -------------------------------------------------------------
+echo "--- Test 07 Dual Sensor Integration Guide Synchronization ---\n";
+$t07Guide = $rootDir . '/arduino/07_dual_sensor_pump_integration_test/wiring_guide.html';
+check("Test 07 wiring_guide.html exists", file_exists($t07Guide));
+if (file_exists($t07Guide)) {
+    $f07G = file_get_contents($t07Guide);
+    check("Test 07 wiring guide has interactive SVG breadboard diagram",
+        strpos($f07G, '<svg') !== false && strpos($f07G, 'class="wire"') !== false);
+    check("Test 07 wiring guide table defines A0, A1, D7, D8, and Star Rails",
+        strpos($f07G, 'Pin A0') !== false && strpos($f07G, 'Pin A1') !== false &&
+        strpos($f07G, 'Pin D7') !== false && strpos($f07G, 'Pin D8') !== false);
+    check("Arduino Hardware index.html links to Test 07",
+        strpos(file_get_contents($rootDir . '/arduino/index.html'), '07_dual_sensor_pump_integration_test') !== false);
+    check("Master Controller wiring guide links to Test 07",
+        strpos($fCtrlWiring, '07_dual_sensor_pump_integration_test') !== false);
+}
+
+// -------------------------------------------------------------
+// WIRING GUIDES UNIFORM NAVIGATION INTEGRITY CHECK
+// -------------------------------------------------------------
+echo "--- Wiring Guides Uniform Navigation Consistency ---\n";
+$guides = [
+    '01' => "$rootDir/arduino/01_soil_root_capacitive_test/wiring_guide.html",
+    '02' => "$rootDir/arduino/02_surface_water_level_test/wiring_guide.html",
+    '03' => "$rootDir/arduino/03_relay_pump_test/wiring_guide.html",
+    '04' => "$rootDir/arduino/04_battery_voltage_test/wiring_guide.html",
+    '05' => "$rootDir/arduino/05_solar_voltage_test/wiring_guide.html",
+    '06' => "$rootDir/arduino/06_solar_charger_battery_test/wiring_guide.html",
+    '07' => "$rootDir/arduino/07_dual_sensor_pump_integration_test/wiring_guide.html",
+    '08' => "$rootDir/arduino/08_dc_adapter_presentation_test/wiring_guide.html",
+    '09' => "$rootDir/arduino/09_esp8266_wifi_bridge_test/wiring_guide.html",
+    '10' => "$rootDir/arduino/10_gsm_sms_irrigation_alert_test/wiring_guide.html",
+    'Main' => "$rootDir/arduino/wbacfspwi_arduino_controller/wiring_guide.html"
+];
+
+$allNavSync = true;
+foreach ($guides as $name => $path) {
+    if (!file_exists($path)) {
+        $allNavSync = false;
+        break;
+    }
+    $content = file_get_contents($path);
+    if (strpos($content, 'Test 07: Dual Sensor') === false ||
+        strpos($content, 'Test 10: GSM SMS Alert') === false) {
+        $allNavSync = false;
+        break;
+    }
+}
+check("All 11 hardware wiring guides uniformly link to Test 07 and Test 10", $allNavSync);
+
 
 // -------------------------------------------------------------
 // SUMMARY
