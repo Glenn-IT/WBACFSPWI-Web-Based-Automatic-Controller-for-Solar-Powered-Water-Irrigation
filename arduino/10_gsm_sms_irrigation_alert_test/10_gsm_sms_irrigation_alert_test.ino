@@ -12,8 +12,8 @@
  *     3. When irrigation is RESTARTED (water level drops below 45.0% again, pump turns ON).
  * 
  * Hardware Pinout:
- *   - Arduino Pin D2: SoftwareSerial RX (Connects to GSM Module TXD)
- *   - Arduino Pin D3: SoftwareSerial TX (Connects to GSM Module RXD via 1kΩ/2kΩ divider for 3.3V logic)
+ *   - Arduino Pin D2: SoftwareSerial RX (Connects to GSM 5VT / TXD)
+ *   - Arduino Pin D3: SoftwareSerial TX (Direct wire to SIM900A 5VR pin; or via 1kΩ/2kΩ divider for raw 3.3V SIM800L RXD)
  *   - Arduino Pin A1: HW-080 Surface Water Level Sensor (Calibrated 3-point piecewise curve)
  *   - Arduino Pin D7: 5V Relay Module (Active LOW, switches 12V DC Water Pump)
  *   - Arduino Pin D8: Capacitive Sensor Power Gate (Corrosion prevention)
@@ -21,10 +21,9 @@
  *   - Arduino Pin D13: Status / Fault LED (Blinks during GSM operations, ON when pump is active)
  * 
  * GSM Module Power Note (CRITICAL):
- *   SIM800L requires 3.7V - 4.4V (nominal 4.0V) and can draw up to 2.0A peak current
- *   during cellular transmission bursts. DO NOT power SIM800L from Arduino 5V or 3.3V pins.
- *   Power via LM2596 Buck Converter or dedicated 3.7V Li-ion battery with shared Common GND.
- *   Place a 1000uF low-ESR electrolytic capacitor across SIM800L VCC and GND.
+ *   SIM900A / SIM800L can draw up to 2.0A peak current during cellular transmission bursts.
+ *   DO NOT power from Arduino 5V or 3.3V pins. Power via LM2596 Buck Converter (5.0V for SIM900A 5V pin,
+ *   or 4.0V for raw VBAT) with a 1000uF low-ESR electrolytic capacitor across power and shared Common GND.
  */
 
 #include <SoftwareSerial.h>
@@ -32,8 +31,8 @@
 // ============================================================================
 // 1. PIN DEFINITIONS & HARDWARE CONSTANTS
 // ============================================================================
-const int PIN_GSM_RX         = 2;      // Arduino RX <- GSM TXD
-const int PIN_GSM_TX         = 3;      // Arduino TX -> GSM RXD (use 1k/2k divider)
+const int PIN_GSM_RX         = 2;      // Arduino RX <- GSM 5VT / TXD
+const int PIN_GSM_TX         = 3;      // Arduino TX -> GSM 5VR (direct for SIM900A; 1k/2k divider for SIM800L)
 const int PIN_RELAY_PUMP     = 7;      // 5V Relay Control (DC Water Pump)
 const int PIN_SENSOR_PWR     = 8;      // Capacitive Sensor Power Gate
 const int PIN_ROOT_SOIL      = A0;     // Capacitive Soil Moisture Sensor v1.2
@@ -50,7 +49,7 @@ SoftwareSerial gsmSerial(PIN_GSM_RX, PIN_GSM_TX);
 // ============================================================================
 // IMPORTANT: Set your admin mobile phone number here (include country code or local format)
 // Examples: "+639123456789" (Philippines), "+1234567890" (US), or "09123456789"
-char ADMIN_PHONE[20] = "+639123456789";
+char ADMIN_PHONE[20] = "+639169751409";
 
 // ============================================================================
 // 3. CALIBRATION & THRESHOLD VALUES (SYNCHRONIZED WITH SYSTEM MEMORY)
@@ -144,25 +143,67 @@ void dumpGSMResponse(unsigned long waitMs) {
   }
 }
 
-// Initialize GSM module and verify network registration
+// Initialize GSM module and verify network registration with multi-baud detection
 bool initGSM() {
-  Serial.println(F("\n--- Initializing GSM Module (SIM800L / SIM900) ---"));
-  gsmSerial.begin(9600);
-  delay(1000);
+  Serial.println(F("\n--- Initializing GSM Module (SIM800L / SIM900A) ---"));
 
-  // Sync baud rate
+  const long candidateBauds[] = {9600, 19200, 115200, 38400, 57600};
+  const int numBauds = sizeof(candidateBauds) / sizeof(candidateBauds[0]);
   bool synced = false;
-  for (int i = 0; i < 5; i++) {
-    if (sendATCommand("AT", "OK", 1500)) {
-      synced = true;
+  long activeBaud = 9600;
+
+  Serial.println(F("[INFO] Auto-detecting GSM baud rate..."));
+  for (int b = 0; b < numBauds; b++) {
+    long testBaud = candidateBauds[b];
+    Serial.print(F("[INFO] Testing baud: "));
+    Serial.println(testBaud);
+    gsmSerial.begin(testBaud);
+    delay(200);
+
+    for (int i = 0; i < 3; i++) {
+      while (gsmSerial.available()) gsmSerial.read(); // Clear RX buffer
+      gsmSerial.println(F("AT"));
+
+      unsigned long start = millis();
+      String resp = "";
+      while (millis() - start < 800) {
+        while (gsmSerial.available()) {
+          resp += (char)gsmSerial.read();
+        }
+        if (resp.indexOf(F("OK")) != -1) {
+          synced = true;
+          activeBaud = testBaud;
+          break;
+        }
+      }
+      if (synced) break;
+      delay(200);
+    }
+    if (synced) {
+      Serial.print(F("[GSM DETECTED] Connected successfully at "));
+      Serial.print(activeBaud);
+      Serial.println(F(" baud!"));
       break;
     }
-    delay(500);
   }
 
   if (!synced) {
-    Serial.println(F("[ERROR] GSM Module not responding to AT commands. Check power & wiring!"));
+    Serial.println(F("\n[ERROR] GSM Module not responding to AT commands."));
+    Serial.println(F("  Check the following 3 wiring points:"));
+    Serial.println(F("  1. Swap TX and RX: Arduino D2 connects to GSM 5VT; Arduino D3 connects to GSM 5VR."));
+    Serial.println(F("  2. Direct 5VR connection: If using SIM900A '5VR' pin, wire D3 directly (remove 1k/2k divider)."));
+    Serial.println(F("  3. Common GND: Ensure Arduino GND and SIM900A GND share the same ground bus."));
     return false;
+  }
+
+  // If detected at a baud rate other than 9600, lock it to 9600 for SoftwareSerial stability
+  if (activeBaud != 9600) {
+    Serial.println(F("[INFO] Locking GSM module to reliable 9600 baud (AT+IPR=9600)..."));
+    gsmSerial.println(F("AT+IPR=9600"));
+    delay(400);
+    gsmSerial.begin(9600);
+    delay(400);
+    sendATCommand("AT&W", "OK", 1000); // Save to non-volatile profile
   }
 
   sendATCommand("ATE0", "OK", 1000);        // Echo OFF

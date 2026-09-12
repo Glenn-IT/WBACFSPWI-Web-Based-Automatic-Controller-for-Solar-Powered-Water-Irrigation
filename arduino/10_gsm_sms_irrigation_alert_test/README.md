@@ -76,8 +76,8 @@ This test suite verifies bidirectional GSM cellular integration for the miniatur
 ### UART Pinout Mapping for SIM900A (S2-1040U-Z1K0B):
 | SIM900A Mini Pin | Arduino Uno Pin | Function / Logic Level | Notes |
 | :--- | :--- | :--- | :--- |
-| **`5VT`** (or `TXD`) | **Pin D2 (RX)** | 5V TTL Transmit from GSM &rarr; Uno RX | Direct jumper wire (Safe). |
-| **`5VR`** (or `RXD`) | **Pin D3 (TX)** | 5V TTL Receive into GSM &larr; Uno TX | Direct jumper wire if board has onboard level shifter; use 1k/2k divider if raw 3.3V `3VR` pin. |
+| **`5VT`** (or `TXD`) | **Pin D2 (RX)** | 5V TTL Transmit from GSM &rarr; Uno RX | Direct jumper wire (Safe direct read). |
+| **`5VR`** (or `RXD`) | **Pin D3 (TX)** | 5V TTL Receive into GSM &larr; Uno TX | **Direct jumper wire** (Onboard level shifter handles 5V). Do NOT use external divider. |
 | **`GND`** | **Star GND / Arduino GND** | Common Ground (0V Reference) | **Mandatory:** All grounds must be tied together. |
 | **`5V` / `VCC5`** | **Star 5.0V (from LM2596)** | Main 2A+ Power Input | Powered from LM2596 tuned to 5.0V with 1000&mu;F cap. |
 
@@ -87,17 +87,21 @@ This test suite verifies bidirectional GSM cellular integration for the miniatur
 
 ### Master Pin Connection Table
 
-| Arduino Uno R3 Pin | Breadboard Component / Wire | GSM Module (SIM800L) Pin | Operational Function & Safety Rule |
+| Arduino Uno R3 Pin | Breadboard Component / Wire | GSM Module Pin | Operational Function & Safety Rule |
 | :--- | :--- | :--- | :--- |
-| **LM2596 / Buck (4.0V)** | Star Power Rail (`+`) | **`VCC` / `NET`** | Clean $4.0\text{V}$ high-current supply with $1000\mu\text{F}$ buffer cap |
+| **LM2596 / Buck** | Star Power Rail (`+`) | **`5V` (SIM900A) / `VCC` (SIM800L)** | Clean $5.0\text{V}$ (SIM900A) or $4.0\text{V}$ (SIM800L) high-current supply with $1000\mu\text{F}$ buffer cap |
 | **Star Common GND** | Star GND Rail (`-`) | **`GND`** | **CRITICAL:** Arduino GND and GSM GND MUST be tied together! |
-| **Pin D2 (SoftwareSerial RX)** | Direct Jumper Wire | **`TXD` (or `TX`)** | Receives AT responses from GSM module (SIM800L 2.8V logic is safely read as HIGH by Arduino) |
-| **Pin D3 (SoftwareSerial TX)** | Voltage Divider Junction | **`RXD` (or `RX`)** | **5V to 3.3V Logic Level Shift:** Arduino D3 $\rightarrow 1\text{k}\Omega \rightarrow$ GSM RXD $\rightarrow 2\text{k}\Omega \rightarrow$ GND |
+| **Pin D2 (SoftwareSerial RX)** | Direct Jumper Wire | **`5VT` (SIM900A) / `TXD` (SIM800L)** | Receives AT responses from GSM module (Safely read by ATmega328P) |
+| **Pin D3 (SoftwareSerial TX)** | Direct Wire / Divider Junction | **`5VR` (SIM900A) / `RXD` (SIM800L)** | **SIM900A:** Direct wire to `5VR` (onboard level shifter).<br>**SIM800L:** 5V $\rightarrow 1\text{k}\Omega \rightarrow$ RXD $\rightarrow 2\text{k}\Omega \rightarrow$ GND. |
 | **Pin A1** | Direct Jumper Wire | HW-080 `AO` | Surface Water Ponding Depth Sensor ($45\%$ Refill / $50\%$ Target) |
 | **Pin D7** | Direct Jumper Wire | Relay Module `IN` | Active LOW trigger for 12V DC Water Pump Relay |
 | **Pin D13** | Built-in Indicator | — | Mirrors pump state and blinks during SMS dispatch |
 
-### 5V-to-3.3V Voltage Divider Diagram (Pin D3 TX to GSM RXD)
+### 5V-to-3.3V Voltage Divider Diagram (Only for Raw 3.3V SIM800L RXD — NOT needed for SIM900A)
+
+> [!NOTE]
+> **SIM900A users:** Do NOT install this divider. Connect Arduino Pin D3 directly to `5VR`.
+> The diagram below is **strictly for raw 3.3V SIM800L modules**:
 
 ```
 Arduino Uno Pin D3 (5V TX)
@@ -106,10 +110,10 @@ Arduino Uno Pin D3 (5V TX)
       │ │  1 kΩ Resistor (1/4 W)
       └┬┘
        ├───► Connects directly to GSM SIM800L Pin RXD (3.3V Max Safe Input)
-      ┌┴┐
-      │ │  2 kΩ (or 2.2 kΩ) Resistor
-      └┬┘
-       │
+       ┌┴┐
+       │ │  2 kΩ (or 2.2 kΩ) Resistor
+       └┬┘
+        │
 Star GND Rail (0V)
 ```
 

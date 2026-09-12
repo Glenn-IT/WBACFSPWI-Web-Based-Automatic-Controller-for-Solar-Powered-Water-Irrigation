@@ -1221,21 +1221,21 @@
                         </tr>
                         <tr data-module="gsm">
                             <td><strong style="color: #10b981;">COMM-04</strong></td>
-                            <td><span class="pin-tag tag-sensor">GSM Module TXD</span></td>
+                            <td><span class="pin-tag tag-sensor">GSM Module TXD / 5VT</span></td>
                             <td>Direct Jumper Wire</td>
                             <td><span class="pin-tag tag-uno">Arduino Pin D2 (RX)</span></td>
                             <td><strong style="color: #10b981;">Green</strong></td>
-                            <td>0V – 2.8V Logic (Safe)</td>
-                            <td>SIM800L TXD logic connects directly to Arduino digital input (2.8V HIGH is safely detected by ATmega328P). Receives AT responses &amp; SMS delivery confirmation.</td>
+                            <td>0V – 5.0V TTL Logic (Safe)</td>
+                            <td>SIM900A 5VT / SIM800L TXD logic connects directly to Arduino digital input (safely read by ATmega328P). Receives AT responses &amp; SMS delivery confirmation.</td>
                         </tr>
                         <tr data-module="gsm">
                             <td><strong style="color: #f59e0b;">COMM-05</strong></td>
                             <td><span class="pin-tag tag-uno">Arduino Pin D3 (TX)</span></td>
-                            <td>1kΩ / 2kΩ Divider</td>
-                            <td><span class="pin-tag tag-sensor">GSM Module RXD</span></td>
+                            <td>Direct Jumper (SIM900A 5VR) / 1kΩ/2kΩ Divider (SIM800L)</td>
+                            <td><span class="pin-tag tag-sensor">GSM Module 5VR / RXD</span></td>
                             <td><strong style="color: #f59e0b;">Amber / Orange</strong></td>
-                            <td>3.33V Stepped Down</td>
-                            <td><strong>Level Shifted:</strong> Arduino 5V TX is stepped down to safe 3.3V via 1kΩ / 2kΩ voltage divider to protect SIM800L cellular UART input. Sends AT+CMGS SMS commands.</td>
+                            <td>5.0V TTL / 3.3V Shifted</td>
+                            <td><strong>AT Transmit Link:</strong> For SIM900A, connect Arduino D3 <strong>directly</strong> to the <code>5VR</code> pin (board has onboard level shifter). For raw SIM800L, step down 5V to 3.3V via 1kΩ/2kΩ divider. Sends AT+CMGS SMS commands.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -1249,7 +1249,7 @@
                     <li><strong>3. Check 1N4007 Diode Stripe:</strong> The silver/white band (Cathode) MUST plug into <strong>Row 35</strong> (switched 12V from relay). Connecting in reverse will short-circuit the relay!</li>
                     <li><strong>4. Star Ground Rule:</strong> Ensure all module grounds (Buck OUT-, Battery -, Solar Charger -, Solar Panel -, Arduino GND, Sensor GND, Relay GND) terminate on the blue breadboard rail to eliminate inductive voltage bounce.</li>
                     <li><strong>5. Dual Telemetry &amp; Wireless WiFi Bridge:</strong> NodeMCU ESP8266MOD can replace the physical USB tether. Connect NodeMCU Vin to Star 5V Rail and GND to Star GND Rail. Connect NodeMCU Pin D2 (TX) directly to Arduino Pin D9 (RX). Connect Arduino Pin D10 (TX) through the 1kΩ / 2kΩ level shifter divider to NodeMCU Pin D1 (RX). Arduino telemetry is streamed to both USB Serial (115200) and SoftwareSerial espSerial (9600) for seamless WiFi dashboard streaming and remote control.</li>
-                    <li><strong>6. SIM800L GSM Cellular Alert Module:</strong> Requires 3.7V &ndash; 4.4V (nominal 4.0V) and draws up to 2.0A peak burst current during RF transmission. Power via LM2596 or 3.7V Li-ion (NOT Arduino 5V pin) with a 1000&mu;F capacitor across VCC/GND. Arduino Pin D2 (RX) reads GSM TXD directly; Arduino Pin D3 (TX) connects to GSM RXD through a 1k&Omega;/2k&Omega; level shifter divider.</li>
+                    <li><strong>6. Cellular Alert Module (SIM900A / SIM800L):</strong> Draws up to 2.0A peak burst current during RF transmission. Power via LM2596 (5.0V for SIM900A 5V pin, or 4.0V for raw VBAT) with a 1000&mu;F capacitor across power and ground (NOT Arduino 5V pin). Arduino Pin D2 (RX) reads GSM 5VT/TXD directly; Arduino Pin D3 (TX) connects <strong>directly to SIM900A 5VR</strong> (or through a 1k&Omega;/2k&Omega; divider if using raw 3.3V SIM800L).</li>
                 </ul>
             </div>
         </div>

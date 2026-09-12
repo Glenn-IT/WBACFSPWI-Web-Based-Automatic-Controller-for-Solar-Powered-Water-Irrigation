@@ -75,8 +75,8 @@ To prevent inductive motor spikes and high-current relay switching from causing 
 | **COMM-01**| Arduino Pin 10 (TX) | Row 45 (1kΩ/2kΩ Divider)| NodeMCU Pin D1 (RX) | **Orange** | 0V – 3.3V Logic | **Wireless Telemetry Link:** Sends structured JSON to NodeMCU (5V $\rightarrow$ 3.3V shifted). |
 | **COMM-02**| NodeMCU Pin D2 (TX) | Direct Jumper | Arduino Pin 9 (RX) | **White / Green** | 3.3V Logic (Safe) | **Remote Command Link:** Receives schedule/override commands from WiFi. |
 | **COMM-03**| USB Port (Arduino / NodeMCU) | Direct USB Cable | Computer / Laptop | **Blue Cable** | UART (115200 baud)| **Optional Diagnostics & Flashing Only** (No longer required for telemetry). |
-| **COMM-04**| GSM Module TXD | Direct Jumper | Arduino Pin D2 (RX) | **Green** | 0V – 2.8V Logic | **GSM Cellular Link:** Receives AT command responses and SMS dispatch status. |
-| **COMM-05**| Arduino Pin D3 (TX) | 1kΩ/2kΩ Divider | GSM Module RXD | **Orange** | 0V – 3.3V Logic | **GSM AT Transmit:** Sends AT+CMGS SMS commands (5V $\rightarrow$ 3.3V shifted). |
+| **COMM-04**| GSM Module TXD / 5VT | Direct Jumper | Arduino Pin D2 (RX) | **Green** | 0V – 5.0V TTL Logic | **GSM Cellular Link:** Receives AT command responses and SMS dispatch status (Safe direct read). |
+| **COMM-05**| Arduino Pin D3 (TX) | Direct Wire (SIM900A 5VR) / 1kΩ/2kΩ Divider (SIM800L) | GSM Module 5VR / RXD | **Orange** | 5.0V TTL / 3.3V Logic | **GSM AT Transmit:** Sends AT+CMGS SMS commands. Direct wire for SIM900A 5VR; 1k/2k divider for raw SIM800L RXD. |
 
 ---
 
@@ -126,17 +126,19 @@ Star GND Rail (-) (Breadboard Row 30)
 
 ---
 
-### C. 5V $\rightarrow$ 3.3V Logic Level Shifters (NodeMCU Pin D1 & GSM SIM800L RXD)
+### C. 5V $\rightarrow$ 3.3V Logic Level Shifter (NodeMCU Pin D1 & SIM800L RXD)
 
-Both the NodeMCU ESP8266 (`D1` RX) and SIM800L GSM Module (`RXD`) operate on **3.3V maximum logic levels**. Connecting Arduino 5V TX pins directly will damage these peripheral chips. Use identical $1\text{k}\Omega / 2\text{k}\Omega$ resistor voltage dividers:
+- **NodeMCU ESP8266 (`D1` RX):** Operates on **3.3V maximum logic**. Connecting Arduino 5V TX (Pin D10) directly will damage the ESP8266. A $1\text{k}\Omega / 2\text{k}\Omega$ resistor voltage divider is **mandatory**.
+- **SIM800L GSM Module (`RXD`):** Raw 3.3V logic input requires the $1\text{k}\Omega / 2\text{k}\Omega$ voltage divider from Arduino D3.
+- **SIM900A Mini Board (`5VR` Pin):** **NO external divider needed!** The SIM900A mini board features an onboard transistor/diode level shifter on `5VR`. Connect Arduino Pin D3 (TX) **directly** to the SIM900A `5VR` pin (adding an external divider would over-attenuate the signal and cause serial timeouts).
 
 ```
-Arduino TX Pin (D10 for NodeMCU / D3 for GSM) [5.0V Logic]
+Arduino TX Pin (D10 for NodeMCU / D3 for raw SIM800L) [5.0V Logic]
        │
       ┌┴┐
       │ │  R_top = 1 kΩ
       └┬┘
-       ├───► Peripheral RX Pin (NodeMCU D1 / GSM RXD) [3.33V Logic Safe]
+       ├───► Peripheral RX Pin (NodeMCU D1 / raw SIM800L RXD) [3.33V Logic Safe]
       ┌┴┐
       │ │  R_bottom = 2 kΩ
       └┬┘

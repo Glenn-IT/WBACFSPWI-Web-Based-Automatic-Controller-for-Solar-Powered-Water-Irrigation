@@ -85,8 +85,8 @@ All hardware sketches and diagrams adhere strictly to these physical pin connect
 | **A1** | HW-080 Surface Water Ponding Sensor | Analog IN | 0.0V–5.0V output from LM393. Raw: 1020 (dry air), 410 (mid 50%), 355 (full 100%). |
 | **A2** | 3S 18650 Battery Voltage Tap | Analog IN | $100\text{k}\Omega / 33\text{k}\Omega$ divider. Ratio: `4.0303`. Max 3.125V at 12.6V. |
 | **A3** | 30W Solar Panel Voltage Tap | Analog IN | $100\text{k}\Omega / 20\text{k}\Omega$ divider. Ratio: `6.0000`. Max 3.667V at 22.0V Voc. |
-| **D2** | SoftwareSerial RX (from GSM TXD) | Digital IN | Connects to SIM800L TXD (2.8V logic is safely read as HIGH by Arduino). |
-| **D3** | SoftwareSerial TX (to GSM RXD) | Digital OUT | Connects to SIM800L RXD via 1kΩ / 2kΩ divider (5V $\rightarrow$ 3.3V). |
+| **D2** | SoftwareSerial RX (from GSM) | Digital IN | Connects directly to GSM `5VT` / `TXD` (2.8V–5.0V TTL safe direct read). |
+| **D3** | SoftwareSerial TX (to GSM) | Digital OUT | Connects directly to SIM900A `5VR` (onboard level shifter) or via 1kΩ / 2kΩ divider for raw 3.3V SIM800L. |
 | **D7** | 5V Relay Control (DC Water Pump) | Digital OUT | **Active LOW** (`LOW` = Relay Engaged / Pump ON; `HIGH` = Pump OFF). |
 | **D8** | Capacitive Sensor Power Gate | Digital OUT | `HIGH` during reading, `LOW` between samples to prevent electrolytic corrosion. |
 | **D9** | SoftwareSerial RX (from NodeMCU) | Digital IN | Connects to NodeMCU Pin `D2` (TX, 3.3V logic is safe for Arduino 5V input). |

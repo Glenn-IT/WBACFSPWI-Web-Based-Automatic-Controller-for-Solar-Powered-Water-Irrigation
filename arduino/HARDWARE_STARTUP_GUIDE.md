@@ -58,9 +58,9 @@ Before turning on power, verify these physical connections on your solderless br
 | **Solar Divider** | Row 25 Tap (R3/R4) | Arduino Pin `A3` | R3 = $100\text{k}\Omega$ (to Solar +), R4 = $20\text{k}\Omega$ (to GND). |
 | **Relay Signal** | Arduino Pin `D7` | Relay Module `IN` | Active LOW trigger. |
 | **Flyback Diode** | Across DC Pump | Across Pump Leads | **Silver Stripe (Cathode)** to switched +12V; **Anode** to Ground. |
-| **GSM Link (RX $\leftarrow$ TX)** | GSM Module TXD | Arduino Pin `D2` | Direct jumper wire (2.8V TTL is safely read by Arduino Uno). |
-| **GSM Link (TX $\rightarrow$ RX)** | Arduino Pin `D3` | GSM Module RXD | **Voltage Divider Required:** Arduino D3 $\rightarrow 1\text{k}\Omega \rightarrow$ RXD $\rightarrow 2\text{k}\Omega \rightarrow$ GND (protects 3.3V logic). |
-| **GSM Power Supply** | Dedicated 4.0V / Battery | SIM800L `VCC` & `GND` | **Critical:** 3.7V–4.4V (4.0V nominal), 2A burst current. Place 1000µF cap across VCC/GND; connect common GND to Star GND. |
+| **GSM Link (RX $\leftarrow$ TX)** | GSM 5VT / TXD | Arduino Pin `D2` | Direct jumper wire (Safe 2.8V–5.0V TTL detected by Arduino Uno). |
+| **GSM Link (TX $\rightarrow$ RX)** | Arduino Pin `D3` | GSM 5VR / RXD | **SIM900A:** Direct wire to `5VR` (onboard level shifter). **SIM800L:** Requires $1\text{k}\Omega / 2\text{k}\Omega$ divider to drop 5V to 3.3V. |
+| **GSM Power Supply** | Dedicated 5.0V / 4.0V | SIM900A `5V` / SIM800L `VCC` | **Critical:** 2.0A peak burst capability. SIM900A mini board connects to 5.0V; raw SIM800L connects to 4.0V. Place 1000µF cap across power/GND; tie all GNDs together! |
 
 ---
 
