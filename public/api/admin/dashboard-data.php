@@ -7,10 +7,9 @@ header('Content-Type: application/json');
 Auth::requireLogin();
 
 $latest = SensorReading::latest();
-$isSample = $latest === null;
-$reading = $latest ?? SensorReading::sample();
+$isSample = false;
 
-$history = $isSample ? SensorReading::sampleHistory(8) : SensorReading::dailyTrend(8);
+$history = $latest !== null ? SensorReading::dailyTrend(8) : [];
 
 $alerts = Alert::recent(5);
 
@@ -22,17 +21,17 @@ $allSchedules = array_values(array_filter(
 ));
 
 echo json_encode([
-    'is_sample' => $isSample,
+    'is_sample' => false,
     'active_command' => Override::getActiveCommand(),
-    'reading' => [
-        'soil_moisture' => $reading['soil_moisture'],
-        'water_level' => $reading['water_level'],
-        'battery_voltage' => $reading['battery_voltage'] !== null ? round((float) $reading['battery_voltage'], 2) : null,
-        'battery_percent' => SensorReading::batteryPercent($reading['battery_voltage'] !== null ? (float) $reading['battery_voltage'] : null),
-        'solar_output' => $reading['solar_output'],
-        'pump_state' => $reading['pump_state'],
-        'recorded_at' => $reading['recorded_at'],
-    ],
+    'reading' => $latest ? [
+        'soil_moisture' => $latest['soil_moisture'],
+        'water_level' => $latest['water_level'],
+        'battery_voltage' => $latest['battery_voltage'] !== null ? round((float) $latest['battery_voltage'], 2) : null,
+        'battery_percent' => SensorReading::batteryPercent($latest['battery_voltage'] !== null ? (float) $latest['battery_voltage'] : null),
+        'solar_output' => $latest['solar_output'],
+        'pump_state' => $latest['pump_state'],
+        'recorded_at' => $latest['recorded_at'],
+    ] : null,
     'trend' => [
         'labels' => array_map(fn($r) => substr($r['recorded_at'], 0, 10), $history),
         'soil_moisture' => array_map(fn($r) => $r['soil_moisture'], $history),

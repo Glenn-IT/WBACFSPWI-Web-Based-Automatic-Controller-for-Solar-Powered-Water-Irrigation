@@ -94,8 +94,12 @@ include __DIR__ . '/partials/sidebar.php';
         <div class="card shadow-sm">
             <div class="card-header">Sensor Trends</div>
             <div class="card-body">
-                <div class="chart-container-responsive">
+                <div class="chart-container-responsive position-relative">
                     <canvas id="trendChart"></canvas>
+                    <div id="trendChartEmpty" class="position-absolute top-50 start-50 translate-middle text-muted text-center" style="display: none; pointer-events: none;">
+                        <span class="fs-4 d-block mb-1">📡</span>
+                        <span class="small">No sensor data received yet — waiting for Arduino / ESP8266 telemetry.</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -127,14 +131,21 @@ let trendChart = null;
 
 function renderTrendChart(trend) {
     const ctx = document.getElementById('trendChart');
+    const emptyMsg = document.getElementById('trendChartEmpty');
+    const hasData = trend && trend.labels && trend.labels.length > 0;
+
+    if (emptyMsg) {
+        emptyMsg.style.display = hasData ? 'none' : 'block';
+    }
+
     const config = {
         type: 'line',
         data: {
-            labels: trend.labels,
+            labels: hasData ? trend.labels : [],
             datasets: [
                 {
                     label: 'Soil Moisture (%)',
-                    data: trend.soil_moisture,
+                    data: hasData ? trend.soil_moisture : [],
                     borderColor: '#2e7d32',
                     backgroundColor: 'rgba(46,125,50,0.1)',
                     tension: 0.3,
@@ -142,7 +153,7 @@ function renderTrendChart(trend) {
                 },
                 {
                     label: 'Water Level (%)',
-                    data: trend.water_level,
+                    data: hasData ? trend.water_level : [],
                     borderColor: '#0288d1',
                     backgroundColor: 'rgba(2,136,209,0.1)',
                     tension: 0.3,
@@ -150,7 +161,7 @@ function renderTrendChart(trend) {
                 },
                 {
                     label: 'Battery Voltage (V)',
-                    data: trend.battery_voltage || trend.battery_percent,
+                    data: hasData ? (trend.battery_voltage || trend.battery_percent) : [],
                     borderColor: '#a855f7',
                     backgroundColor: 'rgba(168,85,247,0.1)',
                     tension: 0.3,
@@ -190,16 +201,19 @@ function refreshDashboard() {
             } else {
                 document.getElementById('stat-battery').textContent = '-- V';
                 if (document.getElementById('stat-battery-sub')) {
-                    document.getElementById('stat-battery-sub').textContent = '';
+                    document.getElementById('stat-battery-sub').textContent = 'Est. Charge: --%';
                 }
             }
 
             document.getElementById('stat-solar').textContent = r && r.solar_output !== null ? r.solar_output + ' W' : '-- W';
 
             const pumpBadge = document.getElementById('stat-pump-state');
-            if (r) {
-                pumpBadge.textContent = r.pump_state === 'on' ? 'ON' : 'OFF';
+            if (r && r.pump_state) {
+                pumpBadge.textContent = r.pump_state.toUpperCase();
                 pumpBadge.className = 'badge ' + (r.pump_state === 'on' ? 'bg-success' : 'bg-secondary');
+            } else {
+                pumpBadge.textContent = 'STANDBY';
+                pumpBadge.className = 'badge bg-secondary';
             }
 
             // Update Control Mode Indicator and Active Button States
@@ -236,9 +250,11 @@ function refreshDashboard() {
                 btnAuto.classList.remove('btn-outline-primary');
             }
 
-            document.getElementById('stat-last-updated').textContent = r ? 'Last updated: ' + r.recorded_at : 'No sensor data received yet.';
-            document.getElementById('sample-data-notice').style.display = data.is_sample ? '' : 'none';
-            document.getElementById('soil-moisture-sample-note').style.display = data.is_sample ? '' : 'none';
+            document.getElementById('stat-last-updated').textContent = r ? 'Last updated: ' + r.recorded_at : 'No sensor data received yet — waiting for Arduino / ESP8266 to connect.';
+            const sampleNotice = document.getElementById('sample-data-notice');
+            if (sampleNotice) sampleNotice.style.display = 'none';
+            const sampleNote = document.getElementById('soil-moisture-sample-note');
+            if (sampleNote) sampleNote.style.display = 'none';
 
             renderTrendChart(data.trend);
 
