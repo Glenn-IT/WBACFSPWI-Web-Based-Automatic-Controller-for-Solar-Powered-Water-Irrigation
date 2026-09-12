@@ -469,17 +469,40 @@ void setup() {
     Serial.println(F("[SYSTEM] GSM SMS Alert Module: OFFLINE (Operating with WiFi Bridge)"));
   }
 
-  // 10-Second Sensor Calibration & Stabilization Window
-  Serial.println(F("[STARTUP] 10-Second Sensor Calibration & Stabilization Window..."));
-  for (int sec = 10; sec > 0; sec--) {
-    Serial.print(F("  -> Stabilizing sensors... "));
+  // 30-Second Sensor Calibration & Network Stabilization Window
+  Serial.println(F("[STARTUP] 30-Second Sensor Calibration & Network Stabilization Window..."));
+  Serial.println(F("[STARTUP] Allowing SIM900A GSM module to lock cell tower and NodeMCU to connect to WiFi..."));
+  for (int sec = 30; sec > 0; sec--) {
+    Serial.print(F("  -> Calibrating sensors & stabilizing network links... "));
     Serial.print(sec);
     Serial.println(F("s remaining"));
-    readRootMoisture();
-    readSurfaceWater();
+
+    // Warm-up sensor readings
+    currentRootMoisture = readRootMoisture();
+    currentSurfaceWater = readSurfaceWater();
+    currentBattVolts    = readBatteryVoltage();
+    currentSolarVolts   = readSolarVoltage();
+
+    // Toggle onboard status LED every second during warm-up
+    digitalWrite(PIN_STATUS_LED, (sec % 2 == 0) ? HIGH : LOW);
+
+    // Stream initial telemetry heartbeat to NodeMCU every 5 seconds
+    if (sec % 5 == 0) {
+      espSerial.print(F("{\"soil_moisture\":"));
+      espSerial.print(currentRootMoisture, 1);
+      espSerial.print(F(",\"water_level\":"));
+      espSerial.print(currentSurfaceWater, 1);
+      espSerial.print(F(",\"battery_voltage\":"));
+      espSerial.print(currentBattVolts, 2);
+      espSerial.print(F(",\"solar_output\":"));
+      espSerial.print(currentSolarVolts, 2);
+      espSerial.print(F(",\"pump_state\":\"off\"}\n"));
+    }
+
     delay(1000);
   }
-  Serial.println(F("[STARTUP] Calibration window complete! Starting autonomous maintenance...\n"));
+  digitalWrite(PIN_STATUS_LED, LOW);
+  Serial.println(F("[STARTUP] 30-second calibration window complete! Starting autonomous maintenance...\n"));
 }
 
 void loop() {
