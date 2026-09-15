@@ -109,7 +109,7 @@ include __DIR__ . '/partials/sidebar.php';
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="<?= BASE_URL ?>/assets/js/chart.umd.min.js"></script>
 <script>
 let trendChart = null;
 

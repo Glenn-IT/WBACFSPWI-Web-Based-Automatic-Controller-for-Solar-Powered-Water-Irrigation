@@ -7,7 +7,7 @@ define('CURRENT_VERSION', 'v4.00');
 <head>
     <meta charset="UTF-8">
     <title>Under Construction - WBACFSPWI</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="<?= defined('BASE_URL') ? BASE_URL : '../public' ?>/assets/css/bootstrap.min.css">
 </head>
 <body class="bg-light">
 <div class="d-flex align-items-center justify-content-center vh-100">
