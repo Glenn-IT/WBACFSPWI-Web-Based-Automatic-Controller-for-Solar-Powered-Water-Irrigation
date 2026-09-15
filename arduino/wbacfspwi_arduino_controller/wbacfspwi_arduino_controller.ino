@@ -58,7 +58,7 @@ SoftwareSerial espSerial(PIN_ESP_RX, PIN_ESP_TX); // WiFi Bridge Link (NodeMCU)
 SoftwareSerial gsmSerial(PIN_GSM_RX, PIN_GSM_TX); // Cellular SMS Link (SIM900A)
 
 // Admin Mobile Phone Number for Automated SMS Alerts
-char ADMIN_PHONE[20] = "+639169751409";
+char ADMIN_PHONE[20] = "+639158127228";
 
 // ============================================================================
 // 2. CALIBRATION & THRESHOLD VALUES (SYNCHRONIZED WITH SYSTEM MEMORY)
