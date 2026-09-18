@@ -48,6 +48,7 @@ This directory contains the standalone Arduino Uno hardware sketches, component 
 | [`08_dc_adapter_presentation_test/`](./08_dc_adapter_presentation_test/08_dc_adapter_presentation_test.ino) | **12V DC Presentation Test** | Bench/Presentation mode using 12V DC power adapter (no battery needed) with interactive serial controls. |
 | [`09_esp8266_wifi_bridge_test/`](./09_esp8266_wifi_bridge_test/09_esp8266_wifi_bridge_test.ino) | **NodeMCU WiFi Bridge Test** | Wireless telemetry bridge linking Arduino Uno SoftwareSerial to local WiFi & XAMPP backend (no USB cable needed). |
 | [`10_gsm_sms_irrigation_alert_test/`](./10_gsm_sms_irrigation_alert_test/10_gsm_sms_irrigation_alert_test.ino) | **GSM SIM800L SMS Alert Test** | Cellular SMS notification module. Dispatches real-time text alerts to Admin phone when irrigation starts (<45%), stops (>=50%), and restarts. |
+| [`11_jsn_sr04t_ultrasonic_water_level_test/`](./11_jsn_sr04t_ultrasonic_water_level_test/11_jsn_sr04t_ultrasonic_water_level_test.ino) | **JSN-SR04T Ultrasonic Level Test** | Non-contact waterproof ultrasonic sensor test & calibration suite. Solves HW-080 corrosion and false splash triggers. |
 | [`wbacfspwi_arduino_controller/`](./wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino) | **Full Controller** | Complete automated controller featuring dual-sensor logic, safety cutoffs, relay hysteresis, and serial telemetry. |
 
 ---

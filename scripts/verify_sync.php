@@ -66,6 +66,26 @@ check("Main Controller defines HW080 Dry=1020, Mid=663, Wet=568",
 check("Calibration Registry records HW-080 (1020/663/568)", 
     strpos($fCal, '1020') !== false && strpos($fCal, '663') !== false && strpos($fCal, '568') !== false);
 
+echo "\n2b. Testing JSN-SR04T Waterproof Ultrasonic Sensor (A1/A4) Synchronization:\n";
+$f11 = file_get_contents("$rootDir/arduino/11_jsn_sr04t_ultrasonic_water_level_test/11_jsn_sr04t_ultrasonic_water_level_test.ino");
+$fPinout = file_get_contents("$rootDir/arduino/Pinout_and_Schematic.md");
+$fSysMem = file_get_contents("$rootDir/SYSTEM_MEMORY.md");
+
+check("Test 11 defines sensorClearanceCM = 17.0 & containerDepthCM = 10.8",
+    strpos($f11, 'sensorClearanceCM = 17.0') !== false && strpos($f11, 'containerDepthCM  = 10.8') !== false);
+check("Main Controller defines PIN_TRIG = A1 & PIN_ECHO = A4",
+    strpos($fMain, 'PIN_TRIG           = A1') !== false && strpos($fMain, 'PIN_ECHO           = A4') !== false);
+check("Main Controller defines sensorClearanceCM = 17.0 & containerDepthCM = 10.8",
+    strpos($fMain, 'sensorClearanceCM       = 17.0') !== false && strpos($fMain, 'containerDepthCM        = 10.8') !== false);
+check("Main Controller implements singlePingCM() & readFilteredDistanceCM()",
+    strpos($fMain, 'singlePingCM()') !== false && strpos($fMain, 'readFilteredDistanceCM(5)') !== false);
+check("Calibration Registry records JSN-SR04T (17.0cm clearance / 10.8cm depth / 27.8cm floor)",
+    strpos($fCal, 'JSN-SR04T Ultrasonic') !== false && strpos($fCal, '17.0cm') !== false && strpos($fCal, '10.8cm') !== false);
+check("Pinout & Schematic specifies JSN-SR04T TRIG on A1 & ECHO on A4",
+    strpos($fPinout, 'JSN-SR04T TRIG') !== false && strpos($fPinout, 'JSN-SR04T ECHO') !== false);
+check("SYSTEM_MEMORY.md documents JSN-SR04T Ultrasonic Sensor on Pins A1/A4",
+    strpos($fSysMem, 'JSN-SR04T') !== false && strpos($fSysMem, 'PIN_TRIG') === false && strpos($fSysMem, '17.0cm') !== false);
+
 echo "\n3. Testing Resistor Voltage Divider Ratios:\n";
 $f04 = file_get_contents("$rootDir/arduino/04_battery_voltage_test/04_battery_voltage_test.ino");
 $f05 = file_get_contents("$rootDir/arduino/05_solar_voltage_test/05_solar_voltage_test.ino");

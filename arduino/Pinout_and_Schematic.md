@@ -55,12 +55,12 @@ To prevent inductive motor spikes and high-current relay switching from causing 
 | **PWR-01** | 12V Motorcycle / 3S Battery (+) [11.1V–14.4V] | Direct Wire | LM2596 Buck IN+ | **Red** | 11.1V – 14.4V DC | Raw battery supply to Buck step-down converter (18/16 AWG with 10A fuse recommended). |
 | **PWR-02** | LM2596 Buck OUT+ | Top Red Rail (`+`) | Arduino 5V Pin | **Red** | 5.00V DC Regulated | **Primary Logic Power:** Powers Arduino ATmega328P MCU. |
 | **PWR-03** | Top Red Rail (`+`) | Direct Jumper | 5V Relay Module VCC | **Red** | 5.00V DC | Powers optocoupler coil driver circuitry. |
-| **PWR-04** | Top Red Rail (`+`) | Direct Jumper | HW-080 Driver VCC | **Red** | 5.00V DC | Powers LM393 surface moisture comparator driver board. |
+| **PWR-04** | Top Red Rail (`+`) | Direct Jumper | JSN-SR04T VCC / HW-080 VCC | **Red** | 5.00V DC | Powers JSN-SR04T ultrasonic transceiver / LM393 driver board. |
 | **PWR-05** | Top Red Rail (`+`) | Direct Jumper | NodeMCU Pin `Vin` | **Red** | 5.00V DC | Powers NodeMCU ESP8266 onboard AMS1117 3.3V regulator from Star 5V rail. |
 | **GND-01** | LM2596 Buck OUT- | Top Blue Rail (`-`) | Arduino GND Pin | **Blue / Slate** | 0.00V (Star GND) | **Star Ground Reference:** Central zero-volt reference point. |
 | **GND-02** | 12V Motorcycle / 3S Battery (-) | Top Blue Rail (`-`) | Buck IN- Terminal | **Blue / Black** | 0.00V (Common) | Ties battery negative return directly into central star ground. |
 | **GND-03** | 30W Solar (-) Terminal | Top Blue Rail (`-`) | Star Common GND | **Blue / Black** | 0.00V (Common) | Ties solar panel return into common ground bus. |
-| **GND-04** | Relay GND & Sensors GND | Top Blue Rail (`-`) | Star Common GND | **Blue / Slate** | 0.00V | Ground returns for relay coil, capacitive sensor, and HW-080. |
+| **GND-04** | Relay GND & Sensors GND | Top Blue Rail (`-`) | Star Common GND | **Blue / Slate** | 0.00V | Ground returns for relay coil, capacitive sensor, JSN-SR04T, and HW-080. |
 | **GND-05** | NodeMCU GND Pin | Top Blue Rail (`-`) | Star Common GND | **Blue / Black** | 0.00V | Ties NodeMCU ground into central Star GND reference. |
 | **ACT-01** | 12V Motorcycle / 3S Battery (+) | Direct Heavy Wire | Relay COM Terminal | **Purple / Red** | 11.5V – 14.4V High Current | Feeds un-stepped battery power to relay switch contacts (18/16 AWG wire). |
 | **ACT-02** | Relay NO Terminal | Row 35 (Diode Cathode) | DC Pump (+) Lead | **Blue** | Switched 12V DC | Powers water pump motor when relay is engaged. |
@@ -69,9 +69,10 @@ To prevent inductive motor spikes and high-current relay switching from causing 
 | **SIG-01** | Arduino Pin D7 | Direct Jumper | Relay IN Pin | **Amber** | 5V Digital Out | Active LOW trigger with 3-minute continuous runtime safety cap. |
 | **SIG-02** | Arduino Pin D8 | Direct Jumper | Capacitive Sensor VCC | **Pink / Red** | 5V Digital Gate | Powers capacitive sensor only during sampling (anti-corrosion). |
 | **SIG-03** | Capacitive Sensor AOUT | Direct Jumper | Arduino Pin A0 | **Green** | 0V – 3.0V Analog | Root zone soil moisture reading (Air ~417, Water ~153). |
-| **SIG-04** | HW-080 Sensor AO | Direct Jumper | Arduino Pin A1 | **Cyan** | 0V – 5.0V Analog | Surface ponding depth controller (Dry=1020, Mid=663, Full=568). Maintains 50% target (ON < 45%, OFF $\ge$ 50%, 5s min runtime, 10s settling). |
+| **SIG-04** | Arduino Pin A1 | Direct Jumper | JSN-SR04T TRIG (or HW-080 AO) | **Cyan** | 5V Digital Out | JSN-SR04T 10µs ultrasonic trigger pulse. Legacy HW-080 analog input. |
 | **SIG-05** | Row 10 (R1/R2 Junction) | 100kΩ / 33kΩ Divider | Arduino Pin A2 | **Purple** | 0V – 3.57V Analog | Battery voltage monitor ($V_{\text{batt}} / 4.0303$). Cutoff < 10.0V. Max 3.57V at 14.4V solar bulk charge. |
 | **SIG-06** | Row 25 (R3/R4 Junction) | 100kΩ / 20kΩ Divider | Arduino Pin A3 | **Gold / Yellow** | 0V – 3.67V Analog | Solar panel monitor ($V_{\text{solar}} / 6.000$). Harvesting > 12.0V. |
+| **SIG-07** | JSN-SR04T ECHO Pin | Direct Jumper | Arduino Pin A4 | **Blue** | 5V Digital In | Ultrasonic echo pulse duration (Time-of-Flight distance). Calibrated: 27.8cm (0%), 22.4cm (50%), 22.9cm (45%). |
 | **COMM-01**| Arduino Pin 10 (TX) | Row 45 (1kΩ/2kΩ Divider)| NodeMCU Pin D1 (RX) | **Orange** | 0V – 3.3V Logic | **Wireless Telemetry Link:** Sends structured JSON to NodeMCU (5V $\rightarrow$ 3.3V shifted). |
 | **COMM-02**| NodeMCU Pin D2 (TX) | Direct Jumper | Arduino Pin 9 (RX) | **White / Green** | 3.3V Logic (Safe) | **Remote Command Link:** Receives schedule/override commands from WiFi. |
 | **COMM-03**| USB Port (Arduino / NodeMCU) | Direct USB Cable | Computer / Laptop | **Blue Cable** | UART (115200 baud)| **Optional Diagnostics & Flashing Only** (No longer required for telemetry). |

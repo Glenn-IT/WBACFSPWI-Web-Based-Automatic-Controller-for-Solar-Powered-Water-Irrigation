@@ -7,9 +7,10 @@
  * Hardware Setup:
  *   - Arduino Uno R3 (ATmega328P)
  *   - Pin A0: Capacitive Soil Moisture Sensor v1.2 (Root Zone)
- *   - Pin A1: HW-080 Surface Water Level Sensor (Surface Ponding / Depth)
+ *   - Pin A1: JSN-SR04T Waterproof Ultrasonic TRIG Output (10µs pulse, replaces legacy HW-080)
  *   - Pin A2: 3S 18650 / 12V Motorcycle Battery Voltage Divider (100kΩ / 33kΩ)
  *   - Pin A3: 30W Solar Panel Voltage Divider (100kΩ / 20kΩ)
+ *   - Pin A4: JSN-SR04T Waterproof Ultrasonic ECHO Input (Time-of-Flight duration)
  *   - Pin D2: GSM SoftwareSerial RX (from SIM900A 5VT / TXD)
  *   - Pin D3: GSM SoftwareSerial TX (direct to SIM900A 5VR onboard level shifter)
  *   - Pin D7: 5V Relay Module (DC Water Pump Switch, Active LOW)
@@ -38,9 +39,11 @@
 // 1. PIN DEFINITIONS & HARDWARE CONSTANTS
 // ============================================================================
 const int PIN_ROOT_SOIL      = A0;     // Capacitive Root Soil Moisture Sensor
-const int PIN_SURFACE_WATER  = A1;     // HW-080 Surface Water Ponding Sensor
+const int PIN_SURFACE_WATER  = A1;     // HW-080 Surface Water Ponding Sensor (Legacy)
+const int PIN_TRIG           = A1;     // JSN-SR04T Waterproof Ultrasonic TRIG Output (10µs pulse)
 const int PIN_VBATT          = A2;     // Battery Voltage Divider (100k/33k)
 const int PIN_VSOLAR         = A3;     // Solar Panel Voltage Divider (100k/20k)
+const int PIN_ECHO           = A4;     // JSN-SR04T Waterproof Ultrasonic ECHO Input (Time-of-Flight)
 
 const int PIN_GSM_RX         = 2;      // Arduino RX <- GSM 5VT / TXD
 const int PIN_GSM_TX         = 3;      // Arduino TX -> GSM 5VR (direct for SIM900A)
@@ -73,7 +76,14 @@ const float VSOLAR_RATIO     = 6.0000; // (100k + 20k) / 20k
 const int SOIL_AIR_RAW       = 417;    // 0% moisture in dry air
 const int SOIL_WATER_RAW     = 153;    // 100% moisture in water
 
-// HW-080 Moisture Sensor (Physical Ruler 3-Point Calibration for Surface Ponding Depth)
+// JSN-SR04T Waterproof Ultrasonic Sensor Calibration (Centimeters)
+// Live Bench Calibrated: Floor=27.8cm (0%), 50% Target=22.4cm, 45% Refill=22.9cm
+float sensorClearanceCM       = 17.0;   // Air gap from transducer face to 100% full mark (27.8 - 10.8)
+float containerDepthCM        = 10.8;   // Calibrated usable water depth (5.4cm at 50% * 2)
+const float SPEED_OF_SOUND_CM_US = 0.0343; // cm per microsecond at ~25°C
+const float MIN_BLIND_ZONE_CM     = 20.0;   // Physical dead band limit of JSN-SR04T
+
+// Legacy HW-080 Moisture Sensor (Preserved for Fallback / Verification)
 const int HW080_RAW_DRY      = 1020;   // Stage 0: Probe in dry air (0.0% surface water)
 const int HW080_RAW_MID      = 663;    // Stage 1: Water at middle of sensor 7-8cm mark (50.0% depth)
 const int HW080_RAW_WET      = 568;    // Stage 2: Probe at container maximum depth (100% full ponding)
@@ -116,6 +126,7 @@ unsigned long lastSmsTime       = 0;
 
 float currentRootMoisture = 0.0;
 float currentSurfaceWater = 0.0;
+float currentDistanceCM   = 0.0;
 float currentBattVolts    = 0.0;
 float currentSolarVolts   = 0.0;
 
@@ -345,25 +356,63 @@ float readRootMoisture() {
   return constrain(pct, 0.0, 100.0);
 }
 
-float readSurfaceWater() {
-  long sum = 0;
-  for (int i = 0; i < 16; i++) {
-    sum += analogRead(PIN_SURFACE_WATER);
-    delay(2);
-  }
-  int raw = sum / 16;
+// Single acoustic pulse-echo time-of-flight measurement via JSN-SR04T
+float singlePingCM() {
+  digitalWrite(PIN_TRIG, LOW);
+  delayMicroseconds(4);
 
-  if (raw >= HW080_RAW_DRY) {
-    return 0.0;
-  } else if (raw >= HW080_RAW_MID) {
-    // Stage 1: Dry air (1020) down to Middle height (663) -> 0.0% to 50.0%
-    float pct = 50.0 * (float)(HW080_RAW_DRY - raw) / (float)(HW080_RAW_DRY - HW080_RAW_MID);
-    return constrain(pct, 0.0, 50.0);
-  } else {
-    // Stage 2: Middle height (663) down to Full top (568) -> 50.0% to 100.0%
-    float pct = 50.0 + 50.0 * (float)(HW080_RAW_MID - raw) / (float)(HW080_RAW_MID - HW080_RAW_WET);
+  digitalWrite(PIN_TRIG, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(PIN_TRIG, LOW);
+
+  unsigned long duration = pulseIn(PIN_ECHO, HIGH, 35000UL); // 35ms timeout (~6m)
+  if (duration == 0) return -1.0;
+
+  return (float)duration * SPEED_OF_SOUND_CM_US / 2.0;
+}
+
+// Multi-sample median filtered distance reading to reject surface ripples & acoustic jitter
+float readFilteredDistanceCM(int samples = 5) {
+  float readings[10];
+  if (samples > 10) samples = 10;
+  if (samples < 1)  samples = 1;
+
+  int validCount = 0;
+  for (int i = 0; i < samples; i++) {
+    float d = singlePingCM();
+    if (d > 0.0) {
+      readings[validCount++] = d;
+    }
+    delay(20);
+  }
+
+  if (validCount == 0) return -1.0;
+
+  // Simple sorting for median extraction
+  for (int i = 0; i < validCount - 1; i++) {
+    for (int j = i + 1; j < validCount; j++) {
+      if (readings[i] > readings[j]) {
+        float temp = readings[i];
+        readings[i] = readings[j];
+        readings[j] = temp;
+      }
+    }
+  }
+  return readings[validCount / 2];
+}
+
+// JSN-SR04T Non-Contact Surface Water Depth Percentage (0.0% to 100.0%)
+float readSurfaceWater() {
+  float dist = readFilteredDistanceCM(5);
+  if (dist > 0.0) {
+    currentDistanceCM = dist;
+    float emptyFloorDistance = sensorClearanceCM + containerDepthCM;
+    float depth = emptyFloorDistance - dist;
+    float pct = (depth / containerDepthCM) * 100.0;
     return constrain(pct, 0.0, 100.0);
   }
+  // Return last known reading if acoustic echo timed out
+  return currentSurfaceWater;
 }
 
 float readBatteryVoltage() {
@@ -391,7 +440,11 @@ void printTelemetry() {
   Serial.print(F("Time: ")); Serial.print(millis() / 1000); Serial.println(F("s"));
   
   Serial.print(F("Root Moisture   : ")); Serial.print(currentRootMoisture, 1); Serial.println(F(" %"));
-  Serial.print(F("Surface Water   : ")); Serial.print(currentSurfaceWater, 1); Serial.println(F(" %"));
+  Serial.print(F("Surface Water   : ")); Serial.print(currentSurfaceWater, 1); Serial.print(F(" %"));
+  if (currentDistanceCM > 0.0) {
+    Serial.print(F(" [Dist: ")); Serial.print(currentDistanceCM, 1); Serial.print(F("cm]"));
+  }
+  Serial.println();
   Serial.print(F("Battery Voltage : ")); Serial.print(currentBattVolts, 2); Serial.print(F(" V "));
   if (lowBatteryLockout) Serial.print(F("[LOW BATT LOCK]"));
   Serial.println();
@@ -440,6 +493,11 @@ void setup() {
 
   pinMode(PIN_STATUS_LED, OUTPUT);
   digitalWrite(PIN_STATUS_LED, LOW);
+
+  // Initialize JSN-SR04T Waterproof Ultrasonic Pins
+  pinMode(PIN_TRIG, OUTPUT);
+  pinMode(PIN_ECHO, INPUT);
+  digitalWrite(PIN_TRIG, LOW);
 
   if (USE_SENSOR_PWR && PIN_SENSOR_PWR >= 0) {
     pinMode(PIN_SENSOR_PWR, OUTPUT);

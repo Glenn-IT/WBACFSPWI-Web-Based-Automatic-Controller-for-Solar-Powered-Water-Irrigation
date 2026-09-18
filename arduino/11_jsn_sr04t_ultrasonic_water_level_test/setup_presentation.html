@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>18×18 cm Circular Container Setup — JSN-SR04T Ultrasonic Presentation — WBACFSPWI</title>
+    <link rel="stylesheet" href="../assets/css/fonts.css">
+    <style>
+        :root {
+            --bg-dark: #090d16;
+            --bg-card: #131c2e;
+            --bg-card-elevated: #1a2744;
+            --border-color: #243556;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-cyan: #06b6d4;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-purple: #8b5cf6;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+        .container { max-width: 1320px; margin: 0 auto; }
+        
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 1.2rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: rgba(6, 182, 212, 0.15);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(6, 182, 212, 0.35);
+            margin-bottom: 0.85rem;
+        }
+        h1 {
+            font-size: 2.3rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #ffffff 0%, #38bdf8 50%, #818cf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        p.subtitle { color: var(--text-secondary); font-size: 1.05rem; max-width: 820px; margin: 0 auto; }
+
+        .nav-bar {
+            display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; margin-bottom: 2.5rem;
+        }
+        .nav-link {
+            font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); background: var(--bg-card);
+            padding: 0.5rem 1rem; border-radius: 0.5rem; text-decoration: none; border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #ffffff; background: var(--accent-cyan); border-color: var(--accent-cyan);
+        }
+
+        .grid-layout { display: grid; grid-template-columns: 1fr; gap: 2.5rem; }
+        
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 1.25rem;
+            padding: 2rem;
+            box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .card-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-primary);
+        }
+        .card-title .icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 0.6rem;
+            background: rgba(6, 182, 212, 0.2);
+            color: var(--accent-cyan);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        /* 2-Column interactive split */
+        .simulator-grid {
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 2rem;
+            align-items: start;
+        }
+        @media (max-width: 1024px) {
+            .simulator-grid { grid-template-columns: 1fr; }
+        }
+
+        .svg-display {
+            background: #060911;
+            border: 1px solid #1a253a;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        svg { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+
+        /* Simulator Controls Panel */
+        .control-panel {
+            background: var(--bg-card-elevated);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 1.75rem;
+        }
+        .control-group {
+            margin-bottom: 1.5rem;
+        }
+        .control-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        .control-label span.val {
+            color: var(--accent-cyan);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.15rem;
+        }
+        input[type=range] {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #243556;
+            outline: none;
+            cursor: pointer;
+            accent-color: var(--accent-cyan);
+        }
+
+        /* Telemetry Metric Cards */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .metric-box {
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            text-align: center;
+        }
+        .metric-title {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-bottom: 0.35rem;
+        }
+        .metric-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        /* Decision Status Pill */
+        .decision-pill {
+            padding: 1rem 1.25rem;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        .status-refill {
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            color: #fbbf24;
+        }
+        .status-buffer {
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            color: #60a5fa;
+        }
+        .status-target {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #34d399;
+        }
+        .status-danger {
+            background: rgba(244, 63, 94, 0.2);
+            border: 1px solid rgba(244, 63, 94, 0.5);
+            color: #fb7185;
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.85; transform: scale(1.02); }
+        }
+
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.55rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 700;
+            font-size: 0.82rem;
+            text-decoration: none;
+            background: var(--accent-cyan);
+            color: #090d16;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-action:hover {
+            filter: brightness(1.15);
+            transform: translateY(-1px);
+        }
+
+        /* Dimension tag */
+        .dim-tag {
+            font-family: 'JetBrains Mono', monospace;
+            background: #0f172a;
+            color: var(--accent-cyan);
+            padding: 0.15rem 0.45rem;
+            border-radius: 0.3rem;
+            font-size: 0.85em;
+        }
+
+        /* Geometry Cards Grid */
+        .geo-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        .geo-card {
+            background: var(--bg-card-elevated);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 1.5rem;
+        }
+        .geo-card.highlight {
+            border: 2px solid var(--accent-cyan);
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.08) 0%, rgba(19, 28, 46, 1) 100%);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <span class="badge">🔘 Tailored Container Geometry</span>
+        <h1>18 cm × 18 cm Circular Container Visual Setup</h1>
+        <p class="subtitle">Exact physical mounting, acoustic cone geometry, and calibration formulas for your <strong>18 cm diameter × 18 cm height circular container</strong>.</p>
+    </header>
+
+    <div class="nav-bar">
+        <a href="../index.html" class="nav-link">🏠 Master Hub</a>
+        <a href="wiring_guide.html" class="nav-link">🔌 Breadboard Wiring Guide</a>
+        <a href="setup_presentation.html" class="nav-link active">📐 18×18cm Container Setup</a>
+        <a href="../02_surface_water_level_test/wiring_guide.html" class="nav-link">Test 02: HW-080 Legacy</a>
+        <a href="../07_dual_sensor_pump_integration_test/wiring_guide.html" class="nav-link">Test 07: Dual Sensor</a>
+        <a href="../wbacfspwi_arduino_controller/wiring_guide.html" class="nav-link">🚀 Full Controller</a>
+    </div>
+
+    <div class="grid-layout">
+
+        <!-- SECTION 1: INTERACTIVE SIMULATOR FOR 18x18 CM CIRCULAR CONTAINER -->
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <div class="card-title">
+                        <div class="icon">🔘</div>
+                        Interactive 18×18 cm Circular Container &amp; Acoustic Simulator
+                    </div>
+                    <div style="font-size:0.9rem; color:var(--text-secondary); margin-top:0.35rem;">
+                        Container: <span class="dim-tag">Ø 18.0 cm × 18.0 cm</span> | Usable Depth: <span class="dim-tag">12.0 cm</span> | Clearance: <span class="dim-tag">21.0 cm</span> | Floor Dist: <span class="dim-tag">33.0 cm</span>
+                    </div>
+                </div>
+
+                <!-- Mode Presets -->
+                <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                    <button class="btn-action" style="background:#06b6d4; color:#090d16;" onclick="apply18Config(12.0, 21.0, 'rice')">🌾 18cm Rice Model (12cm water)</button>
+                    <button class="btn-action" style="background:#3b82f6; color:#ffffff;" onclick="apply18Config(15.0, 21.0, 'tank')">💧 18cm Pure Reservoir (15cm water)</button>
+                    <button class="btn-action" style="background:#334155; color:#f8fafc;" onclick="apply18Config(5.0, 21.0, 'shallow')">🌱 Shallow Tray (5cm water)</button>
+                </div>
+            </div>
+
+            <div class="simulator-grid">
+                <!-- SVG Circular 18x18cm Container Cross-Section -->
+                <div class="svg-display">
+                    <svg id="reservoirSvg" viewBox="0 0 680 620" width="680" height="620" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="waterGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.85"/>
+                                <stop offset="100%" stop-color="#0284c7" stop-opacity="0.95"/>
+                            </linearGradient>
+                            <linearGradient id="soilGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="#78350f" stop-opacity="0.9"/>
+                                <stop offset="100%" stop-color="#451a03" stop-opacity="1"/>
+                            </linearGradient>
+                            <pattern id="blindZoneHatch" width="16" height="16" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+                                <line x1="0" y1="0" x2="0" y2="16" stroke="#f43f5e" stroke-width="3" opacity="0.35"/>
+                            </pattern>
+                        </defs>
+
+                        <!-- Base Table -->
+                        <rect x="30" y="560" width="620" height="30" rx="4" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+                        <text x="340" y="580" fill="#64748b" font-size="11" font-weight="700" text-anchor="middle">Tabletop Demonstration Surface</text>
+
+                        <!-- CIRCULAR CONTAINER CROSS SECTION (18cm wide x 18cm tall) -->
+                        <!-- Scaled: 18cm = 280px wide (X=200 to X=480), 18cm = 270px tall (Y=280 to Y=550) -->
+                        <!-- Top Rim Ellipse (Perspective of round circular mouth) -->
+                        <ellipse cx="340" cy="280" rx="140" ry="24" fill="#131c2e" stroke="#38bdf8" stroke-width="2.5"/>
+                        <!-- Cylindrical Outer Body -->
+                        <path d="M 200 280 L 200 540 Q 340 560 480 540 L 480 280" fill="#0b1220" stroke="#38bdf8" stroke-width="2.5"/>
+                        <!-- Bottom Ellipse curve -->
+                        <path d="M 200 540 Q 340 560 480 540" fill="none" stroke="#38bdf8" stroke-width="2.5"/>
+
+                        <!-- Diameter Dimension Indicator (18.0 cm) -->
+                        <line x1="200" y1="260" x2="480" y2="260" stroke="#38bdf8" stroke-width="1.8"/>
+                        <line x1="200" y1="252" x2="200" y2="268" stroke="#38bdf8" stroke-width="1.8"/>
+                        <line x1="480" y1="252" x2="480" y2="268" stroke="#38bdf8" stroke-width="1.8"/>
+                        <text x="340" y="254" fill="#38bdf8" font-size="11" font-weight="800" text-anchor="middle">Diameter = 18.0 cm (Radius = 9.0 cm)</text>
+
+                        <!-- Height Dimension Indicator (18.0 cm) -->
+                        <line x1="170" y1="280" x2="170" y2="550" stroke="#64748b" stroke-width="1.8"/>
+                        <line x1="162" y1="280" x2="178" y2="280" stroke="#64748b" stroke-width="1.8"/>
+                        <line x1="162" y1="550" x2="178" y2="550" stroke="#64748b" stroke-width="1.8"/>
+                        <text x="155" y="420" fill="#94a3b8" font-size="11" font-weight="700" text-anchor="end">Height = 18.0 cm</text>
+
+                        <!-- Centered Transducer Overhead Position (At Y=70, exactly at Center X=340) -->
+                        <g id="centered-sensor">
+                            <!-- Cross-bar bridge mount sitting across the 18cm rim -->
+                            <rect x="220" y="30" width="240" height="12" rx="3" fill="#334155" stroke="#475569" stroke-width="1.5"/>
+                            <text x="340" y="24" fill="#94a3b8" font-size="9.5" font-weight="700" text-anchor="middle">Center Cross-Bridge Mount (Centered at 9.0 cm from edges)</text>
+
+                            <!-- Vertical drop clamp -->
+                            <rect x="333" y="42" width="14" height="25" fill="#475569"/>
+
+                            <!-- Sensor housing at Y=67 -->
+                            <rect x="315" y="67" width="50" height="38" rx="6" fill="#0284c7" stroke="#38bdf8" stroke-width="2"/>
+                            <!-- Transducer face at Y=105 -->
+                            <circle cx="340" cy="105" r="16" fill="#0369a1" stroke="#bae6fd" stroke-width="2"/>
+                            <text x="340" y="88" fill="#ffffff" font-size="8.5" font-weight="800" text-anchor="middle">JSN-SR04T</text>
+                            <text x="340" y="98" fill="#bae6fd" font-size="7" text-anchor="middle">Center Face</text>
+                        </g>
+
+                        <!-- Acoustic Sound Waves (Centered 50-degree Cone) -->
+                        <g id="acousticWaves" opacity="0.65">
+                            <path d="M 326 130 Q 340 140 354 130" fill="none" stroke="#38bdf8" stroke-width="1.8"/>
+                            <path d="M 312 165 Q 340 178 368 165" fill="none" stroke="#38bdf8" stroke-width="1.8"/>
+                            <path d="M 295 205 Q 340 222 385 205" fill="none" stroke="#38bdf8" stroke-width="1.8"/>
+                            <path d="M 275 250 Q 340 270 405 250" fill="none" stroke="#38bdf8" stroke-width="1.8"/>
+                        </g>
+
+                        <!-- 21cm Blind Zone Air Gap (Y=105 to Y=340) -->
+                        <g id="blindZoneGraphic">
+                            <rect x="235" y="105" width="210" height="235" fill="url(#blindZoneHatch)"/>
+                            <!-- Clearance dimension line -->
+                            <line x1="500" y1="105" x2="500" y2="340" stroke="#f43f5e" stroke-width="2" stroke-dasharray="3,3"/>
+                            <line x1="492" y1="105" x2="508" y2="105" stroke="#f43f5e" stroke-width="2"/>
+                            <line x1="492" y1="340" x2="508" y2="340" stroke="#f43f5e" stroke-width="2"/>
+                            <text x="515" y="225" fill="#fb7185" font-size="11" font-weight="bold">21.0 cm Air Clearance</text>
+                            <text x="515" y="240" fill="#94a3b8" font-size="9">(Blind Zone Safety)</text>
+                        </g>
+
+                        <!-- 100% Full Flood Line (Y=340) -->
+                        <line x1="200" y1="340" x2="480" y2="340" stroke="#f43f5e" stroke-width="1.8" stroke-dasharray="3,3"/>
+                        <text x="500" y="344" fill="#fb7185" font-size="9.5" font-weight="bold">100% Max Flood (12.0 cm)</text>
+
+                        <!-- 50% Target Line (Y=430) -->
+                        <line x1="200" y1="430" x2="480" y2="430" stroke="#10b981" stroke-width="2"/>
+                        <text x="500" y="434" fill="#34d399" font-size="9.5" font-weight="bold">50% Target (6.0 cm) [OFF]</text>
+
+                        <!-- 45% Refill Line (Y=439) -->
+                        <line x1="200" y1="439" x2="480" y2="439" stroke="#f59e0b" stroke-width="1.8" stroke-dasharray="2,2"/>
+                        <text x="500" y="443" fill="#fbbf24" font-size="9" font-weight="bold">45% Refill (5.4 cm) [ON]</text>
+
+                        <!-- 0% Soil Surface / Floor (Y=520) -->
+                        <line x1="200" y1="520" x2="480" y2="520" stroke="#64748b" stroke-width="1.8"/>
+                        <text x="500" y="524" fill="#94a3b8" font-size="9.5" font-weight="bold">0% Floor / Soil Bed (0.0 cm)</text>
+
+                        <!-- Soil Layer at Container Bottom (3cm layer) -->
+                        <path d="M 200 520 L 200 540 Q 340 560 480 540 L 480 520 Z" fill="url(#soilGrad)"/>
+
+                        <!-- DYNAMIC WATER ELEMENT (in 18cm cylinder) -->
+                        <path id="svgWaterShape" d="M 201 430 L 201 520 L 479 520 L 479 430 Z" fill="url(#waterGrad)"/>
+                        
+                        <!-- Water surface ellipse -->
+                        <ellipse id="svgWaterSurfaceEllipse" cx="340" cy="430" rx="138" ry="14" fill="#38bdf8" opacity="0.6"/>
+
+                        <!-- Distance Measurement Indicator -->
+                        <g id="dimensionArrow">
+                            <line id="svgDistLine" x1="340" y1="105" x2="340" y2="430" stroke="#38bdf8" stroke-width="2"/>
+                            <polygon id="svgArrowHead" points="335,424 345,424 340,432" fill="#38bdf8"/>
+                            <rect id="svgDistBadgeBg" x="350" y="260" width="78" height="22" rx="4" fill="#0f172a" stroke="#38bdf8"/>
+                            <text id="svgDistText" x="389" y="275" fill="#38bdf8" font-size="11" font-weight="800" text-anchor="middle">27.0 cm</text>
+                        </g>
+                    </svg>
+                </div>
+
+                <!-- Live Control & Physics Calculator -->
+                <div class="control-panel">
+                    <div class="control-group">
+                        <div class="control-label">
+                            <span id="lblPonding">18cm Container Water Depth</span>
+                            <span class="val" id="valDepthCM">6.0 cm</span>
+                        </div>
+                        <input type="range" id="depthSlider" min="0.0" max="15.0" step="0.2" value="6.0">
+                        <div id="sliderTicks" style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-secondary); margin-top:0.35rem;">
+                            <span>0.0 cm (Dry)</span>
+                            <span>5.4 cm (45%)</span>
+                            <span>6.0 cm (50% Target)</span>
+                            <span>12.0 cm (100% Full)</span>
+                            <span style="color:#fb7185;">>14cm (Blind)</span>
+                        </div>
+                    </div>
+
+                    <!-- Quick Preset Buttons -->
+                    <div style="display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:1.5rem;">
+                        <button class="btn-action" style="font-size:0.75rem; padding:0.35rem 0.65rem; background:#334155; color:#fff;" onclick="setDepth(0)">Empty (0%)</button>
+                        <button class="btn-action" style="font-size:0.75rem; padding:0.35rem 0.65rem; background:#f59e0b; color:#090d16;" onclick="setDepth(5.0)">Refill (<45%)</button>
+                        <button class="btn-action" style="font-size:0.75rem; padding:0.35rem 0.65rem; background:#3b82f6; color:#fff;" onclick="setDepth(5.8)">Buffer (48%)</button>
+                        <button class="btn-action" style="font-size:0.75rem; padding:0.35rem 0.65rem; background:#10b981; color:#090d16;" onclick="setDepth(6.0)">Target (50%)</button>
+                        <button class="btn-action" style="font-size:0.75rem; padding:0.35rem 0.65rem; background:#06b6d4; color:#090d16;" onclick="setDepth(12.0)">Max (100%)</button>
+                        <button class="btn-action" style="font-size:0.75rem; padding:0.35rem 0.65rem; background:#f43f5e; color:#fff;" onclick="setDepth(14.5)">Blind Zone ⚠️</button>
+                    </div>
+
+                    <!-- Live Physics Metrics -->
+                    <div class="metrics-grid">
+                        <div class="metric-box">
+                            <div class="metric-title">Measured Distance</div>
+                            <div class="metric-val" id="valDistance">27.0 cm</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-title">Ponding Level</div>
+                            <div class="metric-val" id="valPercent" style="color:var(--accent-cyan);">50.0%</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-title">Sensor Clearance</div>
+                            <div class="metric-val" id="metricClearance" style="color:#94a3b8;">21.0 cm</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-title">Usable Bed Depth</div>
+                            <div class="metric-val" id="metricBedDepth" style="color:#94a3b8;">12.0 cm</div>
+                        </div>
+                    </div>
+
+                    <!-- Autonomous Decision Output -->
+                    <div id="decisionCard" class="decision-pill status-target">
+                        <span style="font-size:1.4rem;" id="decisionIcon">🛑</span>
+                        <div>
+                            <div style="font-size:1rem; font-weight:800;" id="decisionTitle">TARGET REACHED (50.0%)</div>
+                            <div style="font-size:0.82rem; opacity:0.9;" id="decisionDesc">12V Water Pump turns OFF. Anti-splash run & 10s wave settling complete.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 2: PHYSICAL MOUNTING RULES FOR 18 CM CIRCULAR CONTAINERS -->
+        <div class="card">
+            <div class="card-title">
+                <div class="icon">📐</div>
+                Three Golden Rules for Mounting in an 18 cm Circular Container
+            </div>
+
+            <div class="geo-cards-grid">
+                <!-- Rule 1: Centering -->
+                <div class="geo-card highlight">
+                    <span class="dim-tag" style="color:#38bdf8;">RULE 1: STRICT CENTERING</span>
+                    <h3 style="color:#ffffff; font-size:1.15rem; margin:0.6rem 0 0.4rem;">Center the Probe at Exactly 9.0 cm</h3>
+                    <p style="color:var(--text-secondary); font-size:0.9rem; line-height:1.6;">
+                        Because your container is an 18 cm diameter circle, the radius is exactly <strong>9.0 cm</strong>. The JSN-SR04T must be positioned directly in the <strong>geometric center</strong>.
+                        <br><br>
+                        <strong>Why:</strong> The sensor has a $\sim 50^\circ$ acoustic sound cone. If you mount it even 2 cm off-center, the sound waves will bounce off the curved sidewall before reaching the water surface!
+                    </p>
+                </div>
+
+                <!-- Rule 2: Height Above Rim -->
+                <div class="geo-card">
+                    <span class="dim-tag" style="color:#10b981;">RULE 2: HEIGHT CALCULATION</span>
+                    <h3 style="color:#ffffff; font-size:1.15rem; margin:0.6rem 0 0.4rem;">Transducer Height Above the Rim</h3>
+                    <p style="color:var(--text-secondary); font-size:0.9rem; line-height:1.6;">
+                        The JSN-SR04T has a <strong>20 cm blind zone</strong>.
+                        <br><br>
+                        • If you leave a <strong>3 cm air gap</strong> inside the pot (so water doesn't spill over the top rim at 100% full):
+                        <br>
+                        • The transducer face should sit <strong>18.0 cm above the top rim</strong> of the container ($18\text{cm} + 3\text{cm} = 21.0\text{cm}$ total clearance down to water).
+                    </p>
+                </div>
+
+                <!-- Rule 3: The Cross-Bridge Mount -->
+                <div class="geo-card">
+                    <span class="dim-tag" style="color:#a78bfa;">RULE 3: SIMPLE CROSS-BRIDGE</span>
+                    <h3 style="color:#ffffff; font-size:1.15rem; margin:0.6rem 0 0.4rem;">Make a Simple Wood or Acrylic Bridge</h3>
+                    <p style="color:var(--text-secondary); font-size:0.9rem; line-height:1.6;">
+                        Cut a 20 cm strip of wood, plastic ruler, or acrylic. Place it across the circular opening of the container with two small vertical risers (18 cm tall).
+                        <br><br>
+                        Drill a 20 mm hole in the center of the bridge and insert the JSN-SR04T probe pointing directly straight down into the center of the pot.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 3: CALIBRATION VALUES CHEAT SHEET -->
+        <div class="card">
+            <div class="card-title">
+                <div class="icon">💻</div>
+                Calibration Constants for Your Arduino Sketch (18×18 cm)
+            </div>
+            <p style="color:var(--text-secondary); font-size:0.92rem; margin-bottom:1.25rem;">
+                Here are the pre-calculated geometry values for your 18×18 cm container. You can also calibrate them live in the Serial Monitor by typing <code>c</code> (full mark) and <code>e</code> (empty floor):
+            </p>
+
+            <div style="background:#0f172a; border:1px solid #1e293b; border-radius:0.75rem; padding:1.25rem; font-family:'JetBrains Mono',monospace; font-size:0.9rem; color:#e2e8f0; line-height:1.8;">
+                <span style="color:#64748b;">// Constants for 18 cm x 18 cm Circular Container:</span><br>
+                <span style="color:#38bdf8;">const float</span> SENSOR_CLEARANCE_CM = <span style="color:#f59e0b;">21.0</span>; <span style="color:#64748b;">// Air gap down to 100% full water mark (min 20cm blind zone)</span><br>
+                <span style="color:#38bdf8;">const float</span> CONTAINER_DEPTH_CM  = <span style="color:#f59e0b;">12.0</span>; <span style="color:#64748b;">// Usable water depth (0% to 100% flood)</span><br>
+                <span style="color:#64748b;">// Floor Distance = 21.0 + 12.0 = 33.0 cm</span><br><br>
+                <span style="color:#64748b;">// Autonomous Irrigation Decision Thresholds:</span><br>
+                <span style="color:#10b981;">// 50.0% Target = 6.0 cm water depth  -> Measured Distance = 27.0 cm (Pump OFF)</span><br>
+                <span style="color:#fbbf24;">// 45.0% Refill = 5.4 cm water depth  -> Measured Distance = 27.6 cm (Pump ON)</span>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Geometry State for 18x18 Container
+    let sensorClearanceCM = 21.0; // Air gap down to 100% full line
+    let containerDepthCM  = 12.0; // Default usable depth in 18cm container
+    let totalFloorDistCM  = sensorClearanceCM + containerDepthCM; // 33.0 cm
+
+    // DOM Elements
+    const depthSlider       = document.getElementById('depthSlider');
+    const valDepthCM        = document.getElementById('valDepthCM');
+    const valDistance       = document.getElementById('valDistance');
+    const valPercent        = document.getElementById('valPercent');
+    const metricClearance   = document.getElementById('metricClearance');
+    const metricBedDepth    = document.getElementById('metricBedDepth');
+    const svgWaterShape     = document.getElementById('svgWaterShape');
+    const svgWaterEllipse   = document.getElementById('svgWaterSurfaceEllipse');
+    const svgDistLine       = document.getElementById('svgDistLine');
+    const svgArrowHead      = document.getElementById('svgArrowHead');
+    const svgDistBadgeBg    = document.getElementById('svgDistBadgeBg');
+    const svgDistText       = document.getElementById('svgDistText');
+    const decisionCard      = document.getElementById('decisionCard');
+    const decisionIcon      = document.getElementById('decisionIcon');
+    const decisionTitle     = document.getElementById('decisionTitle');
+    const decisionDesc      = document.getElementById('decisionDesc');
+    const lblPonding        = document.getElementById('lblPonding');
+    const sliderTicks       = document.getElementById('sliderTicks');
+
+    function apply18Config(depth, clearance, mode) {
+        sensorClearanceCM = clearance;
+        containerDepthCM  = depth;
+        totalFloorDistCM  = clearance + depth;
+
+        metricClearance.textContent = clearance.toFixed(1) + ' cm';
+        metricBedDepth.textContent  = depth.toFixed(1) + ' cm';
+
+        if (mode === 'rice') {
+            depthSlider.max = 14.0;
+            depthSlider.step = 0.2;
+            depthSlider.value = 6.0;
+            lblPonding.textContent = "18cm Rice Model Water Depth";
+            sliderTicks.innerHTML = `
+                <span>0.0 cm (Dry)</span>
+                <span>5.4 cm (45%)</span>
+                <span>6.0 cm (50% Target)</span>
+                <span>12.0 cm (100% Full)</span>
+                <span style="color:#fb7185;">>14cm (Blind)</span>
+            `;
+            updateSimulation(6.0);
+        } else if (mode === 'tank') {
+            depthSlider.max = 17.0;
+            depthSlider.step = 0.2;
+            depthSlider.value = 7.5;
+            lblPonding.textContent = "18cm Full Tank Water Depth";
+            sliderTicks.innerHTML = `
+                <span>0.0 cm (Empty)</span>
+                <span>6.75 cm (45%)</span>
+                <span>7.5 cm (50% Target)</span>
+                <span>15.0 cm (100% Full)</span>
+                <span style="color:#fb7185;">>16cm (Blind)</span>
+            `;
+            updateSimulation(7.5);
+        } else {
+            depthSlider.max = 7.0;
+            depthSlider.step = 0.1;
+            depthSlider.value = 2.5;
+            lblPonding.textContent = "Shallow Seedling Tray Depth";
+            sliderTicks.innerHTML = `
+                <span>0.0 cm (Dry)</span>
+                <span>2.25 cm (45%)</span>
+                <span>2.5 cm (50% Target)</span>
+                <span>5.0 cm (100% Full)</span>
+                <span style="color:#fb7185;">>6cm (Blind)</span>
+            `;
+            updateSimulation(2.5);
+        }
+    }
+
+    function updateSimulation(currentDepth) {
+        valDepthCM.textContent = currentDepth.toFixed(1) + ' cm';
+
+        // Distance from transducer face
+        const currentDistance = totalFloorDistCM - currentDepth;
+        valDistance.textContent = currentDistance.toFixed(1) + ' cm';
+
+        // Percentage
+        let pct = (currentDepth / containerDepthCM) * 100.0;
+        if (pct < 0) pct = 0;
+        valPercent.textContent = pct.toFixed(1) + '%';
+
+        // SVG Mapping:
+        // Floor is at SVG Y = 520
+        // 100% full is at SVG Y = 340 (Span = 180px for 12.0cm -> 15px per cm)
+        const pxPerCm = 180.0 / containerDepthCM;
+        const waterHeightPx = currentDepth * pxPerCm;
+        const surfaceY = 520 - waterHeightPx;
+
+        // Update water SVG shape
+        svgWaterShape.setAttribute('d', `M 201 ${surfaceY} L 201 520 L 479 520 L 479 ${surfaceY} Z`);
+
+        // Update surface ellipse
+        svgWaterEllipse.setAttribute('cy', surfaceY);
+
+        // Update distance arrow
+        svgDistLine.setAttribute('y2', surfaceY);
+        svgArrowHead.setAttribute('points', `335,${surfaceY - 6} 345,${surfaceY - 6} 340,${surfaceY + 2}`);
+        
+        // Reposition distance text badge
+        const badgeY = Math.max(115, Math.min(surfaceY - 25, 490));
+        svgDistBadgeBg.setAttribute('y', badgeY);
+        svgDistText.setAttribute('y', badgeY + 14);
+        svgDistText.textContent = currentDistance.toFixed(1) + ' cm';
+
+        // Decision logic
+        decisionCard.className = 'decision-pill ';
+        if (currentDistance < 20.0) {
+            decisionCard.classList.add('status-danger');
+            decisionIcon.textContent = '⚠️';
+            decisionTitle.textContent = 'BLIND ZONE VIOLATION (< 20 cm)';
+            decisionDesc.textContent = 'Water entered the 20cm blind zone! Internal ringing causes echo timeouts. Mount sensor higher or lower water.';
+            valPercent.textContent = 'ERROR (BLIND)';
+            valPercent.style.color = '#f43f5e';
+        } else if (pct < 45.0) {
+            decisionCard.classList.add('status-refill');
+            decisionIcon.textContent = '💧';
+            decisionTitle.textContent = 'REFILL TRIGGER ACTIVATED (< 45.0%)';
+            decisionDesc.textContent = `Pumping water into circular container. Water level is ${pct.toFixed(1)}% (< 45.0%).`;
+            valPercent.style.color = '#fbbf24';
+        } else if (pct >= 50.0) {
+            decisionCard.classList.add('status-target');
+            decisionIcon.textContent = '🛑';
+            decisionTitle.textContent = 'TARGET REACHED (≥ 50.0%)';
+            decisionDesc.textContent = `Target reached at ${pct.toFixed(1)}% (≥ 50.0%). 12V Pump turns OFF. 10s wave settling active.`;
+            valPercent.style.color = '#34d399';
+        } else {
+            decisionCard.classList.add('status-buffer');
+            decisionIcon.textContent = '⚖️';
+            decisionTitle.textContent = 'STABLE BUFFER ZONE (45.0% - 49.9%)';
+            decisionDesc.textContent = 'Hysteresis deadband active. Holding pump OFF to prevent rapid cycling.';
+            valPercent.style.color = '#60a5fa';
+        }
+    }
+
+    function setDepth(d) {
+        depthSlider.value = d;
+        updateSimulation(parseFloat(d));
+    }
+
+    depthSlider.addEventListener('input', (e) => {
+        updateSimulation(parseFloat(e.target.value));
+    });
+
+    // Initialize with 18cm rice model preset at 6.0 cm (50% target)
+    updateSimulation(6.0);
+</script>
+
+</body>
+</html>
