@@ -47,9 +47,10 @@ SoftwareSerial gsmSerial(PIN_GSM_RX, PIN_GSM_TX);
 // ============================================================================
 // 2. ADMIN RECIPIENT PHONE NUMBER & SYSTEM CONFIGURATION
 // ============================================================================
-// IMPORTANT: Set your admin mobile phone number here (include country code or local format)
+// IMPORTANT: Set your admin mobile phone numbers here (include country code or local format)
 // Examples: "+639123456789" (Philippines), "+1234567890" (US), or "09123456789"
-char ADMIN_PHONE[20] = "+639169751409";
+char ADMIN_PHONE[20]   = "+639158127228"; // Primary Admin
+char ADMIN_PHONE_2[20] = "+639242074903"; // Secondary Admin
 
 // ============================================================================
 // 3. CALIBRATION & THRESHOLD VALUES (SYNCHRONIZED WITH SYSTEM MEMORY)
@@ -294,6 +295,16 @@ bool sendSMS(const char* phoneNumber, const String& message) {
   return success;
 }
 
+// Broadcast alert SMS to all configured admin recipients
+void dispatchAlertSMS(const String& message) {
+  sendSMS(ADMIN_PHONE, message);
+  if (strlen(ADMIN_PHONE_2) > 0) {
+    delay(1000); // 1-second pause for GSM modem transmission recovery
+    lastSmsTime = 0; // Clear cooldown so secondary recipient receives alert immediately
+    sendSMS(ADMIN_PHONE_2, message);
+  }
+}
+
 // ============================================================================
 // 6. SENSOR READING FUNCTIONS (SYNCHRONIZED CALIBRATION)
 // ============================================================================
@@ -415,7 +426,7 @@ void processIrrigationLogic() {
       settlingStartTime = now;
       
       String alertMsg = F("[WBACFSPWI ALERT] PUMP TIMEOUT: Continuous runtime cap reached (3 mins). Pump STOPPED for safety cooldown.");
-      sendSMS(ADMIN_PHONE, alertMsg);
+      dispatchAlertSMS(alertMsg);
       return;
     }
 
@@ -431,7 +442,7 @@ void processIrrigationLogic() {
         String msg = F("[WBACFSPWI ALERT] Irrigation STOPPED. Target water level reached ");
         msg += String(currentSurfaceWater, 1);
         msg += F("% (at/above 50.0% threshold). Pump is now OFF.");
-        sendSMS(ADMIN_PHONE, msg);
+        dispatchAlertSMS(msg);
         lastTriggeredEvent = EVENT_STOPPED;
       }
     }
@@ -455,7 +466,7 @@ void processIrrigationLogic() {
           String msg = F("[WBACFSPWI ALERT] Irrigation STARTED. Water level dropped to ");
           msg += String(currentSurfaceWater, 1);
           msg += F("% (below 45.0% threshold). Pump is now ON.");
-          sendSMS(ADMIN_PHONE, msg);
+          dispatchAlertSMS(msg);
           lastTriggeredEvent = EVENT_STARTED;
         }
       }
@@ -472,7 +483,7 @@ void processIrrigationLogic() {
         msg += F("). Water dropped to ");
         msg += String(currentSurfaceWater, 1);
         msg += F("% (< 45.0%). Pump is refilling the field.");
-        sendSMS(ADMIN_PHONE, msg);
+        dispatchAlertSMS(msg);
         lastTriggeredEvent = EVENT_RESTARTED;
       }
     }
@@ -487,8 +498,10 @@ void printHelpMenu() {
   Serial.println(F("\n======================================================="));
   Serial.println(F(" WBACFSPWI Test 10: GSM SMS Alert Interactive Console  "));
   Serial.println(F("======================================================="));
-  Serial.print(F(" Admin Phone Number: "));
+  Serial.print(F(" Primary Admin Phone   : "));
   Serial.println(ADMIN_PHONE);
+  Serial.print(F(" Secondary Admin Phone : "));
+  Serial.println(ADMIN_PHONE_2);
   Serial.println(F(" Available Test Commands:"));
   Serial.println(F("   's' -> Send an instant test SMS to the Admin phone"));
   Serial.println(F("   'c' -> Check GSM signal strength & network registration"));

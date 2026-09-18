@@ -362,6 +362,12 @@ if (file_exists($t10Path)) {
         strpos($f10, 'Irrigation STARTED') !== false &&
         strpos($f10, 'Irrigation STOPPED') !== false &&
         strpos($f10, 'Irrigation RESTARTED') !== false);
+    check("Test 10 defines primary (+639158127228) & secondary (+639242074903) admin recipients",
+        strpos($f10, '+639158127228') !== false && strpos($f10, '+639242074903') !== false);
+    check("Main Controller defines primary (+639158127228) & secondary (+639242074903) admin recipients",
+        strpos($fMain, '+639158127228') !== false && strpos($fMain, '+639242074903') !== false);
+    check("Main Controller implements dispatchAlertSMS() multi-recipient broadcast",
+        strpos($fMain, 'dispatchAlertSMS(') !== false);
     check("Test 10 README.md documentation exists",
         file_exists($rootDir . '/arduino/10_gsm_sms_irrigation_alert_test/README.md'));
     check("Test 10 wiring_guide.html exists with interactive SVG breadboard",

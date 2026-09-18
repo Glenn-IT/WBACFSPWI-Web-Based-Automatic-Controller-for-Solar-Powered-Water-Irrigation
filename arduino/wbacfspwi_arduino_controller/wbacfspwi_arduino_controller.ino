@@ -60,8 +60,9 @@ const bool USE_SENSOR_PWR    = true;   // Enable power gating to prevent corrosi
 SoftwareSerial espSerial(PIN_ESP_RX, PIN_ESP_TX); // WiFi Bridge Link (NodeMCU)
 SoftwareSerial gsmSerial(PIN_GSM_RX, PIN_GSM_TX); // Cellular SMS Link (SIM900A)
 
-// Admin Mobile Phone Number for Automated SMS Alerts
-char ADMIN_PHONE[20] = "+639158127228";
+// Admin Mobile Phone Numbers for Automated SMS Alerts
+char ADMIN_PHONE[20]   = "+639158127228"; // Primary Admin
+char ADMIN_PHONE_2[20] = "+639242074903"; // Secondary Admin
 
 // ============================================================================
 // 2. CALIBRATION & THRESHOLD VALUES (SYNCHRONIZED WITH SYSTEM MEMORY)
@@ -297,6 +298,17 @@ bool sendSMS(const char* phoneNumber, const String& message) {
   return success;
 }
 
+// Broadcast alert SMS to all configured admin recipients
+void dispatchAlertSMS(const String& message) {
+  if (!gsmReady) return;
+  sendSMS(ADMIN_PHONE, message);
+  if (strlen(ADMIN_PHONE_2) > 0) {
+    delay(1000); // 1-second pause for GSM modem transmission recovery
+    lastSmsTime = 0; // Clear cooldown so secondary recipient receives alert immediately
+    sendSMS(ADMIN_PHONE_2, message);
+  }
+}
+
 // ============================================================================
 // 5. PUMP CONTROL & HARDWARE SENSORS
 // ============================================================================
@@ -326,7 +338,7 @@ void setPump(bool enable) {
       msg += F("%");
 
       if (gsmReady) {
-        sendSMS(ADMIN_PHONE, msg);
+        dispatchAlertSMS(msg);
       }
     }
   } else {
@@ -523,6 +535,8 @@ void setup() {
   gsmReady = initGSM();
   if (gsmReady) {
     Serial.println(F("[SYSTEM] GSM SMS Alert Module: ACTIVE"));
+    Serial.print(F("  • Primary Admin   : ")); Serial.println(ADMIN_PHONE);
+    Serial.print(F("  • Secondary Admin : ")); Serial.println(ADMIN_PHONE_2);
   } else {
     Serial.println(F("[SYSTEM] GSM SMS Alert Module: OFFLINE (Operating with WiFi Bridge)"));
   }
@@ -633,7 +647,7 @@ void loop() {
             msg += F("V");
 
             if (gsmReady) {
-              sendSMS(ADMIN_PHONE, msg);
+              dispatchAlertSMS(msg);
             }
           }
         }
