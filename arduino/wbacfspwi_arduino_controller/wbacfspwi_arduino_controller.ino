@@ -104,7 +104,7 @@ const unsigned long PUMP_COOLDOWN_MS = 60000UL;  // 1 minute mandatory cooldown 
 const unsigned long SETTLING_DELAY_MS= 10000UL;  // 10s water settling / stabilization window
 const unsigned long SAMPLE_INTERVAL   = 1000UL;   // Read sensors & evaluate logic every 1s
 const unsigned long TELEMETRY_PERIOD  = 1000UL;   // Print telemetry & stream JSON every 1s
-const unsigned long SMS_COOLDOWN_MS   = 15000UL;  // 15s minimum spacing between SMS sends
+const unsigned long SMS_COOLDOWN_MS   = 3000UL;   // 3s spacing between back-to-back SMS sends
 
 // ============================================================================
 // 3. SYSTEM STATE VARIABLES
@@ -324,26 +324,43 @@ void setPump(bool enable) {
     pumpStartTime = millis();
     Serial.println(F("[EVENT] Pump STARTED."));
 
-    if (lastTriggeredEvent != EVENT_STARTED) {
-      cycleCount++;
-      lastTriggeredEvent = (cycleCount > 1) ? EVENT_RESTARTED : EVENT_STARTED;
+    cycleCount++;
+    lastTriggeredEvent = (cycleCount > 1) ? EVENT_RESTARTED : EVENT_STARTED;
 
-      String msg = F("WBACFSPWI Alert:\nIrrigation ");
-      msg += (cycleCount > 1) ? F("RESTARTED (Cycle #") : F("STARTED.");
-      if (cycleCount > 1) { msg += cycleCount; msg += F(")."); }
-      msg += F("\nWater level: ");
-      msg += String(currentSurfaceWater, 1);
-      msg += F("% (< 45%).\nSoil moisture: ");
-      msg += String(currentRootMoisture, 1);
-      msg += F("%");
+    String msg = F("WBACFSPWI Alert:\nIrrigation ");
+    msg += (cycleCount > 1) ? F("RESTARTED (Cycle #") : F("STARTED.");
+    if (cycleCount > 1) { msg += cycleCount; msg += F(")."); }
+    msg += F("\nMotor is now ON.");
+    msg += F("\nWater level: ");
+    msg += String(currentSurfaceWater, 1);
+    msg += F("% (< 45%).\nSoil moisture: ");
+    msg += String(currentRootMoisture, 1);
+    msg += F("%");
 
-      if (gsmReady) {
-        dispatchAlertSMS(msg);
-      }
+    if (gsmReady) {
+      lastSmsTime = 0; // Bypass cooldown so event alert is dispatched immediately
+      dispatchAlertSMS(msg);
     }
   } else {
     pumpStopTime = millis();
     Serial.println(F("[EVENT] Pump STOPPED."));
+
+    lastTriggeredEvent = EVENT_STOPPED;
+
+    String msg = F("WBACFSPWI Alert:\nIrrigation STOPPED.");
+    msg += F("\nMotor is now OFF.");
+    msg += F("\nWater level: ");
+    msg += String(currentSurfaceWater, 1);
+    msg += F("%\nSoil moisture: ");
+    msg += String(currentRootMoisture, 1);
+    msg += F("%\nBattery: ");
+    msg += String(currentBattVolts, 2);
+    msg += F("V");
+
+    if (gsmReady) {
+      lastSmsTime = 0; // Bypass cooldown so event alert is dispatched immediately
+      dispatchAlertSMS(msg);
+    }
   }
 }
 
@@ -635,21 +652,6 @@ void loop() {
           isSettling = true;
           settlingStartTime = now;
           Serial.println(F(">>> [TARGET REACHED] Starting 10s settling verification..."));
-
-          if (lastTriggeredEvent != EVENT_STOPPED) {
-            lastTriggeredEvent = EVENT_STOPPED;
-            String msg = F("WBACFSPWI Alert:\nIrrigation STOPPED.\nTarget depth reached: ");
-            msg += String(currentSurfaceWater, 1);
-            msg += F("% (>= 50%).\nSoil moisture: ");
-            msg += String(currentRootMoisture, 1);
-            msg += F("%\nBattery: ");
-            msg += String(currentBattVolts, 2);
-            msg += F("V");
-
-            if (gsmReady) {
-              dispatchAlertSMS(msg);
-            }
-          }
         }
       }
     } else {
