@@ -18,9 +18,9 @@
 #include <SoftwareSerial.h>
 
 // ---------------------------------------------------------------- Network Config
-const char* WIFI_SSID   = "192.168.1.13";
-const char* WIFI_PASS   = "uHFYzS4H";
-const char* SERVER_HOST = "http://192.168.1.13/WBACFSPWI-Web-Based-Automatic-Controller-for-Solar-Powered-Water-Irrigation/public";
+const char* WIFI_SSID   = "PLDT_Home_1D000";
+const char* WIFI_PASS   = "pldthome";
+const char* SERVER_HOST = "http://192.168.1.35/WBACFSPWI-Web-Based-Automatic-Controller-for-Solar-Powered-Water-Irrigation/public";
 const char* API_KEY     = "dev-local-device-key"; // Matches DEVICE_API_KEY in config/device.php
 
 // ---------------------------------------------------------------- Pins
@@ -68,6 +68,7 @@ void forwardReport(const String& payload) {
   HTTPClient http;
 
   http.begin(client, String(SERVER_HOST) + "/api/device/report.php");
+  http.setTimeout(3000); // 3-second connection/transfer timeout
   http.addHeader("Content-Type", "application/json");
   http.addHeader("X-API-Key", API_KEY);
 
@@ -121,8 +122,20 @@ void loop() {
   if (arduinoSerial.available() > 0) {
     String line = arduinoSerial.readStringUntil('\n');
     line.trim();
+
+    // Sanitize: Extract latest complete JSON object {...}
+    int lastOpen = line.lastIndexOf('{');
+    int lastClose = line.lastIndexOf('}');
+    if (lastOpen >= 0 && lastClose > lastOpen) {
+      line = line.substring(lastOpen, lastClose + 1);
+    }
+
     if (line.startsWith("{") && line.endsWith("}")) {
       forwardReport(line);
+      // Flush any backlog that accumulated while HTTP was processing
+      while (arduinoSerial.available() > 0) {
+        arduinoSerial.read();
+      }
     }
   }
 

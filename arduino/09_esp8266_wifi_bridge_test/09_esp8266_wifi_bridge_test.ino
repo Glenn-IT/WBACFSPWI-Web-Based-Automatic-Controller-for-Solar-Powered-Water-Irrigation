@@ -31,7 +31,7 @@ const char* WIFI_SSID = "PLDT_Home_1D000";
 const char* WIFI_PASS = "pldthome";
 
 // LAN IP address of the machine running XAMPP, pointing to public/ directory
-const char* SERVER_HOST = "http://192.168.1.166/WBACFSPWI-Web-Based-Automatic-Controller-for-Solar-Powered-Water-Irrigation/public";
+const char* SERVER_HOST = "http://192.168.1.35/WBACFSPWI-Web-Based-Automatic-Controller-for-Solar-Powered-Water-Irrigation/public";
 
 // Device API key matching DEVICE_API_KEY in config/device.php
 const char* DEVICE_API_KEY = "dev-local-device-key";
@@ -112,6 +112,7 @@ bool postTelemetryToBackend(const String& jsonPayload) {
   String endpoint = String(SERVER_HOST) + "/api/device/report.php";
   
   http.begin(client, endpoint);
+  http.setTimeout(3000); // 3-second connection/transfer timeout
   http.addHeader("Content-Type", "application/json");
   http.addHeader("X-API-Key", DEVICE_API_KEY);
 
@@ -224,10 +225,21 @@ void loop() {
     String incoming = arduinoSerial.readStringUntil('\n');
     incoming.trim();
 
+    // Sanitize: If buffer overflow or concatenation occurred, extract the latest complete {...}
+    int lastOpen = incoming.lastIndexOf('{');
+    int lastClose = incoming.lastIndexOf('}');
+    if (lastOpen >= 0 && lastClose > lastOpen) {
+      incoming = incoming.substring(lastOpen, lastClose + 1);
+    }
+
     // Verify valid JSON payload
     if (incoming.startsWith("{") && incoming.endsWith("}")) {
       Serial.println(F("\n>>> [ARDUINO DATA RECEIVED] Telemetry packet intercepted:"));
       postTelemetryToBackend(incoming);
+      // Flush any backlog that accumulated in serial buffer while HTTP was processing
+      while (arduinoSerial.available() > 0) {
+        arduinoSerial.read();
+      }
     } else if (incoming.length() > 0) {
       // Forward any plain debug text from Arduino to USB monitor
       Serial.print(F("[ARDUINO LOG] "));
