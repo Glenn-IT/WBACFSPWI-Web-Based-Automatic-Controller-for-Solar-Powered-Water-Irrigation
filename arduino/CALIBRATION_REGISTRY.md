@@ -7,7 +7,7 @@ This file serves as the single source of truth for physical sensor calibration v
 | Sensor / Measurement | Pin | Raw Dry / Minimum | Raw Wet / Maximum | Scaling Factor | Active Sketches |
 | :--- | :---: | :---: | :---: | :---: | :--- |
 | **Capacitive Soil (Root Zone)** | `A0` | `417` (Air / 0%) | `153` (Water / 100%) | Multi-sample Avg (16x) | `01_soil_root_capacitive_test`<br>`07_dual_sensor_pump_integration_test`<br>`08_dc_adapter_presentation_test`<br>`10_gsm_sms_irrigation_alert_test`<br>`wbacfspwi_arduino_controller` |
-| **JSN-SR04T Ultrasonic (Surface Level)** | `A1` (TRIG)<br>`A4` (ECHO) | `27.8cm` (Floor / 0%) | `17.0cm` (Full / 100%) | Clearance: `17.0cm`<br>Depth: `10.8cm`<br>50% Target: `22.4cm`<br>45% Refill: `22.9cm` | `11_jsn_sr04t_ultrasonic_water_level_test`<br>`wbacfspwi_arduino_controller` |
+| **JSN-SR04T Ultrasonic (Surface Level)** | `A1` (TRIG)<br>`A4` (ECHO) | `28.0cm` (Floor / 0%) | `16.8cm` (Full / 100%) | Clearance: `16.8cm`<br>Depth: `11.2cm`<br>50% Target: `22.4cm`<br>45% Refill: `23.0cm` | `11_jsn_sr04t_ultrasonic_water_level_test`<br>`wbacfspwi_arduino_controller` |
 | **HW-080 (Surface Ponding Level)** | `A1` | `1020` (Air / 0%)<br>`663` (Mid / 50%) | `568` (Full / 100%) | 3-Point Physical Ruler Calibration | `02_surface_water_level_test`<br>`07_dual_sensor_pump_integration_test`<br>`08_dc_adapter_presentation_test`<br>`10_gsm_sms_irrigation_alert_test`<br>`wbacfspwi_arduino_controller` |
 | **Battery Voltage Divider** | `A2` | `0.0V` | `12.6V` (Max 3S) / `14.4V` (Motorcycle) | `4.0303` (100kΩ/33kΩ) | `04_battery_voltage_test`<br>`06_solar_charger_battery_test`<br>`wbacfspwi_arduino_controller` |
 | **Solar Panel Voltage Divider** | `A3` | `0.0V` | `25.0V` (Max Input) | `6.0000` (100kΩ/20kΩ) | `05_solar_voltage_test`<br>`06_solar_charger_battery_test`<br>`wbacfspwi_arduino_controller` |
@@ -45,7 +45,7 @@ This file serves as the single source of truth for physical sensor calibration v
 | :--- | :--- | :---: | :---: | :--- |
 | Initial | Capacitive Soil (A0) | `417` | `153` | Air (0%) vs Full water submersion (100%) |
 | 2026-09-13 | HW-080 Surface (A1) | `1020` (Air)<br>`663` (Middle 50%) | `568` (Full 100%) | 3-Point physical ruler calibration: 1020=0% (dry air), 663=50.0% (exact middle/7-8cm), 568=100.0% (top header / max flood). |
-| 2026-09-19 | JSN-SR04T Ultrasonic (A1/A4) | `27.8cm` (Floor 0%) | `17.0cm` (Full 100%) | Live bench test: Floor=27.8cm, 50% target=22.4cm, 45% refill=22.9cm, usable depth=10.8cm, clearance=17.0cm. Zero jitter, 100% stable reflection. |
+| 2026-09-19 | JSN-SR04T Ultrasonic (A1/A4) | `28.0cm` (Base 0%) | `16.8cm` (Full 100%) | Calibrated: Base=28.0cm (0%), 50% target=22.4cm (depth 5.6cm), 45% refill=23.0cm (depth 5.04cm), usable depth=11.2cm, clearance=16.8cm. Zero jitter, 100% stable reflection. |
 | 2026-09-09 | 12V Battery Divider (A2) | `0.0V` | `14.4V` | Verified compatible with 12V Motorcycle Lead-Acid (up to 14.4V bulk solar charge = 3.57V on ADC). |
 
 ---
