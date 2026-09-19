@@ -31,13 +31,13 @@ const int PIN_LED  = 13; // Built-in activity indicator
 
 // Physical Container Geometry Calibration Constants (in Centimeters)
 // Calibrated from Live Bench Measurements:
-// - Dry Soil Bed / Empty Base Distance = 28.0 cm (Depth: 0.0 cm, Level: 0.0%)
-// - 50.0% Target Water Level Distance  = 22.4 cm (Depth: 5.6 cm, Level: 50.0%) -> Pump OFF
-// - 45.0% Refill Water Level Distance  = 23.0 cm (Depth: 5.04 cm, Level: 45.0%) -> Pump ON
-// - Total Usable Container Depth (100% scale) = 11.2 cm (5.6 cm * 2)
-// - Sensor Clearance (Transducer to 100% mark) = 16.8 cm (28.0 cm - 11.2 cm)
-float sensorClearanceCM = 16.8; // Air gap from transducer face to 100% full mark (28.0 - 11.2)
-float containerDepthCM  = 11.2; // Calibrated usable water depth (5.6cm at 50% * 2)
+// - Dry Soil Bed / Empty Base Distance = 26.0 cm (Depth: 0.0 cm, Level: 0.0%)
+// - 50.0% Target Water Level Distance  = 22.4 cm (Depth: 3.6 cm, Level: 50.0%) -> Pump OFF
+// - 45.0% Refill Water Level Distance  = 22.8 cm (Depth: 3.24 cm, Level: 45.0%) -> Pump ON
+// - Total Usable Container Depth (100% scale) = 7.2 cm (3.6 cm * 2)
+// - Sensor Clearance (Transducer to 100% mark) = 18.8 cm (26.0 cm - 7.2 cm)
+float sensorClearanceCM = 18.8; // Air gap from transducer face to 100% full mark (26.0 - 7.2)
+float containerDepthCM  = 7.2;  // Calibrated usable water depth (3.6cm at 50% * 2)
 
 // Physical Constants
 const float SPEED_OF_SOUND_CM_US = 0.0343; // cm per microsecond at ~25°C

@@ -8,9 +8,9 @@ Transducer non-contact surface water depth calibration tool.
 
 ---
 
-Current Clearance (100% Mark): 16.8 cm
-Current Usable Depth: 11.2 cm
-Base Distance (0% Empty): 28.0 cm
+Current Clearance (100% Mark): 18.8 cm
+Current Usable Depth: 7.2 cm
+Base Distance (0% Empty): 26.0 cm
 
 ---
 

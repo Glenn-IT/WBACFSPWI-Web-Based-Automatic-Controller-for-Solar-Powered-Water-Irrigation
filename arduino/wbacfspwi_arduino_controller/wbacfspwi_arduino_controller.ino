@@ -78,9 +78,9 @@ const int SOIL_AIR_RAW       = 417;    // 0% moisture in dry air
 const int SOIL_WATER_RAW     = 153;    // 100% moisture in water
 
 // JSN-SR04T Waterproof Ultrasonic Sensor Calibration (Centimeters)
-// Live Bench Calibrated: Base=28.0cm (0%), 50% Target=22.4cm, 45% Refill=23.0cm
-float sensorClearanceCM       = 16.8;   // Air gap from transducer face to 100% full mark (28.0 - 11.2)
-float containerDepthCM        = 11.2;   // Calibrated usable water depth (5.6cm at 50% * 2)
+// Live Bench Calibrated: Base=26.0cm (0%), 50% Target=22.4cm, 45% Refill=22.8cm
+float sensorClearanceCM       = 18.8;   // Air gap from transducer face to 100% full mark (26.0 - 7.2)
+float containerDepthCM        = 7.2;    // Calibrated usable water depth (3.6cm at 50% * 2)
 const float SPEED_OF_SOUND_CM_US = 0.0343; // cm per microsecond at ~25°C
 const float MIN_BLIND_ZONE_CM     = 20.0;   // Physical dead band limit of JSN-SR04T
 
