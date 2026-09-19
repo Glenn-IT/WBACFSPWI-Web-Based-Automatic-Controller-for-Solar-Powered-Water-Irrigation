@@ -72,7 +72,7 @@ To prevent inductive motor spikes and high-current relay switching from causing 
 | **SIG-04** | Arduino Pin A1 | Direct Jumper | JSN-SR04T TRIG (or HW-080 AO) | **Cyan** | 5V Digital Out | JSN-SR04T 10µs ultrasonic trigger pulse. Legacy HW-080 analog input. |
 | **SIG-05** | Row 10 (R1/R2 Junction) | 100kΩ / 33kΩ Divider | Arduino Pin A2 | **Purple** | 0V – 3.57V Analog | Battery voltage monitor ($V_{\text{batt}} / 4.0303$). Cutoff < 10.0V. Max 3.57V at 14.4V solar bulk charge. |
 | **SIG-06** | Row 25 (R3/R4 Junction) | 100kΩ / 20kΩ Divider | Arduino Pin A3 | **Gold / Yellow** | 0V – 3.67V Analog | Solar panel monitor ($V_{\text{solar}} / 6.000$). Harvesting > 12.0V. |
-| **SIG-07** | JSN-SR04T ECHO Pin | Direct Jumper | Arduino Pin A4 | **Blue** | 5V Digital In | Ultrasonic echo pulse duration (Time-of-Flight distance). Calibrated: 26.0cm (0%), 22.4cm (50%), 22.8cm (45%). |
+| **SIG-07** | JSN-SR04T ECHO Pin | Direct Jumper | Arduino Pin A4 | **Blue** | 5V Digital In | Ultrasonic echo pulse duration (Time-of-Flight distance). Calibrated: 24.4cm (0%), 22.4cm (50%), 22.6cm (45%). |
 | **COMM-01**| Arduino Pin 10 (TX) | Row 45 (1kΩ/2kΩ Divider)| NodeMCU Pin D1 (RX) | **Orange** | 0V – 3.3V Logic | **Wireless Telemetry Link:** Sends structured JSON to NodeMCU (5V $\rightarrow$ 3.3V shifted). |
 | **COMM-02**| NodeMCU Pin D2 (TX) | Direct Jumper | Arduino Pin 9 (RX) | **White / Green** | 3.3V Logic (Safe) | **Remote Command Link:** Receives schedule/override commands from WiFi. |
 | **COMM-03**| USB Port (Arduino / NodeMCU) | Direct USB Cable | Computer / Laptop | **Blue Cable** | UART (115200 baud)| **Optional Diagnostics & Flashing Only** (No longer required for telemetry). |

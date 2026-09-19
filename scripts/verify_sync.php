@@ -71,20 +71,20 @@ $f11 = file_get_contents("$rootDir/arduino/11_jsn_sr04t_ultrasonic_water_level_t
 $fPinout = file_get_contents("$rootDir/arduino/Pinout_and_Schematic.md");
 $fSysMem = file_get_contents("$rootDir/SYSTEM_MEMORY.md");
 
-check("Test 11 defines sensorClearanceCM = 18.8 & containerDepthCM = 7.2",
-    strpos($f11, 'sensorClearanceCM = 18.8') !== false && strpos($f11, 'containerDepthCM  = 7.2') !== false);
+check("Test 11 defines sensorClearanceCM = 20.4 & containerDepthCM = 4.0",
+    strpos($f11, 'sensorClearanceCM = 20.4') !== false && strpos($f11, 'containerDepthCM  = 4.0') !== false);
 check("Main Controller defines PIN_TRIG = A1 & PIN_ECHO = A4",
     strpos($fMain, 'PIN_TRIG           = A1') !== false && strpos($fMain, 'PIN_ECHO           = A4') !== false);
-check("Main Controller defines sensorClearanceCM = 18.8 & containerDepthCM = 7.2",
-    strpos($fMain, 'sensorClearanceCM       = 18.8') !== false && strpos($fMain, 'containerDepthCM        = 7.2') !== false);
+check("Main Controller defines sensorClearanceCM = 20.4 & containerDepthCM = 4.0",
+    strpos($fMain, 'sensorClearanceCM       = 20.4') !== false && strpos($fMain, 'containerDepthCM        = 4.0') !== false);
 check("Main Controller implements singlePingCM() & readFilteredDistanceCM()",
     strpos($fMain, 'singlePingCM()') !== false && strpos($fMain, 'readFilteredDistanceCM(5)') !== false);
-check("Calibration Registry records JSN-SR04T (18.8cm clearance / 7.2cm depth / 26.0cm base)",
-    strpos($fCal, 'JSN-SR04T Ultrasonic') !== false && strpos($fCal, '18.8cm') !== false && strpos($fCal, '7.2cm') !== false);
+check("Calibration Registry records JSN-SR04T (20.4cm clearance / 4.0cm depth / 24.4cm base)",
+    strpos($fCal, 'JSN-SR04T Ultrasonic') !== false && strpos($fCal, '20.4cm') !== false && strpos($fCal, '4.0cm') !== false);
 check("Pinout & Schematic specifies JSN-SR04T TRIG on A1 & ECHO on A4",
     strpos($fPinout, 'JSN-SR04T TRIG') !== false && strpos($fPinout, 'JSN-SR04T ECHO') !== false);
 check("SYSTEM_MEMORY.md documents JSN-SR04T Ultrasonic Sensor on Pins A1/A4",
-    strpos($fSysMem, 'JSN-SR04T') !== false && strpos($fSysMem, 'PIN_TRIG') === false && strpos($fSysMem, '18.8cm') !== false);
+    strpos($fSysMem, 'JSN-SR04T') !== false && strpos($fSysMem, 'PIN_TRIG') === false && strpos($fSysMem, '20.4cm') !== false);
 
 echo "\n3. Testing Resistor Voltage Divider Ratios:\n";
 $f04 = file_get_contents("$rootDir/arduino/04_battery_voltage_test/04_battery_voltage_test.ino");
