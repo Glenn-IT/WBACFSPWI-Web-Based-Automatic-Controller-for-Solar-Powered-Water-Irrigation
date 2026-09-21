@@ -441,24 +441,19 @@ void dispatchAlertSMS(const String& message) {
 // ============================================================================
 
 void setPump(bool enable) {
-  // Actuator switches immediately: LOW = Pump ON, HIGH = Pump OFF (Zero delay on cutoff prevents overflow)
-  digitalWrite(PIN_RELAY_PUMP, enable ? (RELAY_ACTIVE_LOW ? LOW : HIGH) : (RELAY_ACTIVE_LOW ? HIGH : LOW));
-  digitalWrite(PIN_STATUS_LED, enable ? HIGH : LOW);
-
   if (enable == pumpState) return;
 
-  pumpState = enable;
-  if (pumpState) {
-    pumpStartTime = millis();
-    Serial.println(F("[EVENT] Pump STARTED immediately."));
-
+  if (enable) {
+    // =============================================================
+    // PUMP START SEQUENCE: SMS FIRST (WHILE PUMP IS OFF), THEN ENGAGE RELAY
+    // =============================================================
     cycleCount++;
     lastTriggeredEvent = (cycleCount > 1) ? EVENT_RESTARTED : EVENT_STARTED;
 
     String msg = F("WBACFSPWI Alert:\nIrrigation ");
     msg += (cycleCount > 1) ? F("RESTARTED (Cycle #") : F("STARTED.");
     if (cycleCount > 1) { msg += cycleCount; msg += F(")."); }
-    msg += F("\nMotor is now ON.");
+    msg += F("\nMotor starting now.");
     msg += F("\nWater level: ");
     msg += String(currentSurfaceWater, 1);
     msg += F("% (< 45%).\nSoil moisture: ");
@@ -466,16 +461,28 @@ void setPump(bool enable) {
     msg += F("%");
 
     if (gsmReady) {
-      // Solution 2: Allow motor startup inrush current (2A-4A) to settle into normal running current (~0.5A)
-      Serial.println(F("  [POWER STABILIZATION] Pausing 3.5s for motor startup inrush to settle before cellular transmit..."));
-      delay(3500);
-      Serial.println(F("  [POWER STABILIZATION] Motor current stabilized. Transmitting alert SMS..."));
-      lastSmsTime = 0; // Bypass cooldown so event alert is dispatched immediately
+      Serial.println(F("[POWER & SAFETY] Sending 'STARTED' SMS first while pump is OFF (100% clean power & zero overflow delay)..."));
+      lastSmsTime = 0; // Clear cooldown so event alert is dispatched immediately
       dispatchAlertSMS(msg);
     }
+
+    // Engage pump relay immediately after SMS is dispatched
+    digitalWrite(PIN_RELAY_PUMP, RELAY_ACTIVE_LOW ? LOW : HIGH);
+    digitalWrite(PIN_STATUS_LED, HIGH);
+    pumpState = true;
+    pumpStartTime = millis();
+    Serial.println(F("[ACTUATOR] Relay ENGAGED -> 12V DC Water Pump ON! Entering active sensor monitoring loop."));
+
   } else {
+    // =============================================================
+    // PUMP STOP SEQUENCE: CUT RELAY IMMEDIATELY FIRST, THEN SEND SMS
+    // =============================================================
+    // 1. Cut pump power immediately (0ms delay prevents container overflow!)
+    digitalWrite(PIN_RELAY_PUMP, RELAY_ACTIVE_LOW ? HIGH : LOW);
+    digitalWrite(PIN_STATUS_LED, LOW);
+    pumpState = false;
     pumpStopTime = millis();
-    Serial.println(F("[EVENT] Pump STOPPED immediately (Zero overflow delay)."));
+    Serial.println(F("[ACTUATOR] Relay RELEASED -> 12V DC Water Pump STOPPED immediately (Zero overflow delay)."));
 
     lastTriggeredEvent = EVENT_STOPPED;
 
@@ -490,11 +497,10 @@ void setPump(bool enable) {
     msg += F("V");
 
     if (gsmReady) {
-      // Allow inductive kickback and battery voltage to bounce back to resting voltage before cellular transmit
-      Serial.println(F("  [POWER STABILIZATION] Pausing 1.5s for inductive kickback & power rail bounce-back..."));
-      delay(1500);
-      Serial.println(F("  [POWER STABILIZATION] Power rail clean. Transmitting stop alert SMS..."));
-      lastSmsTime = 0; // Bypass cooldown so event alert is dispatched immediately
+      // 2. Allow 1.0s for inductive kickback & power rail bounce-back
+      delay(1000);
+      Serial.println(F("[POWER & SAFETY] Sending 'STOPPED' SMS on resting power..."));
+      lastSmsTime = 0; // Clear cooldown so event alert is dispatched immediately
       dispatchAlertSMS(msg);
     }
   }
@@ -647,7 +653,8 @@ void printTelemetry() {
 
 void setup() {
   Serial.begin(115200);
-  while (!Serial) { delay(10); }
+  // Non-blocking wait for Serial: allow up to 2 seconds if USB is connected, otherwise continue standalone immediately
+  while (!Serial && millis() < 2000) { delay(10); }
 
   // 1. Initialize relay pin to safe OFF (HIGH for Active LOW) BEFORE pinMode
   digitalWrite(PIN_RELAY_PUMP, RELAY_ACTIVE_LOW ? HIGH : LOW);
@@ -682,7 +689,25 @@ void setup() {
   Serial.println(F("  - SETTLING WINDOW       : 10 Seconds Wave Stabilization"));
   Serial.println(F("=================================================="));
 
-  // Initialize GSM Cellular Transceiver
+  // =============================================================
+  // STEP 1: 5-SECOND GSM BASEBAND WARM-UP COUNTDOWN
+  // =============================================================
+  // Gives the SIM900A module time to power on its internal CPU & radio after power is applied
+  Serial.println(F("\n[STARTUP] Step 1/3: 5-Second GSM Baseband Boot-Up Countdown..."));
+  Serial.println(F("  Allowing SIM900A module to complete hardware power-on & boot baseband..."));
+  for (int s = 5; s > 0; s--) {
+    Serial.print(F("  -> GSM boot countdown: "));
+    Serial.print(s);
+    Serial.println(F("s"));
+    digitalWrite(PIN_STATUS_LED, (s % 2 == 0) ? HIGH : LOW);
+    delay(1000);
+  }
+  digitalWrite(PIN_STATUS_LED, LOW);
+
+  // =============================================================
+  // STEP 2: INITIALIZE & CHECK GSM MODULE, SIGNAL & REGISTRATION
+  // =============================================================
+  Serial.println(F("\n[STARTUP] Step 2/3: Checking GSM Module, Signal & Network Registration..."));
   gsmReady = initGSM();
   if (gsmReady) {
     Serial.println(F("[SYSTEM] GSM SMS Alert Module: ACTIVE"));
@@ -692,13 +717,16 @@ void setup() {
     Serial.println(F("[SYSTEM] GSM SMS Alert Module: OFFLINE (Operating with WiFi Bridge)"));
   }
 
-  // 30-Second Sensor Calibration & Network Stabilization Window
-  Serial.println(F("[STARTUP] 30-Second Sensor Calibration & Network Stabilization Window..."));
-  Serial.println(F("[STARTUP] Allowing SIM900A GSM module to lock cell tower and NodeMCU to connect to WiFi..."));
-  for (int sec = 30; sec > 0; sec--) {
-    Serial.print(F("  -> Calibrating sensors & stabilizing network links... "));
-    Serial.print(sec);
-    Serial.println(F("s remaining"));
+  // =============================================================
+  // STEP 3: 3-SECOND SENSOR STABILIZATION COUNTDOWN
+  // =============================================================
+  // Takes baseline ultrasonic & soil readings before starting autonomous maintenance
+  Serial.println(F("\n[STARTUP] Step 3/3: 3-Second Sensor Stabilization Countdown..."));
+  Serial.println(F("  Locking ultrasonic baseline & stabilizing sensor inputs..."));
+  for (int s = 3; s > 0; s--) {
+    Serial.print(F("  -> Sensor stabilization countdown: "));
+    Serial.print(s);
+    Serial.println(F("s"));
 
     // Warm-up sensor readings
     currentRootMoisture = readRootMoisture();
@@ -706,26 +734,13 @@ void setup() {
     currentBattVolts    = readBatteryVoltage();
     currentSolarVolts   = readSolarVoltage();
 
-    // Toggle onboard status LED every second during warm-up
-    digitalWrite(PIN_STATUS_LED, (sec % 2 == 0) ? HIGH : LOW);
-
-    // Stream initial telemetry heartbeat to NodeMCU every 5 seconds
-    if (sec % 5 == 0) {
-      espSerial.print(F("{\"soil_moisture\":"));
-      espSerial.print(currentRootMoisture, 1);
-      espSerial.print(F(",\"water_level\":"));
-      espSerial.print(currentSurfaceWater, 1);
-      espSerial.print(F(",\"battery_voltage\":"));
-      espSerial.print(currentBattVolts, 2);
-      espSerial.print(F(",\"solar_output\":"));
-      espSerial.print(currentSolarVolts, 2);
-      espSerial.print(F(",\"pump_state\":\"off\"}\n"));
-    }
-
-    delay(1000);
+    digitalWrite(PIN_STATUS_LED, HIGH);
+    delay(500);
+    digitalWrite(PIN_STATUS_LED, LOW);
+    delay(500);
   }
   digitalWrite(PIN_STATUS_LED, LOW);
-  Serial.println(F("[STARTUP] 30-second calibration window complete! Starting autonomous maintenance...\n"));
+  Serial.println(F("[STARTUP] Setup complete! Starting autonomous irrigation maintenance...\n"));
 }
 
 void loop() {

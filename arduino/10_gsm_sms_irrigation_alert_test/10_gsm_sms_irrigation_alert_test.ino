@@ -644,8 +644,6 @@ void processIrrigationLogic() {
       
       // TRIGGER 1: First-time Irrigation Started
       if (cycleCount == 0) {
-        Serial.println(F("  [TRIGGER] Surface water dropped below 45.0%! STARTING irrigation immediately (Cycle #1)."));
-        setPump(true); // Pump engages instantly: water flows right away
         cycleCount = 1;
 
         if (lastTriggeredEvent != EVENT_STARTED) {
@@ -653,21 +651,17 @@ void processIrrigationLogic() {
           msg += String(currentSurfaceWater, 1);
           msg += F("% (below 45.0% threshold). Pump is now ON.");
 
-          // Solution 2: Wait 3.5s for motor startup inrush (2A-4A) to drop to normal running current (~0.5A)
-          Serial.println(F("  [POWER STABILIZATION] Pausing 3.5s for motor startup inrush current to stabilize..."));
-          delay(3500);
-          Serial.println(F("  [POWER STABILIZATION] Motor current stabilized. Transmitting alert SMS..."));
+          Serial.println(F("  [POWER & SAFETY] Sending 'STARTED' SMS first while pump is OFF (100% clean power, zero overflow risk)..."));
           dispatchAlertSMS(msg);
           lastTriggeredEvent = EVENT_STARTED;
         }
+
+        Serial.println(F("  [TRIGGER] Surface water dropped below 45.0%! Engaging pump relay (Cycle #1)."));
+        setPump(true); // Now engage pump relay
       }
       // TRIGGER 3: Water went below threshold AGAIN -> Irrigation RESTARTED
       else if (lastTriggeredEvent == EVENT_STOPPED) {
         cycleCount++;
-        Serial.print(F("  [TRIGGER] Surface water dropped below 45.0% AGAIN! RESTARTING irrigation immediately (Cycle #"));
-        Serial.print(cycleCount);
-        Serial.println(F(")."));
-        setPump(true); // Pump engages instantly
 
         String msg = F("[WBACFSPWI ALERT] Irrigation RESTARTED (Cycle #");
         msg += String(cycleCount);
@@ -675,12 +669,14 @@ void processIrrigationLogic() {
         msg += String(currentSurfaceWater, 1);
         msg += F("% (< 45.0%). Pump is refilling the field.");
 
-        // Solution 2: Wait 3.5s for motor inrush stabilization before cellular RF burst
-        Serial.println(F("  [POWER STABILIZATION] Pausing 3.5s for motor startup inrush current to stabilize..."));
-        delay(3500);
-        Serial.println(F("  [POWER STABILIZATION] Motor current stabilized. Transmitting alert SMS..."));
+        Serial.println(F("  [POWER & SAFETY] Sending 'RESTARTED' SMS first while pump is OFF (100% clean power, zero overflow risk)..."));
         dispatchAlertSMS(msg);
         lastTriggeredEvent = EVENT_RESTARTED;
+
+        Serial.print(F("  [TRIGGER] Surface water dropped below 45.0% AGAIN! Engaging pump relay (Cycle #"));
+        Serial.print(cycleCount);
+        Serial.println(F(")."));
+        setPump(true); // Now engage pump relay
       }
     }
   }
@@ -891,14 +887,54 @@ void setup() {
   // Ensure relay and pump are initially OFF
   setPump(false);
 
-  // Initialize GSM module
+  // =============================================================
+  // STEP 1: 5-SECOND GSM BASEBAND WARM-UP COUNTDOWN
+  // =============================================================
+  Serial.println(F("\n[STARTUP] Step 1/3: 5-Second GSM Baseband Boot-Up Countdown..."));
+  Serial.println(F("  Allowing GSM module to complete hardware power-on & boot baseband..."));
+  for (int s = 5; s > 0; s--) {
+    Serial.print(F("  -> GSM boot countdown: "));
+    Serial.print(s);
+    Serial.println(F("s"));
+    digitalWrite(PIN_STATUS_LED, (s % 2 == 0) ? HIGH : LOW);
+    delay(1000);
+  }
+  digitalWrite(PIN_STATUS_LED, LOW);
+
+  // =============================================================
+  // STEP 2: INITIALIZE & CHECK GSM MODULE, SIGNAL & REGISTRATION
+  // =============================================================
+  Serial.println(F("\n[STARTUP] Step 2/3: Checking GSM Module, Signal & Network Registration..."));
   gsmReady = initGSM();
   if (gsmReady) {
-    Serial.println(F("[SUCCESS] GSM SIM800L module connected and initialized."));
+    Serial.println(F("[SUCCESS] GSM module connected and initialized."));
   } else {
     Serial.println(F("[WARNING] GSM module initialization failed or pending."));
-    Serial.println(F("  Check power supply: SIM800L requires 3.7V - 4.4V with 2A burst current."));
+    Serial.println(F("  Check power supply: SIM800L/SIM900 requires 3.7V - 4.4V with 2A burst current."));
   }
+
+  // =============================================================
+  // STEP 3: 3-SECOND SENSOR STABILIZATION COUNTDOWN
+  // =============================================================
+  Serial.println(F("\n[STARTUP] Step 3/3: 3-Second Sensor Stabilization Countdown..."));
+  Serial.println(F("  Locking ultrasonic baseline & stabilizing sensor inputs..."));
+  for (int s = 3; s > 0; s--) {
+    Serial.print(F("  -> Sensor stabilization countdown: "));
+    Serial.print(s);
+    Serial.println(F("s"));
+
+    // Take initial baseline readings
+    currentDistanceCM   = readFilteredDistanceCM(3);
+    currentSurfaceWater = readSurfaceWater();
+    currentRootMoisture = readRootMoisture();
+
+    digitalWrite(PIN_STATUS_LED, HIGH);
+    delay(500);
+    digitalWrite(PIN_STATUS_LED, LOW);
+    delay(500);
+  }
+  digitalWrite(PIN_STATUS_LED, LOW);
+  Serial.println(F("[STARTUP] Setup complete! Starting automated alert test...\n"));
 
   printHelpMenu();
 }
