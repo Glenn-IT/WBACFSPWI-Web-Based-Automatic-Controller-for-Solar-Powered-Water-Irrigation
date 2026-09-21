@@ -4,17 +4,20 @@
  * 
  * Target Application: Miniature Rice Field Automation
  * Module Under Test: SIM800L / SIM900 GSM/GPRS Cellular Module
+ * Surface Sensor: JSN-SR04T Waterproof Ultrasonic Sensor (Non-Contact Depth)
  * 
  * Description:
- *   Sends automated SMS text message alerts directly to the Admin's mobile phone:
+ *   Sends automated SMS text message alerts directly to Admin mobile phones:
  *     1. When irrigation is STARTED (water level drops below 45.0% threshold, pump turns ON).
  *     2. When irrigation is STOPPED (water level reaches >= 50.0% threshold, pump turns OFF).
  *     3. When irrigation is RESTARTED (water level drops below 45.0% again, pump turns ON).
+ *     4. Emergency Safety Cutoff alert if continuous runtime reaches 3 minutes.
  * 
  * Hardware Pinout:
  *   - Arduino Pin D2: SoftwareSerial RX (Connects to GSM 5VT / TXD)
  *   - Arduino Pin D3: SoftwareSerial TX (Direct wire to SIM900A 5VR pin; or via 1kΩ/2kΩ divider for raw 3.3V SIM800L RXD)
- *   - Arduino Pin A1: HW-080 Surface Water Level Sensor (Calibrated 3-point piecewise curve)
+ *   - Arduino Pin A1: JSN-SR04T Waterproof Ultrasonic TRIG Output (10µs pulse)
+ *   - Arduino Pin A4: JSN-SR04T Waterproof Ultrasonic ECHO Input (5V TTL echo pulse)
  *   - Arduino Pin D7: 5V Relay Module (Active LOW, switches 12V DC Water Pump)
  *   - Arduino Pin D8: Capacitive Sensor Power Gate (Corrosion prevention)
  *   - Arduino Pin A0: Capacitive Soil Moisture Sensor v1.2 (Root Zone)
@@ -23,7 +26,7 @@
  * GSM Module Power Note (CRITICAL):
  *   SIM900A / SIM800L can draw up to 2.0A peak current during cellular transmission bursts.
  *   DO NOT power from Arduino 5V or 3.3V pins. Power via LM2596 Buck Converter (5.0V for SIM900A 5V pin,
- *   or 4.0V for raw VBAT) with a 1000uF low-ESR electrolytic capacitor across power and shared Common GND.
+ *   or 4.0V for raw VBAT) with a 1000µF low-ESR electrolytic capacitor across power and shared Common GND.
  */
 
 #include <SoftwareSerial.h>
@@ -36,7 +39,8 @@ const int PIN_GSM_TX         = 3;      // Arduino TX -> GSM 5VR (direct for SIM9
 const int PIN_RELAY_PUMP     = 7;      // 5V Relay Control (DC Water Pump)
 const int PIN_SENSOR_PWR     = 8;      // Capacitive Sensor Power Gate
 const int PIN_ROOT_SOIL      = A0;     // Capacitive Soil Moisture Sensor v1.2
-const int PIN_SURFACE_WATER  = A1;     // HW-080 Surface Water Ponding Sensor
+const int PIN_TRIG           = A1;     // JSN-SR04T Ultrasonic TRIG Output (Digital Pin 15)
+const int PIN_ECHO           = A4;     // JSN-SR04T Ultrasonic ECHO Input  (Digital Pin 18)
 const int PIN_STATUS_LED     = 13;     // Built-in Status LED
 
 const bool RELAY_ACTIVE_LOW  = true;   // Standard 5V relay modules trigger on LOW
@@ -47,26 +51,27 @@ SoftwareSerial gsmSerial(PIN_GSM_RX, PIN_GSM_TX);
 // ============================================================================
 // 2. ADMIN RECIPIENT PHONE NUMBER & SYSTEM CONFIGURATION
 // ============================================================================
-// IMPORTANT: Set your admin mobile phone numbers here (include country code or local format)
-// Examples: "+639123456789" (Philippines), "+1234567890" (US), or "09123456789"
 char ADMIN_PHONE[20]   = "+639158127228"; // Primary Admin
 char ADMIN_PHONE_2[20] = "+639242074903"; // Secondary Admin
 
 // ============================================================================
-// 3. CALIBRATION & THRESHOLD VALUES (SYNCHRONIZED WITH SYSTEM MEMORY)
+// 3. CALIBRATION & THRESHOLD VALUES (SYNCHRONIZED WITH SYSTEM MEMORY & TEST 11)
 // ============================================================================
 // Capacitive Root Sensor (Air vs Water raw ADC)
-const int SOIL_AIR_RAW       = 417;    // 0% moisture in dry air
-const int SOIL_WATER_RAW     = 153;    // 100% moisture in water
+const int SOIL_AIR_RAW       = 408;    // 0% moisture in dry air (bench calibrated)
+const int SOIL_WATER_RAW     = 172;    // 100% moisture in water (bench calibrated)
 
-// HW-080 Moisture Sensor (Physical Ruler 3-Point Calibration for Surface Ponding Depth)
-const int HW080_RAW_DRY      = 1020;   // Stage 0: Probe in dry air (0.0% surface water)
-const int HW080_RAW_MID      = 663;    // Stage 1: Water at middle of sensor 7-8cm mark (50.0% depth)
-const int HW080_RAW_WET      = 568;    // Stage 2: Probe at container maximum depth (100% full ponding)
+// JSN-SR04T Waterproof Ultrasonic Sensor Geometry (Centimeters)
+// Live Bench Calibrated: Soil Bed=24.4cm (0%), 50% Target=22.4cm, 45% Refill=22.6cm
+float sensorClearanceCM          = 20.4;   // Air gap from transducer face to 100% full mark (24.4 - 4.0)
+float containerDepthCM           = 4.0;    // Calibrated usable water depth (2.0cm at 50% * 2)
+const float SPEED_OF_SOUND_CM_US = 0.0343; // cm per microsecond at ~25°C
+const float MIN_BLIND_ZONE_CM    = 20.0;   // Physical dead band limit of JSN-SR04T
+float currentDistanceCM          = 0.0;    // Last measured acoustic distance
 
 // Irrigation Decision Thresholds (Surface Water Level Control with 5% Hysteresis)
-const float WATER_TARGET_MAX   = 50.0; // Automatically stop pump when surface water level reaches >= 50.0%
-const float WATER_REFILL_MIN   = 45.0; // Automatically start pump only when surface water level drops < 45.0%
+const float WATER_TARGET_MAX   = 50.0; // Automatically stop pump when surface water reaches >= 50.0%
+const float WATER_REFILL_MIN   = 45.0; // Automatically start pump only when surface water drops < 45.0%
 
 // Timing Protections (in milliseconds)
 const unsigned long MIN_PUMP_RUN_MS   = 5000UL;   // 5s minimum runtime (prevents momentary splash cutoffs)
@@ -103,12 +108,52 @@ enum IrrigationEventType {
 IrrigationEventType lastTriggeredEvent = EVENT_NONE;
 
 // ============================================================================
-// 5. GSM HELPER FUNCTIONS
+// 5. GSM HELPER & PARSING FUNCTIONS
 // ============================================================================
 
-// Send an AT command and check for expected response with timeout
+// Flush all leftover bytes in SoftwareSerial buffer
+void flushGSMSerial() {
+  while (gsmSerial.available()) {
+    gsmSerial.read();
+  }
+}
+
+// Wait for a specific text response with timeout
+bool waitForResponse(const char* expected, unsigned long timeoutMs) {
+  unsigned long start = millis();
+  String resp = "";
+  while (millis() - start < timeoutMs) {
+    while (gsmSerial.available()) {
+      char c = (char)gsmSerial.read();
+      resp += c;
+    }
+    if (resp.indexOf(expected) != -1) {
+      return true;
+    }
+    if (resp.indexOf(F("ERROR")) != -1 || resp.indexOf(F("+CMS ERROR")) != -1) {
+      return false;
+    }
+  }
+  return false;
+}
+
+// Wait specifically for the SMS body prompt '>'
+bool waitForPrompt(unsigned long timeoutMs) {
+  unsigned long start = millis();
+  while (millis() - start < timeoutMs) {
+    while (gsmSerial.available()) {
+      char c = (char)gsmSerial.read();
+      if (c == '>') {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+// Send an AT command, print debug info, and check for expected response
 bool sendATCommand(const char* cmd, const char* expectedResponse, unsigned long timeoutMs) {
-  while (gsmSerial.available()) gsmSerial.read(); // Clear RX buffer
+  flushGSMSerial();
 
   Serial.print(F("[GSM TX] "));
   Serial.println(cmd);
@@ -118,7 +163,7 @@ bool sendATCommand(const char* cmd, const char* expectedResponse, unsigned long 
   unsigned long start = millis();
   while (millis() - start < timeoutMs) {
     while (gsmSerial.available()) {
-      char c = gsmSerial.read();
+      char c = (char)gsmSerial.read();
       response += c;
     }
     if (response.indexOf(expectedResponse) != -1) {
@@ -126,19 +171,24 @@ bool sendATCommand(const char* cmd, const char* expectedResponse, unsigned long 
       Serial.println(response);
       return true;
     }
+    if (response.indexOf(F("ERROR")) != -1 || response.indexOf(F("+CMS ERROR")) != -1) {
+      Serial.print(F("[GSM RX ERROR] "));
+      Serial.println(response);
+      return false;
+    }
   }
 
-  Serial.print(F("[GSM RX TIMEOUT/FAIL] "));
+  Serial.print(F("[GSM RX TIMEOUT] "));
   Serial.println(response);
   return false;
 }
 
-// Read and dump GSM serial responses to Serial Monitor (for manual debugging)
+// Read and dump GSM serial responses to Serial Monitor
 void dumpGSMResponse(unsigned long waitMs) {
   unsigned long start = millis();
   while (millis() - start < waitMs) {
     while (gsmSerial.available()) {
-      char c = gsmSerial.read();
+      char c = (char)gsmSerial.read();
       Serial.write(c);
     }
   }
@@ -162,7 +212,7 @@ bool initGSM() {
     delay(200);
 
     for (int i = 0; i < 3; i++) {
-      while (gsmSerial.available()) gsmSerial.read(); // Clear RX buffer
+      flushGSMSerial();
       gsmSerial.println(F("AT"));
 
       unsigned long start = millis();
@@ -190,45 +240,89 @@ bool initGSM() {
 
   if (!synced) {
     Serial.println(F("\n[ERROR] GSM Module not responding to AT commands."));
-    Serial.println(F("  Check the following 3 wiring points:"));
-    Serial.println(F("  1. Swap TX and RX: Arduino D2 connects to GSM 5VT; Arduino D3 connects to GSM 5VR."));
-    Serial.println(F("  2. Direct 5VR connection: If using SIM900A '5VR' pin, wire D3 directly (remove 1k/2k divider)."));
-    Serial.println(F("  3. Common GND: Ensure Arduino GND and SIM900A GND share the same ground bus."));
+    Serial.println(F("  Check the following wiring & power points:"));
+    Serial.println(F("  1. Swap TX and RX: Arduino D2 connects to GSM 5VT / TXD; Arduino D3 connects to GSM 5VR / RXD."));
+    Serial.println(F("  2. Direct 5VR connection: If using SIM900A '5VR' pin, wire D3 directly."));
+    Serial.println(F("  3. Common GND: Ensure Arduino GND and SIM900A/SIM800L GND share the same common ground bus."));
+    Serial.println(F("  4. Power Supply: Requires 3.7V - 4.4V with 2A burst capability + 1000µF buffer capacitor."));
     return false;
   }
 
-  // If detected at a baud rate other than 9600, lock it to 9600 for SoftwareSerial stability
+  // Lock to 9600 baud for rock-solid SoftwareSerial communication
   if (activeBaud != 9600) {
     Serial.println(F("[INFO] Locking GSM module to reliable 9600 baud (AT+IPR=9600)..."));
     gsmSerial.println(F("AT+IPR=9600"));
     delay(400);
     gsmSerial.begin(9600);
     delay(400);
-    sendATCommand("AT&W", "OK", 1000); // Save to non-volatile profile
+    sendATCommand("AT&W", "OK", 1000); // Save baud rate to non-volatile profile
   }
 
-  sendATCommand("ATE0", "OK", 1000);        // Echo OFF
-  sendATCommand("AT+CPIN?", "READY", 3000); // Check SIM status
-  sendATCommand("AT+CMGF=1", "OK", 1000);   // Set SMS to Text Mode
-  sendATCommand("AT+CSCS=\"GSM\"", "OK", 1000); // Set GSM character set
+  sendATCommand("ATE0", "OK", 1000);              // Echo OFF
+  sendATCommand("AT+CMEE=2", "OK", 1000);         // Enable verbose error messages for clear diagnosis
+  sendATCommand("AT+CPIN?", "READY", 3000);       // Verify SIM card readiness
+  sendATCommand("AT+CMGF=1", "OK", 1000);         // Set SMS to Text Mode
+  sendATCommand("AT+CSCS=\"GSM\"", "OK", 1000);   // Set GSM default character encoding
+  sendATCommand("AT+CSMP=17,167,0,0", "OK", 1000);// Standard SMS-SUBMIT parameters (validity 24h, text mode)
 
   // Check signal quality
   Serial.println(F("[INFO] Checking signal quality (AT+CSQ)..."));
   gsmSerial.println(F("AT+CSQ"));
   dumpGSMResponse(1500);
 
-  // Check network registration (1 = Registered Home, 5 = Registered Roaming)
+  // Check network registration (loop up to 10s if searching)
   Serial.println(F("[INFO] Checking network registration (AT+CREG?)..."));
-  gsmSerial.println(F("AT+CREG?"));
-  dumpGSMResponse(2000);
+  bool registered = false;
+  for (int attempt = 1; attempt <= 5; attempt++) {
+    flushGSMSerial();
+    gsmSerial.println(F("AT+CREG?"));
+    unsigned long regStart = millis();
+    String regResp = "";
+    while (millis() - regStart < 2000) {
+      while (gsmSerial.available()) {
+        regResp += (char)gsmSerial.read();
+      }
+    }
+    Serial.print(F("  CREG response: "));
+    Serial.println(regResp);
+
+    if (regResp.indexOf(F("0,1")) != -1 || regResp.indexOf(F("0,5")) != -1 ||
+        regResp.indexOf(F(",1")) != -1 || regResp.indexOf(F(",5")) != -1) {
+      registered = true;
+      Serial.println(F("  [SUCCESS] SIM registered on cellular carrier network!"));
+      break;
+    } else if (regResp.indexOf(F("0,2")) != -1) {
+      Serial.println(F("  [INFO] Modem searching for operator network... waiting 2s."));
+      delay(2000);
+    } else {
+      delay(1500);
+    }
+  }
+
+  if (!registered) {
+    Serial.println(F("  [WARNING] SIM not yet registered on network. SMS dispatch may fail until registered."));
+  }
+
+  // Check SMS Service Center Address (SMSC)
+  Serial.println(F("[INFO] Querying SMS Service Center Address (AT+CSCA?)..."));
+  gsmSerial.println(F("AT+CSCA?"));
+  dumpGSMResponse(1500);
 
   Serial.println(F("--- GSM Module Ready & Configured ---\n"));
   return true;
 }
 
-// Send an SMS to the Admin phone number
+// ============================================================================
+// 6. ROBUST SMS TRANSMISSION ENGINE
+// ============================================================================
+
 bool sendSMS(const char* phoneNumber, const String& message) {
-  if (millis() - lastSmsTime < SMS_COOLDOWN_MS) {
+  if (!phoneNumber || strlen(phoneNumber) < 7) {
+    Serial.println(F("[ERROR] Invalid recipient phone number."));
+    return false;
+  }
+
+  if (millis() - lastSmsTime < SMS_COOLDOWN_MS && lastSmsTime != 0) {
     Serial.println(F("[GSM RATE LIMIT] Skipping SMS to protect against carrier throttling."));
     return false;
   }
@@ -248,48 +342,79 @@ bool sendSMS(const char* phoneNumber, const String& message) {
     delay(80);
   }
 
-  // Set SMS Text Mode
-  gsmSerial.println(F("AT+CMGF=1"));
-  delay(300);
+  // Step 1: Clean buffer
+  flushGSMSerial();
 
-  // Prepare SMS recipient
+  // Step 2: Ensure Text Mode (AT+CMGF=1)
+  gsmSerial.println(F("AT+CMGF=1"));
+  if (!waitForResponse("OK", 2000)) {
+    Serial.println(F("[ERROR] Failed to set SMS text mode (AT+CMGF=1)."));
+    return false;
+  }
+
+  // Step 3: Ensure SMS-SUBMIT parameters (AT+CSMP=17,167,0,0)
+  gsmSerial.println(F("AT+CSMP=17,167,0,0"));
+  waitForResponse("OK", 1000);
+
+  // Step 4: Initiate SMS sending with recipient phone number
+  flushGSMSerial();
   gsmSerial.print(F("AT+CMGS=\""));
   gsmSerial.print(phoneNumber);
   gsmSerial.println(F("\""));
-  delay(500);
 
-  // Send message body
+  // Step 5: Wait for '>' prompt from GSM modem
+  if (!waitForPrompt(5000)) {
+    Serial.println(F("[ERROR] GSM modem did not return '>' prompt. Canceling..."));
+    gsmSerial.write(27); // ESC to abort
+    delay(300);
+    flushGSMSerial();
+    return false;
+  }
+
+  // Step 6: Write message body and terminate with Ctrl+Z (ASCII 26)
   gsmSerial.print(message);
-  delay(300);
+  delay(150);
+  gsmSerial.write(26); // ASCII 26 (Ctrl+Z)
 
-  // Send Ctrl+Z (ASCII 26) to commit and send SMS
-  gsmSerial.write(26);
-
-  // Wait for confirmation response from GSM module
+  // Step 7: Wait for cellular transmission confirmation (+CMGS: <id> or OK)
   String response = "";
   unsigned long start = millis();
   bool success = false;
-  while (millis() - start < 15000UL) { // SMS send may take up to 15s
+  while (millis() - start < 25000UL) { // Cellular transmit may take up to 25s
     while (gsmSerial.available()) {
-      char c = gsmSerial.read();
+      char c = (char)gsmSerial.read();
       response += c;
+      Serial.write(c); // Echo live modem response to Serial Monitor
     }
-    if (response.indexOf(F("+CMGS:")) != -1 || response.indexOf(F("OK")) != -1) {
+    if (response.indexOf(F("+CMGS:")) != -1 || response.indexOf(F("\r\nOK")) != -1) {
       success = true;
       break;
     }
-    if (response.indexOf(F("ERROR")) != -1) {
+    if (response.indexOf(F("ERROR")) != -1 || response.indexOf(F("+CMS ERROR")) != -1) {
       success = false;
       break;
     }
   }
 
   if (success) {
-    Serial.println(F("[SMS STATUS] >>> SMS SENT SUCCESSFULLY! <<<"));
+    Serial.println(F("\n[SMS STATUS] >>> SMS SENT SUCCESSFULLY! <<<"));
     lastSmsTime = millis();
   } else {
-    Serial.print(F("[SMS STATUS] >>> SMS FAILED TO SEND. GSM Response: "));
+    Serial.print(F("\n[SMS STATUS] >>> SMS FAILED TO SEND. Modem Response: "));
     Serial.println(response);
+
+    // Provide actionable troubleshooting insights based on CMS error codes
+    if (response.indexOf(F("302")) != -1) {
+      Serial.println(F("  [DIAGNOSTIC] CMS ERROR 302: Modem not registered on cellular network. Check antenna or SIM."));
+    } else if (response.indexOf(F("304")) != -1 || response.indexOf(F("500")) != -1) {
+      Serial.println(F("  [DIAGNOSTIC] CMS ERROR 304/500: SMSC center address missing, invalid CSMP, or SIM out of load/credits."));
+    } else if (response.indexOf(F("330")) != -1) {
+      Serial.println(F("  [DIAGNOSTIC] CMS ERROR 330: SMSC address error. Query AT+CSCA? in console."));
+    } else if (response.indexOf(F("512")) != -1) {
+      Serial.println(F("  [DIAGNOSTIC] CMS ERROR 512: Modem busy. Wait a few seconds before retrying."));
+    } else if (response.length() == 0) {
+      Serial.println(F("  [DIAGNOSTIC] No response received: Likely GSM power brownout during RF transmission. Ensure 2A power supply + 1000µF capacitor."));
+    }
   }
 
   return success;
@@ -299,37 +424,90 @@ bool sendSMS(const char* phoneNumber, const String& message) {
 void dispatchAlertSMS(const String& message) {
   sendSMS(ADMIN_PHONE, message);
   if (strlen(ADMIN_PHONE_2) > 0) {
-    delay(1000); // 1-second pause for GSM modem transmission recovery
+    delay(1500); // 1.5-second pause for GSM modem transmission recovery
     lastSmsTime = 0; // Clear cooldown so secondary recipient receives alert immediately
     sendSMS(ADMIN_PHONE_2, message);
   }
 }
 
 // ============================================================================
-// 6. SENSOR READING FUNCTIONS (SYNCHRONIZED CALIBRATION)
+// 7. SENSOR READING FUNCTIONS (TEST 11 JSN-SR04T ULTRASONIC & CAPACITIVE SOIL)
 // ============================================================================
 
-float readSurfaceWater() {
-  long sum = 0;
-  for (int i = 0; i < 16; i++) {
-    sum += analogRead(PIN_SURFACE_WATER);
-    delay(2);
-  }
-  int raw = sum / 16;
+// Single acoustic pulse-echo time-of-flight measurement via JSN-SR04T
+float singlePingCM() {
+  digitalWrite(PIN_TRIG, LOW);
+  delayMicroseconds(4);
 
-  if (raw >= HW080_RAW_DRY) {
-    return 0.0;
-  } else if (raw >= HW080_RAW_MID) {
-    // Stage 1: Dry air (1020) down to Middle height (663) -> 0.0% to 50.0%
-    float pct = 50.0 * (float)(HW080_RAW_DRY - raw) / (float)(HW080_RAW_DRY - HW080_RAW_MID);
-    return constrain(pct, 0.0, 50.0);
-  } else {
-    // Stage 2: Middle height (663) down to Full top (568) -> 50.0% to 100.0%
-    float pct = 50.0 + 50.0 * (float)(HW080_RAW_MID - raw) / (float)(HW080_RAW_MID - HW080_RAW_WET);
-    return constrain(pct, 50.0, 100.0);
-  }
+  digitalWrite(PIN_TRIG, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(PIN_TRIG, LOW);
+
+  unsigned long duration = pulseIn(PIN_ECHO, HIGH, 35000UL); // 35ms timeout (~6m max)
+  if (duration == 0) return -1.0;
+
+  return (float)duration * SPEED_OF_SOUND_CM_US / 2.0;
 }
 
+// Multi-sample median filtered distance reading to reject ripples & jitter
+float readFilteredDistanceCM(int samples = 5) {
+  float readings[10];
+  if (samples > 10) samples = 10;
+  if (samples < 1)  samples = 1;
+
+  int validCount = 0;
+  for (int i = 0; i < samples; i++) {
+    float d = singlePingCM();
+    if (d > 0.0) {
+      readings[validCount++] = d;
+    }
+    delay(20);
+  }
+
+  if (validCount == 0) return -1.0;
+
+  // Median sort
+  for (int i = 0; i < validCount - 1; i++) {
+    for (int j = i + 1; j < validCount; j++) {
+      if (readings[i] > readings[j]) {
+        float temp = readings[i];
+        readings[i] = readings[j];
+        readings[j] = temp;
+      }
+    }
+  }
+  return readings[validCount / 2];
+}
+
+// Calculate water depth in centimeters
+float calculateWaterDepthCM(float distanceCM) {
+  if (distanceCM < 0.0 || containerDepthCM <= 0.0) return 0.0;
+  float emptyFloorDistance = sensorClearanceCM + containerDepthCM;
+  float depth = emptyFloorDistance - distanceCM;
+  return constrain(depth, 0.0, containerDepthCM);
+}
+
+// Convert measured distance into 0.0% to 100.0% ponding percentage
+float calculateWaterPercent(float distanceCM) {
+  if (distanceCM < 0.0 || containerDepthCM <= 0.0) return 0.0;
+  float emptyFloorDistance = sensorClearanceCM + containerDepthCM;
+  float depth = emptyFloorDistance - distanceCM;
+  float pct = (depth / containerDepthCM) * 100.0;
+  return constrain(pct, 0.0, 100.0);
+}
+
+// JSN-SR04T Non-Contact Surface Water Depth Percentage (0.0% to 100.0%)
+float readSurfaceWater() {
+  float dist = readFilteredDistanceCM(5);
+  if (dist > 0.0) {
+    currentDistanceCM = dist;
+    return calculateWaterPercent(dist);
+  }
+  // Return last known reading if acoustic echo timed out
+  return currentSurfaceWater;
+}
+
+// Capacitive Soil Moisture Sensor v1.2 (Root Zone) with D8 power gating
 float readRootMoisture() {
   if (USE_SENSOR_PWR && PIN_SENSOR_PWR >= 0) {
     digitalWrite(PIN_SENSOR_PWR, HIGH);
@@ -352,7 +530,7 @@ float readRootMoisture() {
 }
 
 // ============================================================================
-// 7. PUMP CONTROL & STATE DISPATCH
+// 8. PUMP CONTROL & STATE DISPATCH
 // ============================================================================
 
 void setPump(bool enable) {
@@ -372,7 +550,7 @@ void setPump(bool enable) {
 }
 
 // ============================================================================
-// 8. IRRIGATION DECISION & SMS TRIGGER LOGIC
+// 9. IRRIGATION DECISION & SMS TRIGGER LOGIC (3-LAYER SAFETY NET)
 // ============================================================================
 
 void processIrrigationLogic() {
@@ -380,12 +558,16 @@ void processIrrigationLogic() {
   currentRootMoisture = readRootMoisture();
 
   // Print live telemetry to Serial Monitor
-  Serial.print(F("[MONITOR] Surface Water: "));
+  Serial.print(F("[MONITOR] Dist: "));
+  Serial.print(currentDistanceCM, 1);
+  Serial.print(F("cm | Water: "));
   Serial.print(currentSurfaceWater, 1);
-  Serial.print(F("% | Root Moisture: "));
+  Serial.print(F("% (Depth: "));
+  Serial.print(calculateWaterDepthCM(currentDistanceCM), 1);
+  Serial.print(F("cm) | Soil: "));
   Serial.print(currentRootMoisture, 1);
   Serial.print(F("% | Pump: "));
-  Serial.print(pumpState ? F("ON (RUNNING)") : F("OFF"));
+  Serial.print(pumpState ? F("ON") : F("OFF"));
   Serial.print(F(" | Cycle: #"));
   Serial.println(cycleCount);
 
@@ -410,7 +592,7 @@ void processIrrigationLogic() {
   if (pumpState) {
     unsigned long runtime = now - pumpStartTime;
 
-    // Safety Interlock: Anti-splash minimum runtime
+    // Safety Interlock: Anti-splash minimum runtime (5s)
     if (runtime < MIN_PUMP_RUN_MS) {
       Serial.print(F("  [SAFETY] Anti-splash lock active ("));
       Serial.print((MIN_PUMP_RUN_MS - runtime) / 1000);
@@ -418,7 +600,7 @@ void processIrrigationLogic() {
       return;
     }
 
-    // Safety Interlock: Maximum runtime cap
+    // Safety Interlock: Maximum continuous runtime cap (180s)
     if (runtime >= MAX_PUMP_RUN_MS) {
       Serial.println(F("  [SAFETY ALERT] Continuous runtime cap exceeded (180s)! Emergency stop."));
       setPump(false);
@@ -491,7 +673,7 @@ void processIrrigationLogic() {
 }
 
 // ============================================================================
-// 9. SERIAL COMMAND INTERPRETER (INTERACTIVE BENCH TEST CONSOLE)
+// 10. SERIAL COMMAND INTERPRETER (INTERACTIVE BENCH TEST CONSOLE)
 // ============================================================================
 
 void printHelpMenu() {
@@ -502,11 +684,17 @@ void printHelpMenu() {
   Serial.println(ADMIN_PHONE);
   Serial.print(F(" Secondary Admin Phone : "));
   Serial.println(ADMIN_PHONE_2);
+  Serial.print(F(" Surface Water Sensor  : JSN-SR04T Ultrasonic (TRIG: A1, ECHO: A4)\n"));
+  Serial.print(F(" Calibrated Clearance  : ")); Serial.print(sensorClearanceCM, 1); Serial.println(F(" cm"));
+  Serial.print(F(" Usable Depth          : ")); Serial.print(containerDepthCM, 1);  Serial.println(F(" cm"));
+  Serial.print(F(" Empty Floor Distance  : ")); Serial.print(sensorClearanceCM + containerDepthCM, 1); Serial.println(F(" cm"));
+  Serial.println(F("-------------------------------------------------------"));
   Serial.println(F(" Available Test Commands:"));
   Serial.println(F("   's' -> Send an instant test SMS to the Admin phone"));
-  Serial.println(F("   'c' -> Check GSM signal strength & network registration"));
+  Serial.println(F("   'c' -> Comprehensive GSM diagnostics (Signal, Network, SMSC)"));
+  Serial.println(F("   'r' -> Re-initialize GSM modem & network registration"));
   Serial.println(F("   'p' -> Toggle 12V DC Pump Relay ON/OFF"));
-  Serial.println(F("   'w' -> Print live water level & soil moisture readings"));
+  Serial.println(F("   'w' -> Print live Ultrasonic distance, depth & soil moisture"));
   Serial.println(F("   '1' -> Simulate TRIGGER 1: Irrigation Started SMS (< 45%)"));
   Serial.println(F("   '2' -> Simulate TRIGGER 2: Irrigation Stopped SMS (>= 50%)"));
   Serial.println(F("   '3' -> Simulate TRIGGER 3: Irrigation Restarted SMS (< 45% again)"));
@@ -529,20 +717,40 @@ void handleSerialCommands() {
     case 's':
     case 'S': {
       Serial.println(F("\n[TEST] Sending immediate verification SMS to Admin..."));
-      String testMsg = F("[WBACFSPWI TEST] GSM Module SIM800L communication link verified. Ready to report automated irrigation events.");
-      sendSMS(ADMIN_PHONE, testMsg);
+      String testMsg = F("[WBACFSPWI TEST] GSM Module SIM800L link verified with JSN-SR04T ultrasonic sensor. Ready for irrigation alerts.");
+      dispatchAlertSMS(testMsg);
       break;
     }
 
     case 'c':
     case 'C': {
-      Serial.println(F("\n[GSM DIAGNOSTICS] Querying Module Status..."));
+      Serial.println(F("\n[GSM DIAGNOSTICS] Querying Module & Network Status..."));
+      Serial.println(F("1. Signal Quality (AT+CSQ):"));
       gsmSerial.println(F("AT+CSQ"));
       dumpGSMResponse(1500);
+
+      Serial.println(F("\n2. Network Registration (AT+CREG?):"));
       gsmSerial.println(F("AT+CREG?"));
       dumpGSMResponse(1500);
-      gsmSerial.println(F("AT+CBC")); // Battery/voltage status of GSM module
+
+      Serial.println(F("\n3. Current Operator (AT+COPS?):"));
+      gsmSerial.println(F("AT+COPS?"));
+      dumpGSMResponse(2000);
+
+      Serial.println(F("\n4. SMS Service Center Address (AT+CSCA?):"));
+      gsmSerial.println(F("AT+CSCA?"));
       dumpGSMResponse(1500);
+
+      Serial.println(F("\n5. Power/Battery Status (AT+CBC):"));
+      gsmSerial.println(F("AT+CBC"));
+      dumpGSMResponse(1500);
+      break;
+    }
+
+    case 'r':
+    case 'R': {
+      Serial.println(F("\n[RESET] Re-initializing GSM module..."));
+      gsmReady = initGSM();
       break;
     }
 
@@ -554,22 +762,38 @@ void handleSerialCommands() {
       break;
 
     case 'w':
-    case 'W':
-      Serial.println(F("\n[INSTANT READING]"));
-      Serial.print(F("Surface Water Level: "));
-      Serial.print(readSurfaceWater(), 1);
-      Serial.println(F("%"));
-      Serial.print(F("Root Soil Moisture:  "));
-      Serial.print(readRootMoisture(), 1);
-      Serial.println(F("%"));
+    case 'W': {
+      float dist = readFilteredDistanceCM(5);
+      float pct  = calculateWaterPercent(dist);
+      float dpth = calculateWaterDepthCM(dist);
+      float soil = readRootMoisture();
+
+      Serial.println(F("\n[INSTANT SENSOR READINGS]"));
+      Serial.print(F("• Ultrasonic Echo Distance: "));
+      if (dist > 0.0) {
+        Serial.print(dist, 2);
+        Serial.println(F(" cm"));
+      } else {
+        Serial.println(F("TIMEOUT (No echo detected)"));
+      }
+      Serial.print(F("• Surface Water Depth:      "));
+      Serial.print(dpth, 2);
+      Serial.println(F(" cm"));
+      Serial.print(F("• Surface Ponding Level:    "));
+      Serial.print(pct, 1);
+      Serial.println(F(" %"));
+      Serial.print(F("• Root Soil Moisture:       "));
+      Serial.print(soil, 1);
+      Serial.println(F(" %"));
       break;
+    }
 
     case '1': {
       Serial.println(F("\n[SIMULATION] Simulating Trigger 1: Water dropped to 42.0% (< 45.0%) -> Irrigation Started"));
       cycleCount = 1;
       setPump(true);
       String msg = F("[WBACFSPWI ALERT] Irrigation STARTED. Water level dropped to 42.0% (below 45.0% threshold). Pump is now ON.");
-      sendSMS(ADMIN_PHONE, msg);
+      dispatchAlertSMS(msg);
       lastTriggeredEvent = EVENT_STARTED;
       break;
     }
@@ -580,7 +804,7 @@ void handleSerialCommands() {
       isSettling = true;
       settlingStartTime = millis();
       String msg = F("[WBACFSPWI ALERT] Irrigation STOPPED. Target water level reached 50.4% (at/above 50.0% threshold). Pump is now OFF.");
-      sendSMS(ADMIN_PHONE, msg);
+      dispatchAlertSMS(msg);
       lastTriggeredEvent = EVENT_STOPPED;
       break;
     }
@@ -590,7 +814,7 @@ void handleSerialCommands() {
       cycleCount++;
       setPump(true);
       String msg = F("[WBACFSPWI ALERT] Irrigation RESTARTED (Cycle #2). Water dropped to 43.5% (< 45.0%). Pump is refilling the field.");
-      sendSMS(ADMIN_PHONE, msg);
+      dispatchAlertSMS(msg);
       lastTriggeredEvent = EVENT_RESTARTED;
       break;
     }
@@ -625,7 +849,7 @@ void handleSerialCommands() {
 }
 
 // ============================================================================
-// 10. SETUP & MAIN LOOP
+// 11. SETUP & MAIN LOOP
 // ============================================================================
 
 void setup() {
@@ -634,6 +858,7 @@ void setup() {
 
   Serial.println(F("\n======================================================="));
   Serial.println(F(" WBACFSPWI — Test 10: GSM SMS Irrigation Alert System  "));
+  Serial.println(F(" Surface Sensor: JSN-SR04T Waterproof Ultrasonic       "));
   Serial.println(F("======================================================="));
 
   // Initialize output pins
@@ -643,6 +868,11 @@ void setup() {
     pinMode(PIN_SENSOR_PWR, OUTPUT);
     digitalWrite(PIN_SENSOR_PWR, LOW);
   }
+
+  // Initialize JSN-SR04T Ultrasonic sensor pins
+  pinMode(PIN_TRIG, OUTPUT);
+  pinMode(PIN_ECHO, INPUT);
+  digitalWrite(PIN_TRIG, LOW);
 
   // Ensure relay and pump are initially OFF
   setPump(false);

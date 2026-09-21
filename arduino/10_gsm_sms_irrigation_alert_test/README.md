@@ -93,8 +93,11 @@ This test suite verifies bidirectional GSM cellular integration for the miniatur
 | **Star Common GND** | Star GND Rail (`-`) | **`GND`** | **CRITICAL:** Arduino GND and GSM GND MUST be tied together! |
 | **Pin D2 (SoftwareSerial RX)** | Direct Jumper Wire | **`5VT` (SIM900A) / `TXD` (SIM800L)** | Receives AT responses from GSM module (Safely read by ATmega328P) |
 | **Pin D3 (SoftwareSerial TX)** | Direct Wire / Divider Junction | **`5VR` (SIM900A) / `RXD` (SIM800L)** | **SIM900A:** Direct wire to `5VR` (onboard level shifter).<br>**SIM800L:** 5V $\rightarrow 1\text{k}\Omega \rightarrow$ RXD $\rightarrow 2\text{k}\Omega \rightarrow$ GND. |
-| **Pin A1** | Direct Jumper Wire | HW-080 `AO` | Surface Water Ponding Depth Sensor ($45\%$ Refill / $50\%$ Target) |
+| **Pin A1** | Direct Jumper Wire | JSN-SR04T `TRIG` | Ultrasonic Trigger Output (10µs pulse to start sound wave) |
+| **Pin A4** | Direct Jumper Wire | JSN-SR04T `ECHO` | Ultrasonic Echo Input (5V TTL pulse proportional to surface distance) |
+| **Pin A0** | Direct Jumper Wire | Capacitive Soil `AOUT` | Root Zone Soil Moisture Sensor ($408$ Air / $172$ Water) |
 | **Pin D7** | Direct Jumper Wire | Relay Module `IN` | Active LOW trigger for 12V DC Water Pump Relay |
+| **Pin D8** | Direct Jumper Wire | Capacitive Sensor `VCC` | Power Gate Pin (Active HIGH during reading, LOW between samples) |
 | **Pin D13** | Built-in Indicator | — | Mirrors pump state and blinks during SMS dispatch |
 
 ### 5V-to-3.3V Voltage Divider Diagram (Only for Raw 3.3V SIM800L RXD — NOT needed for SIM900A)
@@ -110,9 +113,9 @@ Arduino Uno Pin D3 (5V TX)
       │ │  1 kΩ Resistor (1/4 W)
       └┬┘
        ├───► Connects directly to GSM SIM800L Pin RXD (3.3V Max Safe Input)
-       ┌┴┐
-       │ │  2 kΩ (or 2.2 kΩ) Resistor
-       └┬┘
+      ┌┴┐
+      │ │  2 kΩ (or 2.2 kΩ) Resistor
+      └┬┘
         │
 Star GND Rail (0V)
 ```
@@ -128,9 +131,10 @@ Star GND Rail (0V)
    - **PIN lock disabled** (insert into any smartphone first and disable SIM PIN lock in security settings).
 
 ### Step 2: Set Your Mobile Phone Number
-Open `arduino/10_gsm_sms_irrigation_alert_test/10_gsm_sms_irrigation_alert_test.ino` and update line 46:
+Open `arduino/10_gsm_sms_irrigation_alert_test/10_gsm_sms_irrigation_alert_test.ino` and update lines 52–53:
 ```cpp
-char ADMIN_PHONE[20] = "+639123456789"; // Replace with your mobile phone number
+char ADMIN_PHONE[20]   = "+639158127228"; // Primary Admin
+char ADMIN_PHONE_2[20] = "+639242074903"; // Secondary Admin
 ```
 
 ### Step 3: Flash Sketch in Arduino IDE
@@ -144,14 +148,15 @@ char ADMIN_PHONE[20] = "+639123456789"; // Replace with your mobile phone number
 
 ## 5. Interactive Serial Monitor Commands
 
-The sketch includes an interactive bench testing menu. You can test and verify the entire GSM alert sequence immediately without needing to submerge probes in water:
+The sketch includes an interactive bench testing menu. You can test and verify the entire GSM alert sequence immediately:
 
 | Command Key | Action Performed | Expected Serial Output & SMS |
 | :---: | :--- | :--- |
-| **`s`** | **Instant Test SMS** | Sends an immediate verification SMS: `"[WBACFSPWI TEST] GSM Module SIM800L communication link verified..."` |
-| **`c`** | **Module Diagnostics** | Queries signal strength (`AT+CSQ`), network registration status (`AT+CREG?`), and internal voltage (`AT+CBC`). |
+| **`s`** | **Instant Test SMS** | Sends an immediate verification SMS: `"[WBACFSPWI TEST] GSM Module SIM800L link verified with JSN-SR04T ultrasonic sensor..."` |
+| **`c`** | **Module Diagnostics** | Queries signal strength (`AT+CSQ`), network registration status (`AT+CREG?`), operator (`AT+COPS?`), SMS center address (`AT+CSCA?`), and voltage (`AT+CBC`). |
+| **`r`** | **Re-initialize Modem** | Re-runs auto-baud detection, text mode setup, and network registration loop. |
 | **`p`** | **Pump Toggle** | Toggles 12V DC Pump Relay manually between ON and OFF. |
-| **`w`** | **Sensor Readings** | Prints instantaneous surface water level (%) and root soil moisture (%). |
+| **`w`** | **Sensor Readings** | Prints instantaneous Ultrasonic distance (cm), calculated water depth (cm), surface water level (%), and root soil moisture (%). |
 | **`1`** | **Simulate Trigger 1** | Simulates water dropping to 42.0% ($< 45.0\%$). Pump turns ON and dispatches **Irrigation STARTED** SMS. |
 | **`2`** | **Simulate Trigger 2** | Simulates water rising to 50.4% ($\ge 50.0\%$). Pump turns OFF and dispatches **Irrigation STOPPED** SMS. |
 | **`3`** | **Simulate Trigger 3** | Simulates water dropping to 43.5% ($< 45.0\%$) again. Pump turns ON and dispatches **Irrigation RESTARTED** SMS. |
@@ -165,8 +170,9 @@ The sketch includes an interactive bench testing menu. You can test and verify t
 1. **Power Up**: Power up the LM2596 buck converter and Arduino. Observe the SIM800L onboard LED:
    - **Blinking once per second**: Searching for cellular network.
    - **Blinking once every 3 seconds**: Successfully registered to cellular network!
-2. **Press `s`**: Check your mobile phone. You will receive the test SMS within 5–10 seconds.
-3. **Submerge HW-080 Probe in Water**:
-   - Lift probe into dry air (Water level drops $< 45\%$): The relay clicks ON, water pump activates, and you receive the **Irrigation STARTED** SMS!
-   - Dip probe past the 50% mark (middle of probe): Anti-splash delay holds for 5 seconds, then the relay clicks OFF, water pump stops, and you receive the **Irrigation STOPPED** SMS!
-   - Lift probe again: Relay clicks ON, water pump refills, and you receive the **Irrigation RESTARTED (Cycle #2)** SMS!
+2. **Press `c`**: Check signal quality (`AT+CSQ`) and registration (`AT+CREG: 0,1`). If CSQ is 12–31 and CREG is 1 or 5, your module is ready.
+3. **Press `s`**: Check your mobile phone. You will receive the test SMS within 5–10 seconds.
+4. **Ultrasonic Water Level Dynamic Test**:
+   - Empty/Low water level (Distance $> 22.6\text{ cm}$, level $< 45\%$): The relay clicks ON, water pump activates, and you receive the **Irrigation STARTED** SMS!
+   - Water rises above target (Distance $\le 22.4\text{ cm}$, level $\ge 50\%$): Anti-splash delay holds for 5 seconds, then the relay clicks OFF, water pump stops, and you receive the **Irrigation STOPPED** SMS!
+   - Water level drops again: Relay clicks ON, water pump refills, and you receive the **Irrigation RESTARTED (Cycle #2)** SMS!
