@@ -614,8 +614,8 @@ void processIrrigationLogic() {
 
     // TARGET REACHED: Surface water reached or exceeded 50.0% target
     if (currentSurfaceWater >= WATER_TARGET_MAX) {
-      Serial.println(F("  [TRIGGER] Target threshold REACHED (>= 50.0%)! Stopping irrigation."));
-      setPump(false);
+      Serial.println(F("  [TRIGGER] Target threshold REACHED (>= 50.0%)! Stopping irrigation immediately."));
+      setPump(false); // Pump stops instantly (0ms delay prevents container overflow!)
       isSettling = true;
       settlingStartTime = now;
 
@@ -624,6 +624,10 @@ void processIrrigationLogic() {
         String msg = F("[WBACFSPWI ALERT] Irrigation STOPPED. Target water level reached ");
         msg += String(currentSurfaceWater, 1);
         msg += F("% (at/above 50.0% threshold). Pump is now OFF.");
+
+        Serial.println(F("  [POWER STABILIZATION] Pausing 1.5s for inductive kickback & power rail recovery..."));
+        delay(1500);
+        Serial.println(F("  [POWER STABILIZATION] Power rail clean. Transmitting stop alert SMS..."));
         dispatchAlertSMS(msg);
         lastTriggeredEvent = EVENT_STOPPED;
       }
@@ -640,14 +644,19 @@ void processIrrigationLogic() {
       
       // TRIGGER 1: First-time Irrigation Started
       if (cycleCount == 0) {
-        Serial.println(F("  [TRIGGER] Surface water dropped below 45.0%! STARTING irrigation (Cycle #1)."));
-        setPump(true);
+        Serial.println(F("  [TRIGGER] Surface water dropped below 45.0%! STARTING irrigation immediately (Cycle #1)."));
+        setPump(true); // Pump engages instantly: water flows right away
         cycleCount = 1;
 
         if (lastTriggeredEvent != EVENT_STARTED) {
           String msg = F("[WBACFSPWI ALERT] Irrigation STARTED. Water level dropped to ");
           msg += String(currentSurfaceWater, 1);
           msg += F("% (below 45.0% threshold). Pump is now ON.");
+
+          // Solution 2: Wait 3.5s for motor startup inrush (2A-4A) to drop to normal running current (~0.5A)
+          Serial.println(F("  [POWER STABILIZATION] Pausing 3.5s for motor startup inrush current to stabilize..."));
+          delay(3500);
+          Serial.println(F("  [POWER STABILIZATION] Motor current stabilized. Transmitting alert SMS..."));
           dispatchAlertSMS(msg);
           lastTriggeredEvent = EVENT_STARTED;
         }
@@ -655,16 +664,21 @@ void processIrrigationLogic() {
       // TRIGGER 3: Water went below threshold AGAIN -> Irrigation RESTARTED
       else if (lastTriggeredEvent == EVENT_STOPPED) {
         cycleCount++;
-        Serial.print(F("  [TRIGGER] Surface water dropped below 45.0% AGAIN! RESTARTING irrigation (Cycle #"));
+        Serial.print(F("  [TRIGGER] Surface water dropped below 45.0% AGAIN! RESTARTING irrigation immediately (Cycle #"));
         Serial.print(cycleCount);
         Serial.println(F(")."));
-        setPump(true);
+        setPump(true); // Pump engages instantly
 
         String msg = F("[WBACFSPWI ALERT] Irrigation RESTARTED (Cycle #");
         msg += String(cycleCount);
         msg += F("). Water dropped to ");
         msg += String(currentSurfaceWater, 1);
         msg += F("% (< 45.0%). Pump is refilling the field.");
+
+        // Solution 2: Wait 3.5s for motor inrush stabilization before cellular RF burst
+        Serial.println(F("  [POWER STABILIZATION] Pausing 3.5s for motor startup inrush current to stabilize..."));
+        delay(3500);
+        Serial.println(F("  [POWER STABILIZATION] Motor current stabilized. Transmitting alert SMS..."));
         dispatchAlertSMS(msg);
         lastTriggeredEvent = EVENT_RESTARTED;
       }

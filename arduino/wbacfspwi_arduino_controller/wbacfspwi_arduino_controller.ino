@@ -142,8 +142,48 @@ IrrigationEventType lastTriggeredEvent = EVENT_NONE;
 // 4. GSM CELLULAR HELPER FUNCTIONS
 // ============================================================================
 
+// Flush all leftover bytes in SoftwareSerial buffer
+void flushGSMSerial() {
+  while (gsmSerial.available()) {
+    gsmSerial.read();
+  }
+}
+
+// Wait for a specific text response with timeout
+bool waitForGSMResponse(const char* expected, unsigned long timeoutMs) {
+  unsigned long start = millis();
+  String resp = "";
+  while (millis() - start < timeoutMs) {
+    while (gsmSerial.available()) {
+      char c = (char)gsmSerial.read();
+      resp += c;
+    }
+    if (resp.indexOf(expected) != -1) {
+      return true;
+    }
+    if (resp.indexOf(F("ERROR")) != -1 || resp.indexOf(F("+CMS ERROR")) != -1) {
+      return false;
+    }
+  }
+  return false;
+}
+
+// Wait specifically for the SMS body prompt '>'
+bool waitForGSMPrompt(unsigned long timeoutMs) {
+  unsigned long start = millis();
+  while (millis() - start < timeoutMs) {
+    while (gsmSerial.available()) {
+      char c = (char)gsmSerial.read();
+      if (c == '>') {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 bool sendATCommand(const String& cmd, const char* expected, unsigned long timeoutMs) {
-  while (gsmSerial.available()) gsmSerial.read();
+  flushGSMSerial();
   gsmSerial.println(cmd);
 
   String resp = "";
@@ -155,7 +195,7 @@ bool sendATCommand(const String& cmd, const char* expected, unsigned long timeou
     if (resp.indexOf(expected) != -1) {
       return true;
     }
-    if (resp.indexOf(F("ERROR")) != -1) {
+    if (resp.indexOf(F("ERROR")) != -1 || resp.indexOf(F("+CMS ERROR")) != -1) {
       return false;
     }
   }
@@ -180,7 +220,7 @@ bool initGSM() {
     delay(200);
 
     for (int i = 0; i < 3; i++) {
-      while (gsmSerial.available()) gsmSerial.read();
+      flushGSMSerial();
       gsmSerial.println(F("AT"));
 
       unsigned long start = millis();
@@ -222,10 +262,55 @@ bool initGSM() {
     sendATCommand("AT&W", "OK", 1000);
   }
 
-  sendATCommand("ATE0", "OK", 1000);        // Echo OFF
-  sendATCommand("AT+CPIN?", "READY", 3000); // Check SIM status
-  sendATCommand("AT+CMGF=1", "OK", 1000);   // Set SMS to Text Mode
-  sendATCommand("AT+CSCS=\"GSM\"", "OK", 1000); // Set GSM character set
+  sendATCommand("ATE0", "OK", 1000);              // Echo OFF
+  sendATCommand("AT+CMEE=2", "OK", 1000);         // Enable verbose error messages
+  sendATCommand("AT+CPIN?", "READY", 3000);       // Check SIM status
+  sendATCommand("AT+CMGF=1", "OK", 1000);         // Set SMS to Text Mode
+  sendATCommand("AT+CSCS=\"GSM\"", "OK", 1000);   // Set GSM character set
+  sendATCommand("AT+CSMP=17,167,0,0", "OK", 1000);// Standard SMS-SUBMIT parameters (validity 24h, text mode)
+
+  // Check signal quality
+  Serial.println(F("[INFO] Checking signal quality (AT+CSQ)..."));
+  flushGSMSerial();
+  gsmSerial.println(F("AT+CSQ"));
+  unsigned long csqStart = millis();
+  String csqResp = "";
+  while (millis() - csqStart < 1500) {
+    while (gsmSerial.available()) csqResp += (char)gsmSerial.read();
+  }
+  Serial.print(F("  Signal response: "));
+  Serial.println(csqResp);
+
+  // Check network registration (loop up to 10s if searching)
+  Serial.println(F("[INFO] Checking network registration (AT+CREG?)..."));
+  bool registered = false;
+  for (int attempt = 1; attempt <= 5; attempt++) {
+    flushGSMSerial();
+    gsmSerial.println(F("AT+CREG?"));
+    unsigned long regStart = millis();
+    String regResp = "";
+    while (millis() - regStart < 2000) {
+      while (gsmSerial.available()) regResp += (char)gsmSerial.read();
+    }
+    Serial.print(F("  CREG response: "));
+    Serial.println(regResp);
+
+    if (regResp.indexOf(F("0,1")) != -1 || regResp.indexOf(F("0,5")) != -1 ||
+        regResp.indexOf(F(",1")) != -1 || regResp.indexOf(F(",5")) != -1) {
+      registered = true;
+      Serial.println(F("  [SUCCESS] SIM registered on cellular carrier network!"));
+      break;
+    } else if (regResp.indexOf(F("0,2")) != -1) {
+      Serial.println(F("  [INFO] Modem searching for operator network... waiting 2s."));
+      delay(2000);
+    } else {
+      delay(1500);
+    }
+  }
+
+  if (!registered) {
+    Serial.println(F("  [WARNING] SIM not yet registered on network. SMS dispatch may fail until registered."));
+  }
 
   Serial.println(F("--- GSM Module Ready & Configured ---\n"));
   espSerial.listen(); // Return listening focus to NodeMCU WiFi bridge
@@ -233,7 +318,12 @@ bool initGSM() {
 }
 
 bool sendSMS(const char* phoneNumber, const String& message) {
-  if (millis() - lastSmsTime < SMS_COOLDOWN_MS) {
+  if (!phoneNumber || strlen(phoneNumber) < 7) {
+    Serial.println(F("[ERROR] Invalid recipient phone number."));
+    return false;
+  }
+
+  if (millis() - lastSmsTime < SMS_COOLDOWN_MS && lastSmsTime != 0) {
     Serial.println(F("[GSM RATE LIMIT] Skipping SMS to protect against carrier throttling."));
     return false;
   }
@@ -255,42 +345,80 @@ bool sendSMS(const char* phoneNumber, const String& message) {
     delay(80);
   }
 
-  gsmSerial.println(F("AT+CMGF=1"));
-  delay(300);
+  // Step 1: Clean buffer
+  flushGSMSerial();
 
+  // Step 2: Ensure Text Mode (AT+CMGF=1)
+  gsmSerial.println(F("AT+CMGF=1"));
+  if (!waitForGSMResponse("OK", 2000)) {
+    Serial.println(F("[ERROR] Failed to set SMS text mode (AT+CMGF=1)."));
+    espSerial.listen();
+    return false;
+  }
+
+  // Step 3: Ensure SMS-SUBMIT parameters (AT+CSMP=17,167,0,0)
+  gsmSerial.println(F("AT+CSMP=17,167,0,0"));
+  waitForGSMResponse("OK", 1000);
+
+  // Step 4: Initiate SMS sending with recipient phone number
+  flushGSMSerial();
   gsmSerial.print(F("AT+CMGS=\""));
   gsmSerial.print(phoneNumber);
   gsmSerial.println(F("\""));
-  delay(500);
 
+  // Step 5: Wait for '>' prompt from GSM modem
+  if (!waitForGSMPrompt(5000)) {
+    Serial.println(F("[ERROR] GSM modem did not return '>' prompt. Canceling..."));
+    gsmSerial.write(27); // ESC to abort
+    delay(300);
+    flushGSMSerial();
+    espSerial.listen();
+    return false;
+  }
+
+  // Step 6: Write message body and terminate with Ctrl+Z (ASCII 26)
   gsmSerial.print(message);
-  delay(300);
-
+  delay(150);
   gsmSerial.write(26); // ASCII 26 (Ctrl+Z)
 
+  // Step 7: Wait for cellular transmission confirmation (+CMGS: <id> or OK)
   String response = "";
   unsigned long start = millis();
   bool success = false;
-  while (millis() - start < 15000UL) {
+  while (millis() - start < 25000UL) { // Cellular transmit may take up to 25s
     while (gsmSerial.available()) {
-      response += (char)gsmSerial.read();
+      char c = (char)gsmSerial.read();
+      response += c;
+      Serial.write(c); // Echo live modem response to Serial Monitor
     }
-    if (response.indexOf(F("+CMGS:")) != -1 || response.indexOf(F("OK")) != -1) {
+    if (response.indexOf(F("+CMGS:")) != -1 || response.indexOf(F("\r\nOK")) != -1) {
       success = true;
       break;
     }
-    if (response.indexOf(F("ERROR")) != -1) {
+    if (response.indexOf(F("ERROR")) != -1 || response.indexOf(F("+CMS ERROR")) != -1) {
       success = false;
       break;
     }
   }
 
   if (success) {
-    Serial.println(F("[SMS STATUS] >>> SMS SENT SUCCESSFULLY! <<<"));
+    Serial.println(F("\n[SMS STATUS] >>> SMS SENT SUCCESSFULLY! <<<"));
     lastSmsTime = millis();
   } else {
-    Serial.print(F("[SMS STATUS] >>> SMS FAILED. Response: "));
+    Serial.print(F("\n[SMS STATUS] >>> SMS FAILED TO SEND. Modem Response: "));
     Serial.println(response);
+
+    if (response.indexOf(F("302")) != -1) {
+      Serial.println(F("  [DIAGNOSTIC] CMS ERROR 302: Modem not registered on cellular network. Check antenna or SIM."));
+    } else if (response.indexOf(F("304")) != -1 || response.indexOf(F("500")) != -1) {
+      Serial.println(F("  [DIAGNOSTIC] CMS ERROR 304/500: SMSC center address missing, invalid CSMP, or SIM out of load/credits."));
+    } else if (response.indexOf(F("330")) != -1) {
+      Serial.println(F("  [DIAGNOSTIC] CMS ERROR 330: SMSC address error. Check SIM carrier settings."));
+    } else if (response.indexOf(F("512")) != -1) {
+      Serial.println(F("  [DIAGNOSTIC] CMS ERROR 512: Modem busy. Wait a few seconds before retrying."));
+    } else if (response.length() == 0) {
+      Serial.println(F("  [DIAGNOSTIC] No response received: Likely GSM power brownout during RF transmission. Ensure 2A power supply + 1000µF capacitor."));
+    }
   }
 
   espSerial.listen(); // Return listening focus to NodeMCU WiFi bridge
@@ -302,7 +430,7 @@ void dispatchAlertSMS(const String& message) {
   if (!gsmReady) return;
   sendSMS(ADMIN_PHONE, message);
   if (strlen(ADMIN_PHONE_2) > 0) {
-    delay(1000); // 1-second pause for GSM modem transmission recovery
+    delay(1500); // 1.5-second pause for GSM modem transmission recovery
     lastSmsTime = 0; // Clear cooldown so secondary recipient receives alert immediately
     sendSMS(ADMIN_PHONE_2, message);
   }
@@ -313,6 +441,7 @@ void dispatchAlertSMS(const String& message) {
 // ============================================================================
 
 void setPump(bool enable) {
+  // Actuator switches immediately: LOW = Pump ON, HIGH = Pump OFF (Zero delay on cutoff prevents overflow)
   digitalWrite(PIN_RELAY_PUMP, enable ? (RELAY_ACTIVE_LOW ? LOW : HIGH) : (RELAY_ACTIVE_LOW ? HIGH : LOW));
   digitalWrite(PIN_STATUS_LED, enable ? HIGH : LOW);
 
@@ -321,7 +450,7 @@ void setPump(bool enable) {
   pumpState = enable;
   if (pumpState) {
     pumpStartTime = millis();
-    Serial.println(F("[EVENT] Pump STARTED."));
+    Serial.println(F("[EVENT] Pump STARTED immediately."));
 
     cycleCount++;
     lastTriggeredEvent = (cycleCount > 1) ? EVENT_RESTARTED : EVENT_STARTED;
@@ -337,12 +466,16 @@ void setPump(bool enable) {
     msg += F("%");
 
     if (gsmReady) {
+      // Solution 2: Allow motor startup inrush current (2A-4A) to settle into normal running current (~0.5A)
+      Serial.println(F("  [POWER STABILIZATION] Pausing 3.5s for motor startup inrush to settle before cellular transmit..."));
+      delay(3500);
+      Serial.println(F("  [POWER STABILIZATION] Motor current stabilized. Transmitting alert SMS..."));
       lastSmsTime = 0; // Bypass cooldown so event alert is dispatched immediately
       dispatchAlertSMS(msg);
     }
   } else {
     pumpStopTime = millis();
-    Serial.println(F("[EVENT] Pump STOPPED."));
+    Serial.println(F("[EVENT] Pump STOPPED immediately (Zero overflow delay)."));
 
     lastTriggeredEvent = EVENT_STOPPED;
 
@@ -357,6 +490,10 @@ void setPump(bool enable) {
     msg += F("V");
 
     if (gsmReady) {
+      // Allow inductive kickback and battery voltage to bounce back to resting voltage before cellular transmit
+      Serial.println(F("  [POWER STABILIZATION] Pausing 1.5s for inductive kickback & power rail bounce-back..."));
+      delay(1500);
+      Serial.println(F("  [POWER STABILIZATION] Power rail clean. Transmitting stop alert SMS..."));
       lastSmsTime = 0; // Bypass cooldown so event alert is dispatched immediately
       dispatchAlertSMS(msg);
     }
