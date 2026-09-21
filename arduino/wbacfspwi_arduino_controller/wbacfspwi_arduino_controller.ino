@@ -74,7 +74,7 @@ const float VBATT_RATIO      = 4.0303; // (100k + 33k) / 33k
 const float VSOLAR_RATIO     = 6.0000; // (100k + 20k) / 20k
 
 // Capacitive Root Sensor (Air vs Water raw ADC)
-const int SOIL_AIR_RAW       = 417;    // 0% moisture in dry air
+const int SOIL_AIR_RAW       = 390;    // 0% moisture in dry air
 const int SOIL_WATER_RAW     = 153;    // 100% moisture in water
 
 // JSN-SR04T Waterproof Ultrasonic Sensor Calibration (Centimeters)
@@ -487,9 +487,7 @@ void printTelemetry() {
     Serial.println(F("OFF (Standby)"));
   }
   
-  if (timeoutLockout) {
-    Serial.println(F("[ALERT] Pump Timeout Cooldown in effect!"));
-  }
+  // [DISABLED] Timeout cooldown alert removed — manual switch installed for defense presentation
   Serial.println(F("--------------------------------------------------"));
 
   // Send formatted JSON line over SoftwareSerial to NodeMCU ESP8266 WiFi Bridge
