@@ -37,8 +37,8 @@
   // ============================================================================
   // 2. CALIBRATION CONSTANTS
   // ============================================================================
-  const int SOIL_AIR_RAW       = 417;   // 0% root moisture in dry air
-  const int SOIL_WATER_RAW     = 153;   // 100% root moisture submerged in water
+  const int SOIL_AIR_RAW       = 408;   // 0% root moisture in dry air
+  const int SOIL_WATER_RAW     = 172;   // 100% root moisture submerged in water
 
   // Calibrated HW-080 constants (Calibrated to Physical Ruler & Water Height):
   const int HW080_RAW_DRY      = 1020;  // 0.0% surface standing water (dry surface)

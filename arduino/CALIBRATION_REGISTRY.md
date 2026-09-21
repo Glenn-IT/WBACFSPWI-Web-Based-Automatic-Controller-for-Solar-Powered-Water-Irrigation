@@ -6,7 +6,7 @@ This file serves as the single source of truth for physical sensor calibration v
 
 | Sensor / Measurement | Pin | Raw Dry / Minimum | Raw Wet / Maximum | Scaling Factor | Active Sketches |
 | :--- | :---: | :---: | :---: | :---: | :--- |
-| **Capacitive Soil (Root Zone)** | `A0` | `417` (Air / 0%) | `153` (Water / 100%) | Multi-sample Avg (16x) | `01_soil_root_capacitive_test`<br>`07_dual_sensor_pump_integration_test`<br>`08_dc_adapter_presentation_test`<br>`10_gsm_sms_irrigation_alert_test`<br>`wbacfspwi_arduino_controller` |
+| **Capacitive Soil (Root Zone)** | `A0` | `408` (Air / 0%) | `172` (Water / 100%) | Multi-sample Avg (16x) | `01_soil_root_capacitive_test`<br>`07_dual_sensor_pump_integration_test`<br>`08_dc_adapter_presentation_test`<br>`10_gsm_sms_irrigation_alert_test`<br>`wbacfspwi_arduino_controller` |
 | **JSN-SR04T Ultrasonic (Surface Level)** | `A1` (TRIG)<br>`A4` (ECHO) | `24.4cm` (Floor / 0%) | `20.4cm` (Full / 100%) | Clearance: `20.4cm`<br>Depth: `4.0cm`<br>50% Target: `22.4cm`<br>45% Refill: `22.6cm` | `11_jsn_sr04t_ultrasonic_water_level_test`<br>`wbacfspwi_arduino_controller` |
 | **HW-080 (Surface Ponding Level)** | `A1` | `1020` (Air / 0%)<br>`663` (Mid / 50%) | `568` (Full / 100%) | 3-Point Physical Ruler Calibration | `02_surface_water_level_test`<br>`07_dual_sensor_pump_integration_test`<br>`08_dc_adapter_presentation_test`<br>`10_gsm_sms_irrigation_alert_test`<br>`wbacfspwi_arduino_controller` |
 | **Battery Voltage Divider** | `A2` | `0.0V` | `12.6V` (Max 3S) / `14.4V` (Motorcycle) | `4.0303` (100kΩ/33kΩ) | `04_battery_voltage_test`<br>`06_solar_charger_battery_test`<br>`wbacfspwi_arduino_controller` |
@@ -43,7 +43,8 @@ This file serves as the single source of truth for physical sensor calibration v
 
 | Date | Sensor | Dry Raw ADC | Wet / Full Raw ADC | Notes |
 | :--- | :--- | :---: | :---: | :--- |
-| Initial | Capacitive Soil (A0) | `417` | `153` | Air (0%) vs Full water submersion (100%) |
+| Initial | Capacitive Soil (A0) | `417` | `153` | Original baseline values (Air 0% vs Full submersion 100%) |
+| 2026-09-21 | Capacitive Soil (A0) | `408` | `172` | Re-calibrated from physical bench test. New dry air reading = 408, full submersion reading = 172. All sketches synced. |
 | 2026-09-13 | HW-080 Surface (A1) | `1020` (Air)<br>`663` (Middle 50%) | `568` (Full 100%) | 3-Point physical ruler calibration: 1020=0% (dry air), 663=50.0% (exact middle/7-8cm), 568=100.0% (top header / max flood). |
 | 2026-09-19 | JSN-SR04T Ultrasonic (A1/A4) | `24.4cm` (Soil Bed 0%) | `20.4cm` (Full 100%) | Calibrated: Soil Bed=24.4cm (0%), 50% target=22.4cm (depth 2.0cm), 45% refill=22.6cm (depth 1.8cm), usable depth=4.0cm, clearance=20.4cm. Zero jitter, 100% stable reflection. |
 | 2026-09-09 | 12V Battery Divider (A2) | `0.0V` | `14.4V` | Verified compatible with 12V Motorcycle Lead-Acid (up to 14.4V bulk solar charge = 3.57V on ADC). |

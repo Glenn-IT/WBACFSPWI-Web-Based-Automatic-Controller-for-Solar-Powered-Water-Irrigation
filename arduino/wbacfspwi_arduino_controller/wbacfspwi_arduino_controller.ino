@@ -74,8 +74,8 @@ const float VBATT_RATIO      = 4.0303; // (100k + 33k) / 33k
 const float VSOLAR_RATIO     = 6.0000; // (100k + 20k) / 20k
 
 // Capacitive Root Sensor (Air vs Water raw ADC)
-const int SOIL_AIR_RAW       = 390;    // 0% moisture in dry air
-const int SOIL_WATER_RAW     = 153;    // 100% moisture in water
+const int SOIL_AIR_RAW       = 408;    // 0% moisture in dry air
+const int SOIL_WATER_RAW     = 172;    // 100% moisture in water
 
 // JSN-SR04T Waterproof Ultrasonic Sensor Calibration (Centimeters)
 // Live Bench Calibrated: Soil Bed=24.4cm (0%), 50% Target=22.4cm, 45% Refill=22.6cm

@@ -45,8 +45,8 @@ const bool RELAY_ACTIVE_LOW  = true; // Most Arduino relay modules are Active LO
 // 2. CALIBRATION CONSTANTS
 // ============================================================================
 // Capacitive Soil Moisture Sensor v1.2
-const int SOIL_AIR_RAW       = 417;  // Sensor in dry air (0% moisture)
-const int SOIL_WATER_RAW     = 153;  // Sensor submerged in water (100% moisture)
+const int SOIL_AIR_RAW       = 408;  // Sensor in dry air (0% moisture)
+const int SOIL_WATER_RAW     = 172;  // Sensor submerged in water (100% moisture)
 
 // HW-080 Surface Water Level Sensor (3-Point Ruler Calibration)
 const int HW080_RAW_DRY      = 1020; // 0.0% surface water (dry probe)
