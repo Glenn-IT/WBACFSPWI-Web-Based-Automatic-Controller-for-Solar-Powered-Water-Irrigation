@@ -33,7 +33,7 @@ const int PIN_LED  = 13; // Built-in activity indicator
 // Calibrated from Live Bench Measurements:
 // - Dry Soil Bed Distance = 24.4 cm (Depth: 0.0 cm, Level: 0.0%)
 // - 50.0% Target Water Level Distance  = 22.4 cm (Depth: 2.0 cm, Level: 50.0%) -> Pump OFF
-// - 45.0% Refill Water Level Distance  = 22.6 cm (Depth: 1.8 cm, Level: 45.0%) -> Pump ON
+// - 40.0% Refill Water Level Distance  = 22.8 cm (Depth: 1.6 cm, Level: 40.0%) -> Pump ON
 // - Total Usable Container Depth (100% scale) = 4.0 cm (2.0 cm * 2)
 // - Sensor Clearance (Transducer to 100% mark) = 20.4 cm (24.4 cm - 4.0 cm)
 float sensorClearanceCM = 20.4; // Air gap from transducer face to 100% full mark (24.4 - 4.0)
@@ -45,7 +45,7 @@ const float MIN_BLIND_ZONE_CM     = 20.0;   // Physical hardware limitation of J
 
 // Autonomous Irrigation Decision Thresholds (Harmonized with SYSTEM_MEMORY.md)
 const float WATER_TARGET_MAX = 50.0; // % Pump shutoff target
-const float WATER_REFILL_MIN = 45.0; // % Pump activation trigger
+const float WATER_REFILL_MIN = 40.0; // % Pump activation trigger
 
 // Timing
 unsigned long lastMeasureTime = 0;
@@ -135,11 +135,11 @@ void loop() {
     if (rawDistance < MIN_BLIND_ZONE_CM) {
       Serial.println(F("⚠️ [BLIND ZONE ALERT: Object < 20cm! Mount sensor higher]"));
     } else if (waterPct < WATER_REFILL_MIN) {
-      Serial.println(F("💧 [REFILL TRIGGER: Pump would turn ON (<45.0%)]"));
+      Serial.println(F("💧 [REFILL TRIGGER: Pump would turn ON (<40.0%)]"));
     } else if (waterPct >= WATER_TARGET_MAX) {
       Serial.println(F("🛑 [TARGET REACHED: Pump would turn OFF (>=50.0%)]"));
     } else {
-      Serial.println(F("⚖️  [BUFFER ZONE: 45.0%-50.0% (Holding previous state)]"));
+      Serial.println(F("⚖️  [BUFFER ZONE: 40.0%-50.0% (Holding previous state)]"));
     }
   }
 }

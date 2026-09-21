@@ -53,9 +53,9 @@ const int HW080_RAW_DRY      = 1020; // 0.0% surface water (dry probe)
 const int HW080_RAW_MID      = 663;  // 50.0% water depth (mid-probe mark)
 const int HW080_RAW_WET      = 568;  // 100.0% water depth (fully immersed)
 
-// Irrigation Decision Thresholds (Synchronized 50%/45% Hysteresis)
+// Irrigation Decision Thresholds (Synchronized 50%/40% Hysteresis)
 const float WATER_TARGET_MAX        = 50.0;  // Automatic Mode: Stop pump at >= 50.0% water level
-const float WATER_REFILL_MIN        = 45.0;  // Automatic Mode: Start pump below < 45.0% (5% Hysteresis Gap)
+const float WATER_REFILL_MIN        = 40.0;  // Automatic Mode: Start pump below < 40.0% (10% Hysteresis Gap)
 const unsigned long DEMO_PULSE_MS   = 5000UL;  // '1' command demo pulse: 5 seconds
 const unsigned long MAX_DEMO_RUN_MS = 20000UL; // Safety maximum run cap: 20 seconds
 
@@ -349,7 +349,7 @@ void loop() {
       }
     } else if (surfaceWater < WATER_REFILL_MIN) {
       if (!pumpState) {
-        setPumpState(true, "Surface Water Below Min (<45%) -> Refilling");
+        setPumpState(true, "Surface Water Below Min (<40%) -> Refilling");
       }
     }
   }

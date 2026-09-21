@@ -78,7 +78,7 @@ const int SOIL_AIR_RAW       = 408;    // 0% moisture in dry air
 const int SOIL_WATER_RAW     = 172;    // 100% moisture in water
 
 // JSN-SR04T Waterproof Ultrasonic Sensor Calibration (Centimeters)
-// Live Bench Calibrated: Soil Bed=24.4cm (0%), 50% Target=22.4cm, 45% Refill=22.6cm
+// Live Bench Calibrated: Soil Bed=24.4cm (0%), 50% Target=22.4cm, 40% Refill=22.8cm
 float sensorClearanceCM       = 20.4;   // Air gap from transducer face to 100% full mark (24.4 - 4.0)
 float containerDepthCM        = 4.0;    // Calibrated usable water depth (2.0cm at 50% * 2)
 const float SPEED_OF_SOUND_CM_US = 0.0343; // cm per microsecond at ~25°C
@@ -89,9 +89,9 @@ const int HW080_RAW_DRY      = 1020;   // Stage 0: Probe in dry air (0.0% surfac
 const int HW080_RAW_MID      = 663;    // Stage 1: Water at middle of sensor 7-8cm mark (50.0% depth)
 const int HW080_RAW_WET      = 568;    // Stage 2: Probe at container maximum depth (100% full ponding)
 
-// Irrigation Decision Thresholds (Surface Water Level Control with 5% Hysteresis)
+// Irrigation Decision Thresholds (Surface Water Level Control with 10% Hysteresis)
 const float WATER_TARGET_MAX   = 50.0; // Automatically stop pump when surface water level reaches >= 50.0%
-const float WATER_REFILL_MIN   = 45.0; // Automatically start pump only when surface water level drops < 45.0%
+const float WATER_REFILL_MIN   = 40.0; // Automatically start pump only when surface water level drops < 40.0% (10% Hysteresis Gap)
 
 // Safety & Battery Protection Thresholds
 const float BATT_MIN_LOCKOUT  = 10.00; // Low battery lockout cutoff (10.0V deep discharge protection)
@@ -456,7 +456,7 @@ void setPump(bool enable) {
     msg += F("\nMotor starting now.");
     msg += F("\nWater level: ");
     msg += String(currentSurfaceWater, 1);
-    msg += F("% (< 45%).\nSoil moisture: ");
+    msg += F("% (< 40%).\nSoil moisture: ");
     msg += String(currentRootMoisture, 1);
     msg += F("%");
 
@@ -684,7 +684,7 @@ void setup() {
   Serial.println(F(" Dual Telemetry: NodeMCU WiFi Bridge & SIM900A GSM"));
   Serial.println(F("3-Layer Automatic Surface Water Level Control:"));
   Serial.println(F("  - TARGET MAX (PUMP OFF) : >= 50.0% Surface Water"));
-  Serial.println(F("  - REFILL MIN (PUMP ON)  : < 45.0% Surface Water (5% Hysteresis Gap)"));
+  Serial.println(F("  - REFILL MIN (PUMP ON)  : < 40.0% Surface Water (10% Hysteresis Gap)"));
   Serial.println(F("  - MINIMUM RUNTIME       : 5 Seconds Anti-Splash Protection"));
   Serial.println(F("  - SETTLING WINDOW       : 10 Seconds Wave Stabilization"));
   Serial.println(F("=================================================="));
@@ -777,10 +777,10 @@ void loop() {
       if (now - settlingStartTime >= SETTLING_DELAY_MS) {
         isSettling = false;
         if (currentSurfaceWater < WATER_REFILL_MIN) {
-          Serial.println(F(">>> [REFILL] 10s Settling complete! Level settled < 45.0% -> Resuming pump"));
+          Serial.println(F(">>> [REFILL] 10s Settling complete! Level settled < 40.0% -> Resuming pump"));
           setPump(true);
         } else {
-          Serial.println(F(">>> [STABLE] 10s Settling complete! Level settled >= 45.0% -> Pump stays OFF"));
+          Serial.println(F(">>> [STABLE] 10s Settling complete! Level settled >= 40.0% -> Pump stays OFF"));
         }
       }
     } else if (pumpState) {
@@ -795,7 +795,7 @@ void loop() {
         }
       }
     } else {
-      // Pump is idle and not settling: start pump if below threshold (< 45.0%)
+      // Pump is idle and not settling: start pump if below threshold (< 40.0%)
       if (currentSurfaceWater < WATER_REFILL_MIN) {
         setPump(true);
       }

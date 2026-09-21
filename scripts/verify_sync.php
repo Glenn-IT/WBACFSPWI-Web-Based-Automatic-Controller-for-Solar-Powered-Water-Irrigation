@@ -42,16 +42,16 @@ $f08 = file_get_contents("$rootDir/arduino/08_dc_adapter_presentation_test/08_dc
 $fMain = file_get_contents("$rootDir/arduino/wbacfspwi_arduino_controller/wbacfspwi_arduino_controller.ino");
 $fCal = file_get_contents("$rootDir/arduino/CALIBRATION_REGISTRY.md");
 
-check("Test 01 defines SOIL_AIR_RAW = 417 & SOIL_WATER_RAW = 153", 
-    strpos($f01, '417') !== false && strpos($f01, '153') !== false);
-check("Test 07 defines SOIL_AIR_RAW = 417 & SOIL_WATER_RAW = 153", 
-    strpos($f07, '417') !== false && strpos($f07, '153') !== false);
-check("Test 08 defines SOIL_AIR_RAW = 417 & SOIL_WATER_RAW = 153", 
-    strpos($f08, '417') !== false && strpos($f08, '153') !== false);
-check("Main Controller defines SOIL_AIR_RAW = 417 & SOIL_WATER_RAW = 153", 
-    strpos($fMain, '417') !== false && strpos($fMain, '153') !== false);
-check("Calibration Registry records Capacitive Root (417/153)", 
-    strpos($fCal, '417') !== false && strpos($fCal, '153') !== false);
+check("Test 01 defines SOIL_AIR_RAW = 408 & SOIL_WATER_RAW = 172", 
+    strpos($f01, '408') !== false && strpos($f01, '172') !== false);
+check("Test 07 defines SOIL_AIR_RAW = 408 & SOIL_WATER_RAW = 172", 
+    strpos($f07, '408') !== false && strpos($f07, '172') !== false);
+check("Test 08 defines SOIL_AIR_RAW = 408 & SOIL_WATER_RAW = 172", 
+    strpos($f08, '408') !== false && strpos($f08, '172') !== false);
+check("Main Controller defines SOIL_AIR_RAW = 408 & SOIL_WATER_RAW = 172", 
+    strpos($fMain, '408') !== false && strpos($fMain, '172') !== false);
+check("Calibration Registry records Capacitive Root (408/172)", 
+    strpos($fCal, '408') !== false && strpos($fCal, '172') !== false);
 
 echo "\n2. Testing HW-080 Surface Water Level (A1) 3-Point Calibration:\n";
 $f02 = file_get_contents("$rootDir/arduino/02_surface_water_level_test/02_surface_water_level_test.ino");
@@ -97,14 +97,14 @@ check("Solar Divider Ratio (6.000) across Test 05, 06, Main Controller",
     strpos($f05, '6.00') !== false && strpos($f06, '6.00') !== false && strpos($fMain, '6.00') !== false);
 
 echo "\n4. Testing 3-Layer Irrigation Control Thresholds:\n";
-check("Test 07 maintains Target Max = 50.0% & Refill Min = 45.0%", 
-    preg_match('/WATER_TARGET_MAX\s*=\s*50\.0/', $f07) && preg_match('/WATER_REFILL_MIN\s*=\s*45\.0/', $f07));
-check("Main Controller maintains Target Max = 50.0% & Refill Min = 45.0%", 
-    preg_match('/WATER_TARGET_MAX\s*=\s*50\.0/', $fMain) && preg_match('/WATER_REFILL_MIN\s*=\s*45\.0/', $fMain));
-check("Test 08 maintains Target Max = 50.0% & Refill Min = 45.0%", 
-    preg_match('/WATER_TARGET_MAX\s*=\s*50\.0/', $f08) && preg_match('/WATER_REFILL_MIN\s*=\s*45\.0/', $f08));
-check("Calibration Registry records Target 50.0% & Refill 45.0%", 
-    strpos($fCal, '50.0%') !== false && strpos($fCal, '45.0%') !== false);
+check("Test 07 maintains Target Max = 50.0% & Refill Min = 40.0%", 
+    preg_match('/WATER_TARGET_MAX\s*=\s*50\.0/', $f07) && preg_match('/WATER_REFILL_MIN\s*=\s*40\.0/', $f07));
+check("Main Controller maintains Target Max = 50.0% & Refill Min = 40.0%", 
+    preg_match('/WATER_TARGET_MAX\s*=\s*50\.0/', $fMain) && preg_match('/WATER_REFILL_MIN\s*=\s*40\.0/', $fMain));
+check("Test 08 maintains Target Max = 50.0% & Refill Min = 40.0%", 
+    preg_match('/WATER_TARGET_MAX\s*=\s*50\.0/', $f08) && preg_match('/WATER_REFILL_MIN\s*=\s*40\.0/', $f08));
+check("Calibration Registry records Target 50.0% & Refill 40.0%", 
+    strpos($fCal, '50.0%') !== false && strpos($fCal, '40.0%') !== false);
 check("Main Controller anti-splash min runtime = 5000ms & settling delay = 10000ms", 
     strpos($fMain, 'MIN_PUMP_RUN_MS  = 5000UL') !== false && strpos($fMain, 'SETTLING_DELAY_MS= 10000UL') !== false);
 check("Test 07 anti-splash min runtime = 5000ms & settling delay = 10000ms", 
@@ -356,8 +356,8 @@ if (file_exists($t10Path)) {
     check("Test 10 defines GSM SoftwareSerial on Pins 2(RX) & 3(TX)",
         strpos($f10, 'PIN_GSM_RX') !== false && strpos($f10, '2') !== false &&
         strpos($f10, 'PIN_GSM_TX') !== false && strpos($f10, '3') !== false);
-    check("Test 10 enforces calibrated 50.0% target & 45.0% refill thresholds",
-        strpos($f10, '50.0') !== false && strpos($f10, '45.0') !== false);
+    check("Test 10 enforces calibrated 50.0% target & 40.0% refill thresholds",
+        strpos($f10, '50.0') !== false && strpos($f10, '40.0') !== false);
     check("Test 10 contains automated SMS triggers for Started, Stopped, and Restarted",
         strpos($f10, 'Irrigation STARTED') !== false &&
         strpos($f10, 'Irrigation STOPPED') !== false &&

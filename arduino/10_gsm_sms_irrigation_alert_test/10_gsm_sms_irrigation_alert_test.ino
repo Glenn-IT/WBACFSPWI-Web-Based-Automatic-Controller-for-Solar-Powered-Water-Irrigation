@@ -62,16 +62,16 @@ const int SOIL_AIR_RAW       = 408;    // 0% moisture in dry air (bench calibrat
 const int SOIL_WATER_RAW     = 172;    // 100% moisture in water (bench calibrated)
 
 // JSN-SR04T Waterproof Ultrasonic Sensor Geometry (Centimeters)
-// Live Bench Calibrated: Soil Bed=24.4cm (0%), 50% Target=22.4cm, 45% Refill=22.6cm
+// Live Bench Calibrated: Soil Bed=24.4cm (0%), 50% Target=22.4cm, 40% Refill=22.8cm
 float sensorClearanceCM          = 20.4;   // Air gap from transducer face to 100% full mark (24.4 - 4.0)
 float containerDepthCM           = 4.0;    // Calibrated usable water depth (2.0cm at 50% * 2)
 const float SPEED_OF_SOUND_CM_US = 0.0343; // cm per microsecond at ~25°C
 const float MIN_BLIND_ZONE_CM    = 20.0;   // Physical dead band limit of JSN-SR04T
 float currentDistanceCM          = 0.0;    // Last measured acoustic distance
 
-// Irrigation Decision Thresholds (Surface Water Level Control with 5% Hysteresis)
+// Irrigation Decision Thresholds (Surface Water Level Control with 10% Hysteresis)
 const float WATER_TARGET_MAX   = 50.0; // Automatically stop pump when surface water reaches >= 50.0%
-const float WATER_REFILL_MIN   = 45.0; // Automatically start pump only when surface water drops < 45.0%
+const float WATER_REFILL_MIN   = 40.0; // Automatically start pump only when surface water drops < 40.0%
 
 // Timing Protections (in milliseconds)
 const unsigned long MIN_PUMP_RUN_MS   = 5000UL;   // 5s minimum runtime (prevents momentary splash cutoffs)
@@ -636,10 +636,10 @@ void processIrrigationLogic() {
   }
 
   // --------------------------------------------------------------------------
-  // DECISION B: PUMP IS CURRENTLY OFF -> CHECK FOR START / REFILL THRESHOLD (< 45%)
+  // DECISION B: PUMP IS CURRENTLY OFF -> CHECK FOR START / REFILL THRESHOLD (< 40%)
   // --------------------------------------------------------------------------
   if (!pumpState) {
-    // Water level dropped below 45.0% refill minimum
+    // Water level dropped below 40.0% refill minimum
     if (currentSurfaceWater < WATER_REFILL_MIN) {
       
       // TRIGGER 1: First-time Irrigation Started
@@ -649,14 +649,14 @@ void processIrrigationLogic() {
         if (lastTriggeredEvent != EVENT_STARTED) {
           String msg = F("[WBACFSPWI ALERT] Irrigation STARTED. Water level dropped to ");
           msg += String(currentSurfaceWater, 1);
-          msg += F("% (below 45.0% threshold). Pump is now ON.");
+          msg += F("% (below 40.0% threshold). Pump is now ON.");
 
           Serial.println(F("  [POWER & SAFETY] Sending 'STARTED' SMS first while pump is OFF (100% clean power, zero overflow risk)..."));
           dispatchAlertSMS(msg);
           lastTriggeredEvent = EVENT_STARTED;
         }
 
-        Serial.println(F("  [TRIGGER] Surface water dropped below 45.0%! Engaging pump relay (Cycle #1)."));
+        Serial.println(F("  [TRIGGER] Surface water dropped below 40.0%! Engaging pump relay (Cycle #1)."));
         setPump(true); // Now engage pump relay
       }
       // TRIGGER 3: Water went below threshold AGAIN -> Irrigation RESTARTED
@@ -667,13 +667,13 @@ void processIrrigationLogic() {
         msg += String(cycleCount);
         msg += F("). Water dropped to ");
         msg += String(currentSurfaceWater, 1);
-        msg += F("% (< 45.0%). Pump is refilling the field.");
+        msg += F("% (< 40.0%). Pump is refilling the field.");
 
         Serial.println(F("  [POWER & SAFETY] Sending 'RESTARTED' SMS first while pump is OFF (100% clean power, zero overflow risk)..."));
         dispatchAlertSMS(msg);
         lastTriggeredEvent = EVENT_RESTARTED;
 
-        Serial.print(F("  [TRIGGER] Surface water dropped below 45.0% AGAIN! Engaging pump relay (Cycle #"));
+        Serial.print(F("  [TRIGGER] Surface water dropped below 40.0% AGAIN! Engaging pump relay (Cycle #"));
         Serial.print(cycleCount);
         Serial.println(F(")."));
         setPump(true); // Now engage pump relay
@@ -799,10 +799,10 @@ void handleSerialCommands() {
     }
 
     case '1': {
-      Serial.println(F("\n[SIMULATION] Simulating Trigger 1: Water dropped to 42.0% (< 45.0%) -> Irrigation Started"));
+      Serial.println(F("\n[SIMULATION] Simulating Trigger 1: Water dropped to 38.0% (< 40.0%) -> Irrigation Started"));
       cycleCount = 1;
       setPump(true);
-      String msg = F("[WBACFSPWI ALERT] Irrigation STARTED. Water level dropped to 42.0% (below 45.0% threshold). Pump is now ON.");
+      String msg = F("[WBACFSPWI ALERT] Irrigation STARTED. Water level dropped to 38.0% (below 40.0% threshold). Pump is now ON.");
       dispatchAlertSMS(msg);
       lastTriggeredEvent = EVENT_STARTED;
       break;
@@ -820,10 +820,10 @@ void handleSerialCommands() {
     }
 
     case '3': {
-      Serial.println(F("\n[SIMULATION] Simulating Trigger 3: Water dropped to 43.5% (< 45.0%) AGAIN -> Irrigation Restarted"));
+      Serial.println(F("\n[SIMULATION] Simulating Trigger 3: Water dropped to 38.5% (< 40.0%) AGAIN -> Irrigation Restarted"));
       cycleCount++;
       setPump(true);
-      String msg = F("[WBACFSPWI ALERT] Irrigation RESTARTED (Cycle #2). Water dropped to 43.5% (< 45.0%). Pump is refilling the field.");
+      String msg = F("[WBACFSPWI ALERT] Irrigation RESTARTED (Cycle #2). Water dropped to 38.5% (< 40.0%). Pump is refilling the field.");
       dispatchAlertSMS(msg);
       lastTriggeredEvent = EVENT_RESTARTED;
       break;

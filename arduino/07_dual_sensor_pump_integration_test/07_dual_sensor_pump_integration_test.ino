@@ -49,7 +49,7 @@
   // 3. IRRIGATION CONTROL THRESHOLDS (3-LAYER SAFETY: HYSTERESIS + MIN RUN + SETTLING)
   // ============================================================================
   const float WATER_TARGET_MAX   = 50.0; // Turn pump OFF when water level reaches >= 50.0%
-  const float WATER_REFILL_MIN   = 45.0; // Turn pump ON whenever water level drops < 45.0% (5% Hysteresis Gap)
+  const float WATER_REFILL_MIN   = 40.0; // Turn pump ON whenever water level drops < 40.0% (10% Hysteresis Gap)
 
   const unsigned long MIN_PUMP_RUN_MS     = 5000UL;   // 5 seconds minimum runtime (prevents momentary splash cutoffs)
   const unsigned long MAX_PUMP_RUNTIME_MS = 180000UL; // 180 seconds continuous run protection
@@ -140,7 +140,7 @@
     Serial.println(F("=================================================================="));
     Serial.println(F("3-Layer Automatic Surface Water Level Maintenance:"));
     Serial.println(F("  - TARGET MAX (PUMP OFF) : >= 50.0% Surface Water"));
-    Serial.println(F("  - REFILL MIN (PUMP ON)  : < 45.0% Surface Water (5% Hysteresis Gap)"));
+    Serial.println(F("  - REFILL MIN (PUMP ON)  : < 40.0% Surface Water (10% Hysteresis Gap)"));
     Serial.println(F("  - MINIMUM RUNTIME       : 5 Seconds (Anti-Splash Protection)"));
     Serial.println(F("  - SETTLING WINDOW       : 10 Seconds Wave Stabilization"));
     Serial.println(F("  - Calibrated            : HW080 Dry=1020, Mid=663, Full=568"));
