@@ -7,21 +7,25 @@
  * 
  * Purpose:
  *   - High-reliability, non-contact surface water depth (ponding level) measurement.
- *   - Replaces the legacy resistive HW-080 sensor to eliminate electrolytic corrosion,
- *     mineral scaling, and false 100% flood triggers caused by water splashing.
- *   - Provides interactive Serial Monitor calibration to configure container geometry:
- *       1. Sensor Clearance (Transducer face down to 100% full water mark)
- *       2. Total Usable Container Depth (Floor to 100% mark)
+ *   - Calibrated for New Container Geometry:
+ *       • Dry Soil / Base Floor (0% Empty)   = 28.0 cm (Depth: 0.0 cm)
+ *       • 40.0% Refill Trigger (Pump ON)     = 24.8 cm (Depth: 3.2 cm)
+ *       • 50.0% Target Level (Pump OFF)      = 24.0 cm (Depth: 4.0 cm)
+ *       • 100.0% Maximum Capacity (Full Tank) = 20.0 cm (Depth: 8.0 cm)
+ *       • Usable Container Depth             = 8.0 cm
+ *       • Sensor Clearance (Air Gap to 100%) = 20.0 cm
  * 
  * Pinout:
- *   - JSN-SR04T 5V   -> LM2596 Star 5.0V Power Rail
- *   - JSN-SR04T GND  -> Star Common Ground Rail
+ *   - JSN-SR04T 5V   -> LM2596 Star 5.0V Power Rail (or 5V pin)
+ *   - JSN-SR04T GND  -> Star Common Ground Rail (or GND pin)
  *   - JSN-SR04T TRIG -> Arduino Pin A1 (Configured as Digital OUTPUT)
  *   - JSN-SR04T ECHO -> Arduino Pin A4 (Configured as Digital INPUT)
+ *   - Built-in LED   -> Pin 13 (Activity indicator)
  * 
  * Note on Blind Zone:
- *   The JSN-SR04T physical blind zone is 20 cm - 25 cm. The transducer must be mounted
- *   at least 25 cm above the maximum allowable flood level (100% mark).
+ *   The JSN-SR04T physical blind zone is 20 cm - 25 cm. At 100% full capacity (20.0 cm),
+ *   the water reaches the minimum range boundary. In standard autonomous operation,
+ *   the pump shuts off at 50% (24.0 cm), remaining safely within the valid detection zone.
  */
 
 // Pin Assignments
@@ -31,21 +35,22 @@ const int PIN_LED  = 13; // Built-in activity indicator
 
 // Physical Container Geometry Calibration Constants (in Centimeters)
 // Calibrated from Live Bench Measurements:
-// - Dry Soil Bed Distance = 24.4 cm (Depth: 0.0 cm, Level: 0.0%)
-// - 50.0% Target Water Level Distance  = 22.4 cm (Depth: 2.0 cm, Level: 50.0%) -> Pump OFF
-// - 40.0% Refill Water Level Distance  = 22.8 cm (Depth: 1.6 cm, Level: 40.0%) -> Pump ON
-// - Total Usable Container Depth (100% scale) = 4.0 cm (2.0 cm * 2)
-// - Sensor Clearance (Transducer to 100% mark) = 20.4 cm (24.4 cm - 4.0 cm)
-float sensorClearanceCM = 20.4; // Air gap from transducer face to 100% full mark (24.4 - 4.0)
-float containerDepthCM  = 4.0;  // Calibrated usable water depth (2.0cm at 50% * 2)
+// - Dry Soil Bed Distance                      = 28.0 cm (Depth: 0.0 cm, Level: 0.0%)
+// - 50.0% Target Water Level Distance          = 24.0 cm (Depth: 4.0 cm, Level: 50.0%) -> Pump OFF
+// - 40.0% Refill Water Level Distance          = 24.8 cm (Depth: 3.2 cm, Level: 40.0%) -> Pump ON
+// - 100.0% Full Water Level Distance           = 20.0 cm (Depth: 8.0 cm, Level: 100.0%)
+// - Total Usable Container Depth (100% scale)  = 8.0 cm (28.0 cm - 20.0 cm)
+// - Sensor Clearance (Transducer to 100% mark) = 20.0 cm
+float sensorClearanceCM = 20.0; // Air gap from transducer face to 100% full mark
+float containerDepthCM  = 8.0;  // Calibrated usable water depth (28.0cm - 20.0cm)
 
 // Physical Constants
 const float SPEED_OF_SOUND_CM_US = 0.0343; // cm per microsecond at ~25°C
 const float MIN_BLIND_ZONE_CM     = 20.0;   // Physical hardware limitation of JSN-SR04T
 
 // Autonomous Irrigation Decision Thresholds (Harmonized with SYSTEM_MEMORY.md)
-const float WATER_TARGET_MAX = 50.0; // % Pump shutoff target
-const float WATER_REFILL_MIN = 40.0; // % Pump activation trigger
+const float WATER_TARGET_MAX = 50.0; // % Pump shutoff target (24.0 cm)
+const float WATER_REFILL_MIN = 40.0; // % Pump activation trigger (24.8 cm)
 
 // Timing
 unsigned long lastMeasureTime = 0;
@@ -82,6 +87,8 @@ void setup() {
   Serial.print(F("Current Clearance (100% Mark): ")); Serial.print(sensorClearanceCM, 1); Serial.println(F(" cm"));
   Serial.print(F("Current Usable Depth:          ")); Serial.print(containerDepthCM, 1);  Serial.println(F(" cm"));
   Serial.print(F("Floor Distance (0% Empty):     ")); Serial.print(sensorClearanceCM + containerDepthCM, 1); Serial.println(F(" cm"));
+  Serial.print(F("50.0% Target Distance (OFF):   ")); Serial.print(sensorClearanceCM + (containerDepthCM * 0.5), 1); Serial.println(F(" cm"));
+  Serial.print(F("40.0% Refill Distance (ON):    ")); Serial.print((sensorClearanceCM + containerDepthCM) - (containerDepthCM * 0.4), 1); Serial.println(F(" cm"));
   Serial.println(F("------------------------------------------------------------"));
   Serial.println(F("Type 'h' or '?' anytime in the Serial Monitor for command menu."));
   Serial.println(F("============================================================\n"));
@@ -146,23 +153,20 @@ void loop() {
 
 // Single acoustic pulse-echo time-of-flight measurement
 float singlePingCM() {
-  // Ensure trigger pin is low for clean high pulse
   digitalWrite(PIN_TRIG, LOW);
   delayMicroseconds(4);
 
-  // Send 10 microsecond trigger pulse
   digitalWrite(PIN_TRIG, HIGH);
   delayMicroseconds(10);
   digitalWrite(PIN_TRIG, LOW);
 
-  // Measure round-trip echo pulse duration with 35ms timeout (~6m max)
+  // 35ms timeout (~6m max)
   unsigned long duration = pulseIn(PIN_ECHO, HIGH, 35000UL);
 
   if (duration == 0) {
-    return -1.0; // Echo timed out or obstructed
+    return -1.0;
   }
 
-  // Distance = (Time * Speed of Sound) / 2
   return (float)duration * SPEED_OF_SOUND_CM_US / 2.0;
 }
 
@@ -178,7 +182,7 @@ float readFilteredDistanceCM(int samples) {
     if (d > 0.0) {
       readings[validCount++] = d;
     }
-    delay(25); // Brief acoustic dissipation pause between pings
+    delay(25);
   }
 
   if (validCount == 0) return -1.0;
@@ -194,7 +198,6 @@ float readFilteredDistanceCM(int samples) {
     }
   }
 
-  // Return median reading
   return readings[validCount / 2];
 }
 
@@ -265,7 +268,6 @@ void handleSerialCommands() {
   if (!Serial.available()) return;
 
   char cmd = Serial.read();
-  // Flush any trailing newline/carriage return characters
   while (Serial.available()) {
     char c = Serial.peek();
     if (c == '\r' || c == '\n') Serial.read();
@@ -325,7 +327,6 @@ void handleSerialCommands() {
       break;
 
     default:
-      // Ignore unhandled characters
       break;
   }
 }
@@ -345,5 +346,7 @@ void printHelpMenu() {
   Serial.print(F("  • Clearance (100% line): ")); Serial.print(sensorClearanceCM, 2); Serial.println(F(" cm"));
   Serial.print(F("  • Usable Depth:          ")); Serial.print(containerDepthCM, 2);  Serial.println(F(" cm"));
   Serial.print(F("  • Empty Floor Distance:  ")); Serial.print(sensorClearanceCM + containerDepthCM, 2); Serial.println(F(" cm"));
+  Serial.print(F("  • 50.0% Target (OFF):    ")); Serial.print(sensorClearanceCM + (containerDepthCM * 0.5), 2); Serial.println(F(" cm"));
+  Serial.print(F("  • 40.0% Refill (ON):     ")); Serial.print((sensorClearanceCM + containerDepthCM) - (containerDepthCM * 0.4), 2); Serial.println(F(" cm"));
   Serial.println(F("============================================================\n"));
 }

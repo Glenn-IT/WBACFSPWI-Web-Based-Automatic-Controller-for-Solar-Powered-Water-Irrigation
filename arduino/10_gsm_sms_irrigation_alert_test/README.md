@@ -173,6 +173,6 @@ The sketch includes an interactive bench testing menu. You can test and verify t
 2. **Press `c`**: Check signal quality (`AT+CSQ`) and registration (`AT+CREG: 0,1`). If CSQ is 12–31 and CREG is 1 or 5, your module is ready.
 3. **Press `s`**: Check your mobile phone. You will receive the test SMS within 5–10 seconds.
 4. **Ultrasonic Water Level Dynamic Test**:
-   - Empty/Low water level (Distance $> 22.6\text{ cm}$, level $< 45\%$): The relay clicks ON, water pump activates, and you receive the **Irrigation STARTED** SMS!
-   - Water rises above target (Distance $\le 22.4\text{ cm}$, level $\ge 50\%$): Anti-splash delay holds for 5 seconds, then the relay clicks OFF, water pump stops, and you receive the **Irrigation STOPPED** SMS!
+   - Empty/Low water level (Distance $> 24.8\text{ cm}$, level $< 40\%$): The relay clicks ON, water pump activates, and you receive the **Irrigation STARTED** SMS!
+   - Water rises above target (Distance $\le 24.0\text{ cm}$, level $\ge 50\%$): Anti-splash delay holds for 5 seconds, then the relay clicks OFF, water pump stops, and you receive the **Irrigation STOPPED** SMS!
    - Water level drops again: Relay clicks ON, water pump refills, and you receive the **Irrigation RESTARTED (Cycle #2)** SMS!
