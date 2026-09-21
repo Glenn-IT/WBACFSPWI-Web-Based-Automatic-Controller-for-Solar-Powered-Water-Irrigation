@@ -99,8 +99,8 @@ const float BATT_RESUME_VOLTS = 10.50; // Voltage needed to clear lockout and re
 
 // Timing Protections (in milliseconds)
 const unsigned long MIN_PUMP_RUN_MS  = 5000UL;   // 5s minimum runtime (prevents momentary splash cutoffs)
-const unsigned long MAX_PUMP_RUN_MS  = 180000UL; // 3 minutes maximum continuous runtime
-const unsigned long PUMP_COOLDOWN_MS = 60000UL;  // 1 minute mandatory cooldown after timeout
+// const unsigned long MAX_PUMP_RUN_MS  = 180000UL; // [DISABLED] 3-min runtime cap — manual switch installed for defense presentation
+// const unsigned long PUMP_COOLDOWN_MS = 60000UL;  // [DISABLED] 1-min cooldown — manual switch installed for defense presentation
 const unsigned long SETTLING_DELAY_MS= 10000UL;  // 10s water settling / stabilization window
 const unsigned long SAMPLE_INTERVAL   = 1000UL;   // Read sensors & evaluate logic every 1s
 const unsigned long TELEMETRY_PERIOD  = 1000UL;   // Print telemetry & stream JSON every 1s
@@ -112,7 +112,6 @@ const unsigned long SMS_COOLDOWN_MS   = 3000UL;   // 3s spacing between back-to-
 bool  pumpState          = false;
 bool  isSettling         = false;
 bool  lowBatteryLockout  = false;
-bool  timeoutLockout     = false;
 bool  manualOverride     = false;
 bool  manualOverrideState= false;
 bool  gsmReady           = false;
@@ -615,19 +614,10 @@ void loop() {
       lowBatteryLockout = false;
     }
 
-    // 2. Pump Timeout & Cooldown Check
-    if (pumpState && (now - pumpStartTime >= MAX_PUMP_RUN_MS)) {
-      Serial.println(F("[SAFETY] Max pump runtime reached! Stopping pump."));
-      setPump(false);
-      timeoutLockout = true;
-    }
-    if (timeoutLockout && (now - pumpStopTime >= PUMP_COOLDOWN_MS)) {
-      timeoutLockout = false;
-      Serial.println(F("[SAFETY] Cooldown finished. Resuming normal operations."));
-    }
+    // 2. Pump Timeout & Cooldown Check — [DISABLED] Manual switch installed for defense presentation
 
     // 3. Automated Decision Logic with 10s Settling Safety Net & Manual Override
-    if (lowBatteryLockout || timeoutLockout) {
+    if (lowBatteryLockout) {
       setPump(false);
       isSettling = false;
     } else if (manualOverride) {
