@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Figure 4 Prototype Hardware Wiring & Assembly Guide — WBACFSPWI</title>
+    <link rel="stylesheet" href="./assets/css/fonts.css">
+    <style>
+        :root {
+            --bg-dark: #0a0f1d;
+            --bg-card: #131c31;
+            --border-color: #2e3c54;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-cyan: #06b6d4;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --wire-red: #ef4444;
+            --wire-black: #0f172a;
+            --wire-blue: #0284c7;
+            --wire-green: #10b981;
+            --wire-yellow: #eab308;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2.5rem 1.5rem;
+        }
+
+        .container { max-width: 1320px; margin: 0 auto; }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.35rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-green);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            margin-bottom: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2.3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-banner {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
+            border: 2px solid var(--border-color);
+            border-radius: 1.25rem;
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.4rem;
+            border-radius: 0.6rem;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary { background: #0284c7; color: #fff; }
+        .btn-primary:hover { background: #0369a1; transform: translateY(-2px); }
+        .btn-outline { border: 1px solid var(--border-color); color: var(--text-secondary); }
+        .btn-outline:hover { color: #fff; border-color: var(--accent-cyan); }
+
+        /* Schematic Card */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .card-header {
+            font-size: 1.25rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* SVG Schematic Container */
+        .svg-container {
+            background: #090e18;
+            border: 1px solid #1e293b;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            overflow-x: auto;
+            text-align: center;
+        }
+
+        /* Table */
+        table.wiring-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+
+        table.wiring-table th, table.wiring-table td {
+            padding: 0.85rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        table.wiring-table th {
+            background: rgba(15, 23, 42, 0.8);
+            color: var(--accent-cyan);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+
+        table.wiring-table tr:hover td {
+            background: rgba(30, 41, 59, 0.4);
+        }
+
+        .tag-wire {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            font-family: monospace;
+        }
+
+        .tag-red { background: #ef4444; color: #fff; }
+        .tag-black { background: #1e293b; color: #cbd5e1; border: 1px solid #475569; }
+        .tag-blue { background: #0284c7; color: #fff; }
+        .tag-green { background: #10b981; color: #fff; }
+        .tag-yellow { background: #eab308; color: #000; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <span class="badge">Hardware Prototype Guide</span>
+        <h1>Figure 4 Standalone ESP32 Prototype Wiring</h1>
+        <p style="color: var(--text-secondary); max-width: 800px; margin: 0 auto;">
+            Complete electrical schematic, pinout mapping, and star-ground wiring instructions for the solar-powered automatic irrigation prototype shown in Figure 4.
+        </p>
+    </header>
+
+    <div class="hero-banner">
+        <div>
+            <h3 style="color: #fff; font-weight: 800; margin-bottom: 0.35rem;">Live Digital Prototype Available</h3>
+            <p style="color: var(--text-secondary); max-width: 650px; font-size: 0.95rem;">
+                You can test this exact hardware circuit interactively in your browser with animated water pumps, solar irradiance controls, and smartphone telemetry.
+            </p>
+        </div>
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <a href="../../public/prototype.php" target="_blank" class="btn btn-primary">
+                Open Interactive Simulator &rarr;
+            </a>
+            <a href="../../public/mobile.php" target="_blank" class="btn btn-outline">
+                Open Mobile Phone View
+            </a>
+            <a href="../index.html" class="btn btn-outline">
+                &larr; Master Hardware Hub
+            </a>
+        </div>
+    </div>
+
+    <!-- Section 1: Visual Schematic Matching Figure 4 -->
+    <div class="card">
+        <div class="card-header">
+            <span>🔌 Visual Star Wiring Diagram (Figure 4 Architecture)</span>
+        </div>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">
+            This vector diagram illustrates the physical jumper connections between the Solar Panel, Solar Charge Controller, 12V Battery, Solderless Breadboard, ESP32, Soil Probe, Relay Module, and 12V Water Pump.
+        </p>
+        <div class="svg-container">
+            <svg viewBox="0 0 1000 520" style="max-width: 100%; height: auto;">
+                <!-- Definitions -->
+                <defs>
+                    <linearGradient id="solGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#1e3a8a"/>
+                        <stop offset="100%" stop-color="#0284c7"/>
+                    </linearGradient>
+                    <linearGradient id="chgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#1e293b"/>
+                        <stop offset="100%" stop-color="#0f172a"/>
+                    </linearGradient>
+                </defs>
+
+                <!-- 1. SOLAR PANEL (Top Left) -->
+                <rect x="30" y="30" width="160" height="110" rx="8" fill="url(#solGrad)" stroke="#38bdf8" stroke-width="2"/>
+                <line x1="30" y1="67" x2="190" y2="67" stroke="#60a5fa" stroke-width="1"/>
+                <line x1="30" y1="103" x2="190" y2="103" stroke="#60a5fa" stroke-width="1"/>
+                <line x1="83" y1="30" x2="83" y2="140" stroke="#60a5fa" stroke-width="1"/>
+                <line x1="136" y1="30" x2="136" y2="140" stroke="#60a5fa" stroke-width="1"/>
+                <text x="110" y="165" fill="#f8fafc" font-size="12" font-weight="bold" text-anchor="middle">SOLAR PANEL (12V/30W)</text>
+
+                <!-- 2. SOLAR CHARGE CONTROLLER (Top Center) -->
+                <rect x="290" y="30" width="220" height="110" rx="10" fill="#0f1e3d" stroke="#2563eb" stroke-width="2"/>
+                <rect x="315" y="45" width="170" height="40" rx="4" fill="#022c22" stroke="#059669" stroke-width="1.5"/>
+                <text x="400" y="70" fill="#34d399" font-size="13" font-family="monospace" font-weight="bold" text-anchor="middle">12.4V [CHG ON]</text>
+                <!-- Terminal Screws -->
+                <circle cx="320" cy="115" r="5" fill="#ef4444"/>
+                <circle cx="340" cy="115" r="5" fill="#1e293b"/>
+                <circle cx="380" cy="115" r="5" fill="#ef4444"/>
+                <circle cx="400" cy="115" r="5" fill="#1e293b"/>
+                <circle cx="440" cy="115" r="5" fill="#ef4444"/>
+                <circle cx="460" cy="115" r="5" fill="#1e293b"/>
+                <text x="330" y="132" fill="#94a3b8" font-size="9" text-anchor="middle">PV</text>
+                <text x="390" y="132" fill="#94a3b8" font-size="9" text-anchor="middle">BATT</text>
+                <text x="450" y="132" fill="#94a3b8" font-size="9" text-anchor="middle">LOAD</text>
+                <text x="400" y="20" fill="#93c5fd" font-size="12" font-weight="bold" text-anchor="middle">SOLAR CHARGE CONTROLLER</text>
+
+                <!-- 3. 12V BATTERY (Mid Left) -->
+                <rect x="30" y="210" width="160" height="100" rx="8" fill="#111827" stroke="#475569" stroke-width="2"/>
+                <rect x="50" y="195" width="25" height="15" fill="#ef4444" rx="2"/>
+                <text x="62" y="206" fill="#fff" font-size="10" font-weight="bold" text-anchor="middle">+</text>
+                <rect x="145" y="195" width="25" height="15" fill="#374151" rx="2"/>
+                <text x="157" y="206" fill="#fff" font-size="10" font-weight="bold" text-anchor="middle">-</text>
+                <text x="110" y="265" fill="#f8fafc" font-size="13" font-weight="bold" text-anchor="middle">12V BATTERY</text>
+                <text x="110" y="285" fill="#94a3b8" font-size="10" text-anchor="middle">Lead-Acid / 3S Li-ion</text>
+
+                <!-- 4. SOLDERLESS BREADBOARD (Center) -->
+                <rect x="270" y="210" width="300" height="100" rx="8" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/>
+                <!-- Power Rails -->
+                <line x1="280" y1="225" x2="560" y2="225" stroke="#ef4444" stroke-width="3"/>
+                <line x1="280" y1="235" x2="560" y2="235" stroke="#0284c7" stroke-width="3"/>
+                <text x="420" y="265" fill="#0f172a" font-size="14" font-weight="800" text-anchor="middle">BREADBOARD</text>
+                <text x="420" y="285" fill="#64748b" font-size="10" text-anchor="middle">Star Power &amp; Common Ground</text>
+
+                <!-- 5. ESP32 (Bottom Left) -->
+                <rect x="50" y="380" width="120" height="110" rx="8" fill="#0f172a" stroke="#3b82f6" stroke-width="2"/>
+                <rect x="75" y="405" width="70" height="55" rx="4" fill="#64748b" stroke="#cbd5e1" stroke-width="1"/>
+                <text x="110" y="437" fill="#0f172a" font-size="10" font-weight="bold" text-anchor="middle">ESP32</text>
+                <text x="110" y="505" fill="#93c5fd" font-size="11" font-weight="bold" text-anchor="middle">ESP-WROOM-32</text>
+
+                <!-- 6. SOIL MOISTURE MODULE & PROBE (Bottom Center) -->
+                <rect x="250" y="400" width="110" height="60" rx="6" fill="#042f2e" stroke="#14b8a6" stroke-width="2"/>
+                <text x="305" y="435" fill="#5eead4" font-size="10" font-weight="bold" text-anchor="middle">SOIL MODULE</text>
+                <!-- Probe in Soil -->
+                <rect x="420" y="420" width="35" height="65" rx="3" fill="#64748b"/>
+                <line x1="428" y1="440" x2="428" y2="480" stroke="#000" stroke-width="3"/>
+                <line x1="446" y1="440" x2="446" y2="480" stroke="#000" stroke-width="3"/>
+                <ellipse cx="437" cy="485" rx="45" ry="15" fill="#78350f" opacity="0.8"/>
+                <text x="437" y="510" fill="#fde68a" font-size="10" font-weight="bold" text-anchor="middle">SOIL PROBE</text>
+
+                <!-- 7. RELAY MODULE (Mid Right) -->
+                <rect x="650" y="220" width="90" height="80" rx="6" fill="#0284c7" stroke="#38bdf8" stroke-width="2"/>
+                <text x="695" y="265" fill="#fff" font-size="12" font-weight="bold" text-anchor="middle">RELAY</text>
+                <text x="695" y="280" fill="#e0f2fe" font-size="8" text-anchor="middle">10A / Active LOW</text>
+
+                <!-- 8. WATER PUMP (Top Right) -->
+                <rect x="640" y="40" width="110" height="75" rx="8" fill="#1f2937" stroke="#4b5563" stroke-width="2"/>
+                <circle cx="695" cy="77" r="18" fill="#374151" stroke="#9ca3af" stroke-width="1.5"/>
+                <text x="695" y="130" fill="#f8fafc" font-size="11" font-weight="bold" text-anchor="middle">WATER PUMP (12V)</text>
+
+                <!-- 9. SMARTPHONE (Far Right) -->
+                <rect x="830" y="160" width="130" height="230" rx="18" fill="#000" stroke="#475569" stroke-width="3"/>
+                <rect x="840" y="180" width="110" height="190" rx="10" fill="#0f172a"/>
+                <rect x="850" y="210" width="90" height="50" rx="6" fill="#1e293b"/>
+                <text x="895" y="235" fill="#ef4444" font-size="16" font-weight="bold" text-anchor="middle">Dry</text>
+                <rect x="860" y="280" width="70" height="35" rx="8" fill="#10b981"/>
+                <text x="895" y="303" fill="#fff" font-size="15" font-weight="bold" text-anchor="middle">ON</text>
+                <text x="895" y="410" fill="#38bdf8" font-size="11" font-weight="bold" text-anchor="middle">SMARTPHONE (Wi-Fi)</text>
+
+                <!-- JUMPER WIRES -->
+                <!-- Solar -> Controller -->
+                <path d="M 190 70 L 320 70 L 320 110" fill="none" stroke="#ef4444" stroke-width="3"/>
+                <path d="M 190 90 L 340 90 L 340 110" fill="none" stroke="#111827" stroke-width="3"/>
+
+                <!-- Battery -> Controller -->
+                <path d="M 62 195 L 62 170 L 380 170 L 380 120" fill="none" stroke="#ef4444" stroke-width="3"/>
+                <path d="M 157 195 L 157 185 L 400 185 L 400 120" fill="none" stroke="#111827" stroke-width="3"/>
+
+                <!-- Controller Load -> Breadboard -->
+                <path d="M 440 120 L 440 170 L 330 170 L 330 225" fill="none" stroke="#ef4444" stroke-width="2.5"/>
+                <path d="M 460 120 L 460 180 L 360 180 L 360 235" fill="none" stroke="#0284c7" stroke-width="2.5"/>
+
+                <!-- Breadboard -> ESP32 Power -->
+                <path d="M 310 225 L 310 350 L 80 350 L 80 380" fill="none" stroke="#ef4444" stroke-width="2.5"/>
+                <path d="M 330 235 L 330 365 L 100 365 L 100 380" fill="none" stroke="#0284c7" stroke-width="2.5"/>
+
+                <!-- ESP32 -> Soil Module -->
+                <path d="M 170 420 L 250 420" fill="none" stroke="#10b981" stroke-width="2.5"/>
+                <path d="M 360 430 L 420 430" fill="none" stroke="#eab308" stroke-width="2"/>
+
+                <!-- ESP32 -> Relay Signal (GPIO 26) -->
+                <path d="M 170 440 L 650 440 L 650 280" fill="none" stroke="#38bdf8" stroke-width="2.5"/>
+
+                <!-- Relay to Water Pump (Switched 12V Hot Line) -->
+                <path d="M 695 220 L 695 115" fill="none" stroke="#ef4444" stroke-width="3"/>
+                <path d="M 730 115 L 730 195 L 560 195 L 560 235" fill="none" stroke="#111827" stroke-width="3"/>
+
+                <!-- Wi-Fi Link Arc -->
+                <path d="M 170 390 C 220 330, 800 300, 830 250" fill="none" stroke="#38bdf8" stroke-width="2" stroke-dasharray="5 5"/>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Section 2: Complete Connection Matrix -->
+    <div class="card">
+        <div class="card-header">
+            <span>📋 Full Hardware Connection Matrix</span>
+        </div>
+        <table class="wiring-table">
+            <thead>
+                <tr>
+                    <th>Tag</th>
+                    <th>Source Component</th>
+                    <th>Source Pin / Terminal</th>
+                    <th>Destination Component</th>
+                    <th>Destination Pin</th>
+                    <th>Wire Color</th>
+                    <th>Purpose &amp; Interface</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="tag-wire tag-red">SOL-01</span></td>
+                    <td>Solar Panel (30W)</td>
+                    <td>PV Positive (+)</td>
+                    <td>Solar Charge Controller</td>
+                    <td>PV (+) Terminal</td>
+                    <td><span class="tag-wire tag-red">Red</span></td>
+                    <td>Solar harvesting input (18V–21V Voc)</td>
+                </tr>
+                <tr>
+                    <td><span class="tag-wire tag-black">SOL-02</span></td>
+                    <td>Solar Panel (30W)</td>
+                    <td>PV Negative (-)</td>
+                    <td>Solar Charge Controller</td>
+                    <td>PV (-) Terminal</td>
+                    <td><span class="tag-wire tag-black">Black</span></td>
+                    <td>Solar panel ground return</td>
+                </tr>
+                <tr>
+                    <td><span class="tag-wire tag-red">BAT-01</span></td>
+                    <td>12V Battery</td>
+                    <td>Positive (+) Terminal</td>
+                    <td>Solar Charge Controller</td>
+                    <td>BATT (+) Terminal</td>
+                    <td><span class="tag-wire tag-red">Red</span></td>
+                    <td>Battery charging and storage connection</td>
+                </tr>
+                <tr>
+                    <td><span class="tag-wire tag-black">BAT-02</span></td>
+                    <td>12V Battery</td>
+                    <td>Negative (-) Terminal</td>
+                    <td>Solar Charge Controller</td>
+                    <td>BATT (-) Terminal</td>
+                    <td><span class="tag-wire tag-black">Black</span></td>
+                    <td>Battery ground reference</td>
+                </tr>
+                <tr>
+                    <td><span class="tag-wire tag-red">PWR-01</span></td>
+                    <td>Solar Controller / Battery</td>
+                    <td>Load / Batt (+)</td>
+                    <td>Breadboard</td>
+                    <td>Red Power Rail (+5V / +12V)</td>
+                    <td><span class="tag-wire tag-red">Red</span></td>
+                    <td>System power distribution bus</td>
+                </tr>
+                <tr>
+                    <td><span class="tag-wire tag-black">GND-01</span></td>
+                    <td>Solar Controller / Battery</td>
+                    <td>Load / Batt (-)</td>
+                    <td>Breadboard</td>
+                    <td>Blue Ground Rail (GND)</td>
+                    <td><span class="tag-wire tag-black">Black</span></td>
+                    <td>Star common ground bus</td>
+                </tr>
+                <tr>
+                    <td><span class="tag-wire tag-green">SIG-01</span></td>
+                    <td>ESP32 DevKit</td>
+                    <td>GPIO 34 (ADC1)</td>
+                    <td>Soil Moisture Module</td>
+                    <td>AO (Analog Out)</td>
+                    <td><span class="tag-wire tag-green">Green</span></td>
+                    <td>Analog soil moisture voltage sensing (12-bit)</td>
+                </tr>
+                <tr>
+                    <td><span class="tag-wire tag-yellow">SIG-02</span></td>
+                    <td>ESP32 DevKit</td>
+                    <td>GPIO 25</td>
+                    <td>Soil Moisture Module</td>
+                    <td>VCC</td>
+                    <td><span class="tag-wire tag-yellow">Yellow</span></td>
+                    <td>Power gating pin (prevents probe corrosion)</td>
+                </tr>
+                <tr>
+                    <td><span class="tag-wire tag-blue">ACT-01</span></td>
+                    <td>ESP32 DevKit</td>
+                    <td>GPIO 26</td>
+                    <td>Relay Module</td>
+                    <td>IN (Control Pin)</td>
+                    <td><span class="tag-wire tag-blue">Blue</span></td>
+                    <td>Active-LOW digital relay trigger</td>
+                </tr>
+                <tr>
+                    <td><span class="tag-wire tag-red">ACT-02</span></td>
+                    <td>Relay Module</td>
+                    <td>Normally Open (NO)</td>
+                    <td>12V DC Water Pump</td>
+                    <td>Positive (+) Lead</td>
+                    <td><span class="tag-wire tag-red">Red</span></td>
+                    <td>Switched high-side 12V pump power</td>
+                </tr>
+                <tr>
+                    <td><span class="tag-wire tag-black">ACT-03</span></td>
+                    <td>12V DC Water Pump</td>
+                    <td>Negative (-) Lead</td>
+                    <td>Breadboard</td>
+                    <td>Blue Ground Rail (GND)</td>
+                    <td><span class="tag-wire tag-black">Black</span></td>
+                    <td>Pump motor return path to common ground</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Section 3: Bill of Materials & Notes -->
+    <div class="card">
+        <div class="card-header">
+            <span>📦 Prototype Bill of Materials (BOM)</span>
+        </div>
+        <ul style="color: var(--text-secondary); padding-left: 1.5rem; line-height: 1.8;">
+            <li><b>1x 12V/30W Polycrystalline Solar Panel</b> with standard mounting bracket</li>
+            <li><b>1x 10A/20A 12V PWM Solar Charge Controller</b> with integrated LCD status screen</li>
+            <li><b>1x 12V Motorcycle Lead-Acid or 3S 18650 Li-ion Battery Pack (11.1V–12.6V)</b></li>
+            <li><b>1x 830-Point Solderless Breadboard</b> with dual power distribution buses</li>
+            <li><b>1x ESP32 NodeMCU-32S / ESP-WROOM-32</b> 30-pin/38-pin Development Board</li>
+            <li><b>1x Soil Moisture Sensor Module</b> with LM393 comparator &amp; dual-prong probe</li>
+            <li><b>1x 5V/3.3V 1-Channel Optocoupler Relay Module</b> (10A 250VAC / 30VDC rating)</li>
+            <li><b>1x 12V DC Submersible/Diaphragm Miniature Water Pump</b> with silicone tubing</li>
+            <li><b>Assorted Jumper Wires</b> (Male-to-Male and Male-to-Female)</li>
+        </ul>
+    </div>
+</div>
+
+</body>
+</html>
