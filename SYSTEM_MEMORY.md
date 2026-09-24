@@ -189,6 +189,7 @@ The standalone Arduino Uno controller (`wbacfspwi_arduino_controller.ino`) and i
 - **Model:** [`src/models/Override.php`](file:///C:/xampp/htdocs/WBACFSPWI-Web-Based-Automatic-Controller-for-Solar-Powered-Water-Irrigation/src/models/Override.php)
 - **Device Delivery:** Embedded in HTTP 200 response of `/api/device/report.php` as `"command": "PUMP_ON" | "PUMP_OFF" | "PUMP_AUTO"`. NodeMCU receives response and writes command to Arduino Uno SoftwareSerial (D1/D2 <-> 9/10).
 - **Arduino Safety Override:** Manual state overrides automatic water level thresholds, while preserving low-battery lockout (<10.0V) and thermal/runtime safety limits.
+- **Dashboard UI Controls:** Interactive 3-way toggle switch buttons (`⚡ Force ON`, `🛑 Force OFF`, `🔄 Auto Mode`) on the Pump Relay State card for immediate operator control and override feedback.
 
 ---
 

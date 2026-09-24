@@ -59,8 +59,27 @@ include __DIR__ . '/partials/sidebar.php';
                         <span class="badge bg-dark border border-secondary text-info" id="stat-pump-mode">AUTOMATIC</span>
                     </div>
                 </div>
-                <div class="small text-muted mt-2 pt-2 border-top border-light-subtle" id="pump-status-sub">
-                    Autonomous: ON &lt; 45%, OFF &ge; 50%
+
+                <!-- Manual Pump Override Switch Buttons -->
+                <div class="mt-2 pt-2 border-top border-light-subtle">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="text-muted small fw-semibold">Manual Control:</span>
+                        <span class="small text-muted" id="pump-control-msg" style="font-size: 0.75rem;"></span>
+                    </div>
+                    <div class="btn-group w-100 btn-group-pump" role="group" aria-label="Pump Controls">
+                        <button type="button" class="btn btn-sm btn-outline-success" id="btn-pump-on" title="Force Pump ON">
+                            ⚡ Force ON
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" id="btn-pump-off" title="Force Pump OFF">
+                            🛑 Force OFF
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-primary active" id="btn-pump-auto" title="Resume Automatic Sensor Logic">
+                            🔄 Auto Mode
+                        </button>
+                    </div>
+                    <div class="small text-muted mt-2" id="pump-status-sub" style="font-size: 0.78rem;">
+                        Autonomous: ON &lt; 40%, OFF &ge; 50%
+                    </div>
                 </div>
             </div>
         </div>
@@ -200,21 +219,46 @@ function refreshDashboard() {
                 pumpBadge.className = 'badge bg-secondary';
             }
 
-            // Update Control Mode Indicator
+            // Update Control Mode Indicator and Active Button States
             const modeBadge = document.getElementById('stat-pump-mode');
             const subEl = document.getElementById('pump-status-sub');
+            const btnOn = document.getElementById('btn-pump-on');
+            const btnOff = document.getElementById('btn-pump-off');
+            const btnAuto = document.getElementById('btn-pump-auto');
+
+            if (btnOn && btnOff && btnAuto) {
+                btnOn.classList.remove('active', 'btn-success');
+                btnOn.classList.add('btn-outline-success');
+                btnOff.classList.remove('active', 'btn-danger');
+                btnOff.classList.add('btn-outline-danger');
+                btnAuto.classList.remove('active', 'btn-primary');
+                btnAuto.classList.add('btn-outline-primary');
+            }
+
             if (data.active_command === 'PUMP_ON') {
                 modeBadge.textContent = 'MANUAL ON';
                 modeBadge.className = 'badge bg-success';
                 if (subEl) subEl.textContent = 'Active Override: Pump forced ON';
+                if (btnOn) {
+                    btnOn.classList.add('active', 'btn-success');
+                    btnOn.classList.remove('btn-outline-success');
+                }
             } else if (data.active_command === 'PUMP_OFF') {
                 modeBadge.textContent = 'MANUAL OFF';
                 modeBadge.className = 'badge bg-danger';
                 if (subEl) subEl.textContent = 'Active Override: Pump forced OFF';
+                if (btnOff) {
+                    btnOff.classList.add('active', 'btn-danger');
+                    btnOff.classList.remove('btn-outline-danger');
+                }
             } else {
                 modeBadge.textContent = 'AUTOMATIC';
                 modeBadge.className = 'badge bg-dark border border-secondary text-info';
-                if (subEl) subEl.textContent = 'Autonomous: ON < 45%, OFF ≥ 50%';
+                if (subEl) subEl.textContent = 'Autonomous: ON < 40%, OFF ≥ 50%';
+                if (btnAuto) {
+                    btnAuto.classList.add('active', 'btn-primary');
+                    btnAuto.classList.remove('btn-outline-primary');
+                }
             }
 
             document.getElementById('stat-last-updated').textContent = r ? 'Last updated: ' + r.recorded_at : 'No sensor data received yet — waiting for Arduino / ESP8266 to connect.';
@@ -245,6 +289,44 @@ function refreshDashboard() {
         })
         .catch(() => {});
 }
+
+function setPumpOverride(action) {
+    const msgEl = document.getElementById('pump-control-msg');
+    if (msgEl) msgEl.textContent = 'Sending...';
+
+    const formData = new URLSearchParams();
+    formData.append('action', action);
+
+    fetch('<?= BASE_URL ?>/api/admin/pump-control.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            if (msgEl) {
+                msgEl.textContent = 'Command queued!';
+                setTimeout(() => { if (msgEl) msgEl.textContent = ''; }, 3000);
+            }
+            refreshDashboard();
+        } else {
+            alert(data.error || 'Failed to update pump state.');
+            if (msgEl) msgEl.textContent = '';
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        if (msgEl) msgEl.textContent = 'Network error.';
+    });
+}
+
+const btnPumpOn = document.getElementById('btn-pump-on');
+const btnPumpOff = document.getElementById('btn-pump-off');
+const btnPumpAuto = document.getElementById('btn-pump-auto');
+if (btnPumpOn) btnPumpOn.addEventListener('click', () => setPumpOverride('on'));
+if (btnPumpOff) btnPumpOff.addEventListener('click', () => setPumpOverride('off'));
+if (btnPumpAuto) btnPumpAuto.addEventListener('click', () => setPumpOverride('auto'));
 
 refreshDashboard();
 setInterval(refreshDashboard, 3000);
