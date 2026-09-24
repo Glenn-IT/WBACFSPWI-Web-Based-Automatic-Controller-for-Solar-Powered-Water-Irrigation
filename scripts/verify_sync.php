@@ -186,7 +186,7 @@ echo "\n10. Testing Frontend Navigation & View Routing:\n";
 $fSidebar = file_get_contents("$rootDir/public/admin/partials/sidebar.php");
 $expectedNav = [
     'dashboard' => '/admin/dashboard.php',
-    'schedule'  => '/admin/schedule.php',
+    'telemetry' => '/admin/telemetry_test.php',
     'logs'      => '/admin/logs.php',
     'reports'   => '/admin/reports.php',
     'users'     => '/admin/users.php',

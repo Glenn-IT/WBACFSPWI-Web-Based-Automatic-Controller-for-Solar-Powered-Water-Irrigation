@@ -110,17 +110,9 @@ include __DIR__ . '/partials/sidebar.php';
 </div>
 
 <div class="row g-3">
-    <div class="col-md-6">
+    <div class="col-12">
         <div class="card shadow-sm">
-            <div class="card-header">Today's Schedule</div>
-            <div class="card-body text-muted" id="today-schedules">
-                Loading...
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="card shadow-sm">
-            <div class="card-header">Recent Alerts</div>
+            <div class="card-header">Recent Alerts & System Notifications</div>
             <div class="card-body text-muted" id="recent-alerts">
                 Loading...
             </div>
@@ -270,12 +262,14 @@ function refreshDashboard() {
             renderTrendChart(data.trend);
 
             const scheduleEl = document.getElementById('today-schedules');
-            if (data.today_schedules.length === 0) {
-                scheduleEl.textContent = 'No schedules run today.';
-            } else {
-                scheduleEl.innerHTML = '<ul class="list-unstyled mb-0">' + data.today_schedules.map(s =>
-                    `<li class="mb-1"><strong>${s.label}</strong> — ${s.start_time} (${s.duration_seconds || s.duration_minutes} sec)</li>`
-                ).join('') + '</ul>';
+            if (scheduleEl) {
+                if (data.today_schedules.length === 0) {
+                    scheduleEl.textContent = 'No schedules run today.';
+                } else {
+                    scheduleEl.innerHTML = '<ul class="list-unstyled mb-0">' + data.today_schedules.map(s =>
+                        `<li class="mb-1"><strong>${s.label}</strong> — ${s.start_time} (${s.duration_seconds || s.duration_minutes} sec)</li>`
+                    ).join('') + '</ul>';
+                }
             }
 
             const alertsEl = document.getElementById('recent-alerts');

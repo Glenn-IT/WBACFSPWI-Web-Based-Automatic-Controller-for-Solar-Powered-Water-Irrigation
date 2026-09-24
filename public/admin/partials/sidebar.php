@@ -6,7 +6,6 @@ $user = Auth::user();
 $navItems = [
     'dashboard' => ['label' => 'Dashboard', 'href' => '/admin/dashboard.php', 'roles' => ['super_admin', 'admin', 'viewer']],
     'telemetry' => ['label' => 'Live Telemetry Test', 'href' => '/admin/telemetry_test.php', 'roles' => ['super_admin', 'admin', 'viewer']],
-    'schedule'  => ['label' => 'Schedules', 'href' => '/admin/schedule.php', 'roles' => ['super_admin', 'admin']],
     'logs'      => ['label' => 'Logs & Alerts', 'href' => '/admin/logs.php', 'roles' => ['super_admin', 'admin']],
     'reports'   => ['label' => 'Reports', 'href' => '/admin/reports.php', 'roles' => ['super_admin', 'admin', 'viewer']],
     'users'     => ['label' => 'User Management', 'href' => '/admin/users.php', 'roles' => ['super_admin']],
