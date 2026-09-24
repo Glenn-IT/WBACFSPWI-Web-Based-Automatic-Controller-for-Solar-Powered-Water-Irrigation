@@ -37,7 +37,7 @@ class Override
             $createdTs = strtotime($latest['created_at']);
             if (time() - $createdTs >= $testRunSec) {
                 self::clearAll();
-                return 'PUMP_AUTO';
+                return 'PUMP_OFF';
             }
         }
 

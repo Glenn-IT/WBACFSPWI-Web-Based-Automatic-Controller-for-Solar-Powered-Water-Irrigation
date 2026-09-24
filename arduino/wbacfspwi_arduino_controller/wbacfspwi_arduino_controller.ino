@@ -840,6 +840,9 @@ void loop() {
     } else if (cmd == "PUMP_AUTO") {
       if (manualOverride) {
         manualOverride = false;
+        if (pumpState && currentSurfaceWater >= WATER_REFILL_MIN) {
+          setPump(false);
+        }
         Serial.println(F(">>> [REMOTE COMMAND via WiFi] Manual Override Cleared -> AUTO Mode Resumed"));
       }
     }

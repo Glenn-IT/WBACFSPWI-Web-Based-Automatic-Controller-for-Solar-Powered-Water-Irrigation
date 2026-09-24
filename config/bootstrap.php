@@ -1,5 +1,7 @@
 <?php
 
+date_default_timezone_set('Asia/Manila');
+
 // Web path to the public/ directory, so URLs work whether the app is served
 // from a subfolder (e.g. XAMPP htdocs) or as the web root ('' in that case).
 $publicDir = str_replace('\\', '/', (string) realpath(__DIR__ . '/../public'));
