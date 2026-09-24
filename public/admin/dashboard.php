@@ -290,10 +290,90 @@ function refreshDashboard() {
         .catch(() => {});
 }
 
-function setPumpOverride(action) {
-    const msgEl = document.getElementById('pump-control-msg');
-    if (msgEl) msgEl.textContent = 'Sending...';
+let isPumpCommandLocked = false;
 
+function setPumpOverride(action) {
+    if (isPumpCommandLocked) return;
+
+    // Apply 10s anti-spam lock for manual control to protect the SIM800L/SIM900A module
+    isPumpCommandLocked = true;
+
+    const btnOn = document.getElementById('btn-pump-on');
+    const btnOff = document.getElementById('btn-pump-off');
+    const btnAuto = document.getElementById('btn-pump-auto');
+    if (btnOn) btnOn.disabled = true;
+    if (btnOff) btnOff.disabled = true;
+    if (btnAuto) btnAuto.disabled = true;
+
+    const overlay = document.getElementById('pumpLoadingOverlay');
+    const timerEl = document.getElementById('pumpLoadingTimer');
+    const barEl = document.getElementById('pumpLoadingBar');
+    const iconEl = document.getElementById('pumpLoadingIcon');
+    const titleEl = document.getElementById('pumpLoadingTitle');
+    const subtitleEl = document.getElementById('pumpLoadingSubtitle');
+    const stepEl = document.getElementById('pumpLoadingStep');
+    const msgEl = document.getElementById('pump-control-msg');
+
+    if (action === 'on') {
+        if (iconEl) iconEl.textContent = '⚡';
+        if (titleEl) titleEl.textContent = 'Forcing Pump ON...';
+        if (subtitleEl) subtitleEl.textContent = 'Engaging DC pump relay. Locking controls for 10s to safeguard SIM module & battery against voltage inrush.';
+    } else if (action === 'off') {
+        if (iconEl) iconEl.textContent = '🛑';
+        if (titleEl) titleEl.textContent = 'Forcing Pump OFF...';
+        if (subtitleEl) subtitleEl.textContent = 'Disengaging DC pump relay. Locking controls for 10s to allow wave settling and prevent GSM SMS collisions.';
+    } else {
+        if (iconEl) iconEl.textContent = '🔄';
+        if (titleEl) titleEl.textContent = 'Resuming Auto Mode...';
+        if (subtitleEl) subtitleEl.textContent = 'Returning to autonomous sensor logic. Locking controls for 10s to synchronize cellular telemetry.';
+    }
+
+    if (overlay) {
+        overlay.style.display = 'flex';
+    }
+
+    // Start 10-second countdown (10000 ms)
+    const totalDurationMs = 10000;
+    const intervalMs = 100;
+    let elapsedMs = 0;
+
+    const countdownTimer = setInterval(() => {
+        elapsedMs += intervalMs;
+        const remainingMs = Math.max(0, totalDurationMs - elapsedMs);
+        const remainingSec = (remainingMs / 1000).toFixed(1);
+        const percent = (remainingMs / totalDurationMs) * 100;
+
+        if (timerEl) timerEl.textContent = remainingSec + 's';
+        if (barEl) barEl.style.width = percent + '%';
+
+        if (stepEl) {
+            if (remainingMs > 7000) {
+                stepEl.textContent = 'Dispatching command via WiFi bridge...';
+            } else if (remainingMs > 4000) {
+                stepEl.textContent = 'Safeguarding SIM module & preventing SMS queue collision...';
+            } else if (remainingMs > 1000) {
+                stepEl.textContent = 'Stabilizing power rails & awaiting telemetry echo...';
+            } else {
+                stepEl.textContent = 'Finalizing synchronization...';
+            }
+        }
+
+        if (elapsedMs >= totalDurationMs) {
+            clearInterval(countdownTimer);
+            if (overlay) overlay.style.display = 'none';
+            isPumpCommandLocked = false;
+            if (btnOn) btnOn.disabled = false;
+            if (btnOff) btnOff.disabled = false;
+            if (btnAuto) btnAuto.disabled = false;
+            if (msgEl) {
+                msgEl.textContent = 'Hardware ready.';
+                setTimeout(() => { if (msgEl) msgEl.textContent = ''; }, 3000);
+            }
+            refreshDashboard();
+        }
+    }, intervalMs);
+
+    // Send HTTP POST request in parallel
     const formData = new URLSearchParams();
     formData.append('action', action);
 
@@ -304,20 +384,12 @@ function setPumpOverride(action) {
     })
     .then(res => res.json())
     .then(data => {
-        if (data.success) {
-            if (msgEl) {
-                msgEl.textContent = 'Command queued!';
-                setTimeout(() => { if (msgEl) msgEl.textContent = ''; }, 3000);
-            }
-            refreshDashboard();
-        } else {
-            alert(data.error || 'Failed to update pump state.');
-            if (msgEl) msgEl.textContent = '';
+        if (!data.success) {
+            alert(data.error || 'Failed to dispatch pump command.');
         }
     })
     .catch(err => {
         console.error(err);
-        if (msgEl) msgEl.textContent = 'Network error.';
     });
 }
 
@@ -331,5 +403,38 @@ if (btnPumpAuto) btnPumpAuto.addEventListener('click', () => setPumpOverride('au
 refreshDashboard();
 setInterval(refreshDashboard, 3000);
 </script>
+
+<!-- Hardware Synchronization & Anti-Spam Loading Overlay (10s lock) -->
+<div id="pumpLoadingOverlay" style="display: none; position: fixed; inset: 0; z-index: 10500; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(8px); align-items: center; justify-content: center; padding: 1.5rem;">
+    <div class="card shadow-lg border-0 text-center" style="max-width: 450px; width: 100%; border-radius: 1rem; background: #1e293b; color: #f8fafc; border: 1px solid rgba(255, 255, 255, 0.1) !important;">
+        <div class="card-body p-4 p-md-5">
+            <div class="mb-3 position-relative d-inline-block">
+                <div class="spinner-border text-warning" style="width: 3.75rem; height: 3.75rem; border-width: 0.3em;" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <div class="position-absolute top-50 start-50 translate-middle fs-5" id="pumpLoadingIcon">
+                    ⚡
+                </div>
+            </div>
+            
+            <h5 class="fw-bold mb-1" id="pumpLoadingTitle">Syncing Hardware Command</h5>
+            <p class="text-secondary small mb-3" id="pumpLoadingSubtitle">
+                Transmitting command to ESP8266 & Arduino controller. Locking interface to protect SIM800L/SIM900A GSM module from request collisions.
+            </p>
+
+            <div class="display-5 fw-bold text-warning mb-2 font-monospace" id="pumpLoadingTimer">
+                10.0s
+            </div>
+
+            <div class="progress mb-3" style="height: 10px; background-color: rgba(255,255,255,0.1); border-radius: 5px; overflow: hidden;">
+                <div id="pumpLoadingBar" class="progress-bar progress-bar-striped progress-bar-animated bg-warning" role="progressbar" style="width: 100%; transition: width 0.1s linear;"></div>
+            </div>
+
+            <div class="badge bg-dark border border-secondary text-info px-3 py-2 text-wrap" id="pumpLoadingStep" style="font-size: 0.82rem; font-weight: 500;">
+                Initializing cellular link & stabilizing power rails...
+            </div>
+        </div>
+    </div>
+</div>
 
 <?php include __DIR__ . '/partials/footer.php'; ?>
