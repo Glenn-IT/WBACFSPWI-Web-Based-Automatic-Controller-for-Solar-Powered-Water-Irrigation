@@ -12,6 +12,7 @@ $schedules = array_map(function ($s) {
         'id' => (int) $s['id'],
         'label' => $s['label'],
         'start_time' => substr($s['start_time'], 0, 5),
+        'duration_seconds' => (int) $s['duration_minutes'],
         'duration_minutes' => (int) $s['duration_minutes'],
         'days_of_week' => explode(',', $s['days_of_week']),
     ];

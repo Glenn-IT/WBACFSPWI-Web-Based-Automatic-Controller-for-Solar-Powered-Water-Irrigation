@@ -274,7 +274,7 @@ function refreshDashboard() {
                 scheduleEl.textContent = 'No schedules run today.';
             } else {
                 scheduleEl.innerHTML = '<ul class="list-unstyled mb-0">' + data.today_schedules.map(s =>
-                    `<li class="mb-1"><strong>${s.label}</strong> — ${s.start_time} (${s.duration_minutes} min)</li>`
+                    `<li class="mb-1"><strong>${s.label}</strong> — ${s.start_time} (${s.duration_seconds || s.duration_minutes} sec)</li>`
                 ).join('') + '</ul>';
             }
 

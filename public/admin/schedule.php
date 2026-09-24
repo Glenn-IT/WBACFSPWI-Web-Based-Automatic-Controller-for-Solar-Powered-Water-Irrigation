@@ -32,6 +32,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
+        if ($action === 'test_run') {
+            $id = (int) ($_POST['id'] ?? 0);
+            $res = Schedule::triggerTestRun($id, (int) $user['id']);
+            if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+                header('Content-Type: application/json');
+                echo json_encode($res);
+                exit;
+            }
+            header('Location: ' . BASE_URL . '/admin/schedule.php?test_run=' . $id);
+            exit;
+        }
+
         if ($action === 'save') {
             $label = trim($_POST['label'] ?? '');
             $startTime = $_POST['start_time'] ?? '';
@@ -107,9 +119,13 @@ include __DIR__ . '/partials/sidebar.php';
                                value="<?= htmlspecialchars($editing['start_time'] ?? '') ?>">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Duration (minutes)</label>
-                        <input type="number" name="duration_minutes" min="1" class="form-control" required
-                               value="<?= htmlspecialchars((string) ($editing['duration_minutes'] ?? '')) ?>">
+                        <label class="form-label fw-semibold">Duration (seconds)</label>
+                        <input type="number" name="duration_minutes" min="1" max="3600" class="form-control" required
+                               value="<?= htmlspecialchars((string) ($editing['duration_minutes'] ?? '15')) ?>"
+                               placeholder="e.g. 10, 15, 30">
+                        <div class="form-text text-muted" style="font-size: 0.8rem;">
+                            Presentation mode: duration is configured in seconds (e.g. 10s, 15s, 30s) for live demonstration.
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label d-block">Days of Week</label>
@@ -159,7 +175,7 @@ include __DIR__ . '/partials/sidebar.php';
                             <tr>
                                 <td><?= htmlspecialchars($s['label']) ?></td>
                                 <td><?= htmlspecialchars(substr($s['start_time'], 0, 5)) ?></td>
-                                <td><?= (int) $s['duration_minutes'] ?> min</td>
+                                <td><span class="badge bg-light text-dark border"><?= (int) $s['duration_minutes'] ?>s</span></td>
                                 <td><?= htmlspecialchars(strtoupper(str_replace(',', ', ', $s['days_of_week']))) ?></td>
                                 <td>
                                     <span class="badge <?= $s['is_active'] ? 'bg-success' : 'bg-secondary' ?>">
@@ -167,6 +183,13 @@ include __DIR__ . '/partials/sidebar.php';
                                     </span>
                                 </td>
                                 <td class="text-end text-nowrap">
+                                    <?php if ($s['is_active']): ?>
+                                        <button type="button" class="btn btn-sm btn-outline-success" 
+                                                onclick="startScheduleTestRun(<?= (int) $s['id'] ?>, '<?= htmlspecialchars(addslashes($s['label'])) ?>', <?= (int) $s['duration_minutes'] ?>)"
+                                                title="Trigger an immediate presentation test run of this schedule">
+                                            ▶ Test Run
+                                        </button>
+                                    <?php endif; ?>
                                     <a href="<?= BASE_URL ?>/admin/schedule.php?edit=<?= (int) $s['id'] ?>" class="btn btn-sm btn-outline-primary">Edit</a>
                                     <form method="post" action="<?= BASE_URL ?>/admin/schedule.php" class="d-inline">
                                         <?= Csrf::field() ?>
@@ -193,5 +216,106 @@ include __DIR__ . '/partials/sidebar.php';
         </div>
     </div>
 </div>
+
+<!-- Schedule Presentation Test Run Loading Overlay -->
+<div id="schedLoadingOverlay" style="display: none; position: fixed; inset: 0; z-index: 10500; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(8px); align-items: center; justify-content: center; padding: 1.5rem;">
+    <div class="card shadow-lg border-0 text-center" style="max-width: 460px; width: 100%; border-radius: 1rem; background: #1e293b; color: #f8fafc; border: 1px solid rgba(255, 255, 255, 0.1) !important;">
+        <div class="card-body p-4 p-md-5">
+            <div class="mb-3 position-relative d-inline-block">
+                <div class="spinner-border text-success" style="width: 3.75rem; height: 3.75rem; border-width: 0.3em;" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <div class="position-absolute top-50 start-50 translate-middle fs-5" id="schedLoadingIcon">
+                    💧
+                </div>
+            </div>
+            
+            <h5 class="fw-bold mb-1" id="schedLoadingTitle">Running Irrigation Schedule</h5>
+            <p class="text-secondary small mb-3" id="schedLoadingSubtitle">
+                Presentation Test Run active. Server commanding PUMP_ON to hardware for scheduled seconds cycle.
+            </p>
+
+            <div class="display-5 fw-bold text-success mb-2 font-monospace" id="schedLoadingTimer">
+                --s
+            </div>
+
+            <div class="progress mb-3" style="height: 10px; background-color: rgba(255,255,255,0.1); border-radius: 5px; overflow: hidden;">
+                <div id="schedLoadingBar" class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 100%; transition: width 0.1s linear;"></div>
+            </div>
+
+            <div class="badge bg-dark border border-secondary text-info px-3 py-2 text-wrap" id="schedLoadingStep" style="font-size: 0.82rem; font-weight: 500;">
+                Actuating pump relay & irrigating miniature rice field...
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function startScheduleTestRun(id, label, durationSec) {
+    if (!confirm(`Trigger presentation test run for "${label}" (${durationSec} seconds)?`)) {
+        return;
+    }
+
+    const overlay = document.getElementById('schedLoadingOverlay');
+    const timerEl = document.getElementById('schedLoadingTimer');
+    const barEl = document.getElementById('schedLoadingBar');
+    const titleEl = document.getElementById('schedLoadingTitle');
+    const subtitleEl = document.getElementById('schedLoadingSubtitle');
+    const stepEl = document.getElementById('schedLoadingStep');
+
+    if (titleEl) titleEl.textContent = `Schedule: ${label}`;
+    if (subtitleEl) subtitleEl.textContent = `Presentation test run (${durationSec}s cycle). Server has dispatched PUMP_ON to hardware.`;
+    if (timerEl) timerEl.textContent = durationSec.toFixed(1) + 's';
+    if (barEl) barEl.style.width = '100%';
+    if (overlay) overlay.style.display = 'flex';
+
+    // Post to trigger
+    const formData = new URLSearchParams();
+    formData.append('action', 'test_run');
+    formData.append('id', id);
+    formData.append('csrf_token', '<?= Csrf::token() ?>');
+
+    fetch('<?= BASE_URL ?>/admin/schedule.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: formData
+    }).catch(err => console.error(err));
+
+    // Countdown timer matching durationSec
+    const totalDurationMs = durationSec * 1000;
+    const intervalMs = 100;
+    let elapsedMs = 0;
+
+    const timer = setInterval(() => {
+        elapsedMs += intervalMs;
+        const remainingMs = Math.max(0, totalDurationMs - elapsedMs);
+        const remainingSec = (remainingMs / 1000).toFixed(1);
+        const percent = (remainingMs / totalDurationMs) * 100;
+
+        if (timerEl) timerEl.textContent = remainingSec + 's';
+        if (barEl) barEl.style.width = percent + '%';
+
+        if (stepEl) {
+            if (remainingMs > 5000) {
+                stepEl.textContent = `Pumping standing water (Target duration: ${durationSec}s)...`;
+            } else if (remainingMs > 1500) {
+                stepEl.textContent = 'Approaching cycle completion & settling window...';
+            } else {
+                stepEl.textContent = 'Auto-stopping pump & resetting mode...';
+            }
+        }
+
+        if (elapsedMs >= totalDurationMs) {
+            clearInterval(timer);
+            if (overlay) overlay.style.display = 'none';
+            alert(`Schedule "${label}" completed its ${durationSec}-second presentation run!`);
+            location.reload();
+        }
+    }, intervalMs);
+}
+</script>
 
 <?php include __DIR__ . '/partials/footer.php'; ?>

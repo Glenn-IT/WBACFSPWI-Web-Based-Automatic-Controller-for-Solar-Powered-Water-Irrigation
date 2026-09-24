@@ -148,17 +148,22 @@ The standalone Arduino Uno controller (`wbacfspwi_arduino_controller.ino`) and i
   }
   ```
 
-### Endpoint 2: Device Pull Schedule
+### Endpoint 2: Device Pull Schedule & Server-Driven Schedule Execution Engine
 - **URL:** `GET /api/device/pull-schedule.php`
 - **Headers:** `X-API-Key: <DEVICE_API_KEY>`
+- **Presentation Timing:** Schedule duration is measured and executed in **seconds** (e.g. 10s, 15s, 30s) for live demonstration efficiency.
+- **Server Execution Engine:** The server evaluates active schedules in `Schedule::getActiveRunningSchedule()`. When current real-world clock time falls within an active schedule window (`start_time` $\rightarrow$ `start_time + duration_seconds`), `POST /api/device/report.php` automatically returns `"command": "PUMP_ON"` with `"schedule_active": true`.
+- **Automatic Revert:** When duration seconds elapse, the server returns `"command": "PUMP_AUTO"` to disengage the pump and return to autonomous sensor thresholds.
+- **Presentation Test Run:** Each active schedule on [`public/admin/schedule.php`](file:///C:/xampp/htdocs/WBACFSPWI-Web-Based-Automatic-Controller-for-Solar-Powered-Water-Irrigation/public/admin/schedule.php) features an immediate **"▶ Test Run"** action with interactive visual countdown overlay for instant defense demonstration.
 - **Response Body:**
   ```json
   {
     "schedules": [
       {
         "id": 1,
-        "label": "Morning Irrigation",
+        "label": "Morning Irrigation Demo",
         "start_time": "06:00",
+        "duration_seconds": 15,
         "duration_minutes": 15,
         "days_of_week": ["mon", "wed", "fri"]
       }

@@ -42,6 +42,7 @@ echo json_encode([
     'today_schedules' => array_map(fn($s) => [
         'label' => $s['label'],
         'start_time' => substr($s['start_time'], 0, 5),
+        'duration_seconds' => (int) $s['duration_minutes'],
         'duration_minutes' => (int) $s['duration_minutes'],
     ], $allSchedules),
     'alerts' => array_map(fn($a) => [

@@ -31,10 +31,21 @@ class Override
             return 'PUMP_AUTO';
         }
 
+        // Check if test_run_seconds is specified in reason (e.g. "test_run_seconds:15")
+        if (!empty($latest['reason']) && preg_match('/test_run_seconds:(\d+)/', $latest['reason'], $m)) {
+            $testRunSec = (int) $m[1];
+            $createdTs = strtotime($latest['created_at']);
+            if (time() - $createdTs >= $testRunSec) {
+                self::clearAll();
+                return 'PUMP_AUTO';
+            }
+        }
+
         // Check if auto_revert_minutes has expired
         if (!empty($latest['auto_revert_minutes'])) {
             $createdTs = strtotime($latest['created_at']);
             if (time() - $createdTs > ($latest['auto_revert_minutes'] * 60)) {
+                self::clearAll();
                 return 'PUMP_AUTO';
             }
         }

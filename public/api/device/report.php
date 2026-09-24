@@ -27,7 +27,10 @@ $soilMoisture = isset($payload['soil_moisture']) ? (float) $payload['soil_moistu
 $waterLevel = isset($payload['water_level']) ? (float) $payload['water_level'] : null;
 $batteryVoltage = isset($payload['battery_voltage']) ? (float) $payload['battery_voltage'] : null;
 $solarOutput = isset($payload['solar_output']) ? (float) $payload['solar_output'] : null;
-$scheduleId = isset($payload['schedule_id']) ? (int) $payload['schedule_id'] : null;
+$runningSchedule = Schedule::getActiveRunningSchedule();
+if ($scheduleId === null && $runningSchedule !== null) {
+    $scheduleId = (int) $runningSchedule['id'];
+}
 
 SensorReading::create([
     'soil_moisture' => $soilMoisture,
@@ -68,8 +71,15 @@ if ($batteryVoltage !== null && $batteryVoltage > ALERT_HIGH_BATTERY_VOLTS && !A
 
 $activeCommand = Override::getActiveCommand();
 
+// If no manual override is active, check if automated schedule engine requires pump ON
+if ($activeCommand === 'PUMP_AUTO' && $runningSchedule !== null) {
+    $activeCommand = 'PUMP_ON';
+}
+
 echo json_encode([
     'status' => 'ok',
     'alerts_created' => $newAlerts,
     'command' => $activeCommand,
+    'schedule_active' => $runningSchedule !== null,
+    'schedule_id' => $scheduleId,
 ]);
